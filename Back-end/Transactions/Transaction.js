@@ -17,7 +17,7 @@ const TransactionSchema = new mongoose.Schema({
     type: String,
     enum: ['Sale', 'Expense', 'Purchase']
   },
-  performedBy: { type: ObjectId, ref: 'User' },
+  performedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   date: {type:Date,required:true,default:Date.now},
   note: {type:String,required:true}
 },{timestamps:true});

@@ -17,15 +17,27 @@ export const globalErrorHandler = (err, req, res, next) => {
     });
   } else {
     if (err.isOperational) {
-        // if (err.name === 'CastError') err = handleCastErrorDB(err);
-        // if (err.code === 11000) err = handleDuplicateFieldsDB(err);
-        // if (err.name === 'ValidationError') err = handleValidationErrorDB(err);
+      
+        
       res.status(statusCode).json({
         status: "error",
         message,
       });
     } else {
-      res.status(statusCode).json({
+      console.error("Error =>", err);
+      // if(err.heartbeatFrequencyMS === 10000){
+        
+      // }
+      //   if (err.name === 'CastError') err = handleCastErrorDB(err);
+      //   if (err.code === 11000) err = handleDuplicateFieldsDB(err);
+        if (err.name === 'ValidationError'){
+          console.log(' this is the error from validation in production')
+          const errors = Object.values(err.errors).map(error => error.message);
+          console.log(errors)
+            res.status(400).send(errors);
+       
+        }
+      res.status(500).json({
         status: "error",
         message: "Internal Server Error",
       });
