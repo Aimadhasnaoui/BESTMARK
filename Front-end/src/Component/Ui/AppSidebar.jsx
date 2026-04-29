@@ -122,7 +122,7 @@ export default function AppSidebar() {
             <SidebarMenuButton asChild>
               <a
                 href="#"
-                className="rounded-none cursor-pointer transition-all border-l-4 border-transparent !hover:bg-red-100 text-red-500"
+                className="rounded-none cursor-pointer transition-all border-l-4 border-transparent !hover:bg-red-100 text-red-500 !hover:text-white"
               >
                 <LogOut size={24} />
                 <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
