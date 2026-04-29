@@ -14,9 +14,7 @@ import {
   SidebarMenuAction,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { CollapsibleTrigger } from "@/components/ui/collapsible";
-import { CollapsibleContent } from "@/components/ui/collapsible";
-import { Collapsible } from "@/components/ui/collapsible";
+import { Link } from "react-router-dom";
 import {
   User2,
   Plus,
@@ -39,13 +37,13 @@ export default function AppSidebar() {
   const [currentPage, setcurrentPage] = useState("dashboard");
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "products", label: "Products", icon: Package },
-    { id: "stock", label: "Stock Management", icon: ClipboardList },
-    { id: "sales", label: "Sales & POS", icon: Receipt },
-    { id: "finance", label: "Finance", icon: Banknote },
-    { id: "suppliers", label: "Suppliers & Employees", icon: Users2 },
-    { id: "requests", label: "Customer Requests", icon: HelpCircle },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard,path: "/dashboard" },
+    { id: "products", label: "Products", icon: Package,path: "/products" },
+    { id: "stock", label: "Stock Management", icon: ClipboardList,path: "/stock" },
+    { id: "sales", label: "Sales & POS", icon: Receipt,path: "/sales" },
+    { id: "finance", label: "Finance", icon: Banknote,path: "/finance" },
+    { id: "suppliers", label: "Suppliers & Employees", icon: Users2,path: "/suppliers" },
+    { id: "requests", label: "Customer Requests", icon: HelpCircle,path: "/requests" },
   ];
 
   return (
@@ -76,8 +74,7 @@ export default function AppSidebar() {
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton asChild>
-                <a
-                  href="#"
+                <Link to={item.path}
                   onClick={() => setcurrentPage(item.id)}
                   className={`rounded-none cursor-pointer transition-all  ${
                     currentPage === item.id
@@ -89,7 +86,7 @@ export default function AppSidebar() {
                   <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
                     {item.label}
                   </span>
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -102,8 +99,7 @@ export default function AppSidebar() {
         <SidebarMenu className="gap-2">
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a
-                href="#"
+              <Link to="/settings"
                 onClick={() => setcurrentPage("settings")}
                 className={`rounded-none cursor-pointer transition-all ${
                   currentPage === "settings"
@@ -115,20 +111,21 @@ export default function AppSidebar() {
                 <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
                   Settings
                 </span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <a
+              <button
                 href="#"
+                // onClick={handleLogout}
                 className="rounded-none cursor-pointer transition-all border-l-4 border-transparent !hover:bg-red-100 text-red-500 !hover:text-white"
               >
                 <LogOut size={24} />
                 <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
                   Logout
                 </span>
-              </a>
+              </button>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
