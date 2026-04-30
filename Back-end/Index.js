@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import cors from "cors";
 import {
   handeUnhanledRoute,
   globalErrorHandler,
@@ -31,6 +32,7 @@ mongoose
     console.log("Database connection failed", error);
   });
 app.use(express.json());
+app.use(cors());
 app.disable("x-powered-by");
 
 app.use("/api/users", User);
@@ -44,7 +46,7 @@ app.use("/api/sales", Sale);
 app.use("/api/employees", Employee);
 app.use("/api/employee-types", EmployeeType);
 app.use("/api/products", Product);
-app.use("/api/categories", Category);
+app.use("/api/categories/products", Category);
 app.use("/api/expenses", Expense);
 app.use("/api/expense-types", ExpenseType);
 

@@ -13,8 +13,8 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Search } from "lucide-react";
-
+import { Search, AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton"; 
 export function DataTable({
   data,
   columns,
@@ -22,6 +22,10 @@ export function DataTable({
   ButtonText = "Ajouter",
   onButtonClick,
   TableTitle,
+  isLoading,
+  isError,
+  ErrorMessage='Error Occured while fetching data',
+  
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -90,15 +94,43 @@ export function DataTable({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.map((row) => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className={`px-5 py-4 border-b ${cell.column.columnDef.className || ''}`}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            {
+              isLoading ? (
+                Array.from({ length: 10 }).map((_, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    {
+                      columns.map((column) => (
+                        <td key={column.id} className="px-5 py-4 border-b">
+                          <Skeleton className="h-4 w-[250px]" />
+                        </td>
+                      ))
+                    }
+             
+                  </tr>
+                ))
+              ) :isError ? (
+                <tr>
+                  <td colSpan={columns.length} className="py-20">
+                    <div className="flex flex-col items-center justify-center gap-3">
+                      <div className="bg-red-50 p-4 rounded-full">
+                        <AlertCircle className="h-10 w-10 text-red-500" />
+                      </div>
+                      <p className="text-red-600 text-lg font-semibold">{ErrorMessage}</p>
+                    </div>
                   </td>
-                ))}
-              </tr>
-            ))}
+                </tr>
+              ) : (
+                table.getRowModel().rows.map((row) => (
+                  <tr key={row.id} className="hover:bg-gray-50 transition-colors">
+                    {row.getVisibleCells().map((cell) => (
+                      <td key={cell.id} className={`px-5 py-4 border-b text-[#1E293B] ${cell.column.columnDef.className || ''}`}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              )
+            }
           </tbody>
         </table>
       </div>

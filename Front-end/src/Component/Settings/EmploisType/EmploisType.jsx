@@ -1,4 +1,4 @@
-import { DataTable } from "@/Component/UI/DataTable";
+import { DataTable } from "@/Component/Ui/DataTable";
 import { useMemo } from "react";
 
 const mockData = [

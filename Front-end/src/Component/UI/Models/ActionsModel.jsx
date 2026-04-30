@@ -12,7 +12,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 
 
-export function ActionsModel({ children, title = "Edit Profile",open, setIsOpen ,handleSubmit}) {
+export function ActionsModel({ children, title = "Edit Profile",open, setIsOpen ,handleSubmit,isPending}) {
   return (
     <Dialog open={open} onOpenChange={setIsOpen}> 
  <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden flex flex-col max-h-[85vh]">
@@ -26,9 +26,6 @@ export function ActionsModel({ children, title = "Edit Profile",open, setIsOpen 
           <div className="p-6">
             {children}
           </div>
-
-          <Separator />
-
           <DialogFooter className="  flex items-center gap-2">
           <div className="flex justify-end gap-4 w-full px-4 py-2">
               <Button
@@ -45,7 +42,7 @@ export function ActionsModel({ children, title = "Edit Profile",open, setIsOpen 
                 onClick={handleSubmit}
               className="bg-[#0050CB] hover:bg-[#0040a3] text-white px-8 cursor-pointer"
             >
-              Save changes
+              {isPending ? "Saving..." : "Save changes"}
             </Button>
           </div>
           </DialogFooter>

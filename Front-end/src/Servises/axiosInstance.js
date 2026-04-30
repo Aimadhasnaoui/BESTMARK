@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const axiosInstance=axios.create({
-    baseURL:process.env.VITE_BASE_URL,
+    baseURL:import.meta.env.VITE_BASE_URL,
 })
 
 // Attach token to outgoing requests
