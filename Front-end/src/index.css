@@ -128,3 +128,8 @@
     @apply font-sans;
     }
 }
+.scroll-container,
+.hide-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}

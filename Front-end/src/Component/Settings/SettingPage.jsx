@@ -1,6 +1,9 @@
 import React from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { PackageSearch,UserCog,IdCardLanyard } from 'lucide-react'
+import ProductType from './Pages/ProductType'
+import EmploisType from './Pages/EmploisType'
+import Profile from './pages/Profil/Profile'
 export default function SettingPage() {
   return (
     <div className=''>
@@ -13,9 +16,9 @@ export default function SettingPage() {
         <TabsTrigger value="reports" className='flex text-md flex-row gap-3 items-center cursor-pointer pb-2'>
           <UserCog/>Profile</TabsTrigger>
       </TabsList>
-        <TabsContent value="overview">Product Types</TabsContent>
-      <TabsContent value="analytics">Employee Types</TabsContent>
-      <TabsContent value="reports">Profile</TabsContent>
+        <TabsContent value="overview"><ProductType/></TabsContent>
+      <TabsContent value="analytics"><EmploisType/></TabsContent>
+      <TabsContent value="reports"><Profile/></TabsContent>
     </Tabs>
     </div>
   )
