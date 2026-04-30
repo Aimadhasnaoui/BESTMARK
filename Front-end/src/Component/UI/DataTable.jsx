@@ -59,6 +59,7 @@ export function DataTable({
         </InputGroup>
         {isAjouter && (
           <Button
+            size="lg"
             className="bg-[#0050CB] cursor-pointer text-white rounded-md py-4 px-2"
             onClick={onButtonClick}
           >
@@ -77,7 +78,7 @@ export function DataTable({
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-6 py-5 border-b text-left text-[#64748B]"
+                    className={`px-6 py-5 border-b text-left text-[#64748B] ${header.column.columnDef.className || ''}`}
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -92,7 +93,7 @@ export function DataTable({
             {table.getRowModel().rows.map((row) => (
               <tr key={row.id} className="hover:bg-gray-50">
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-5 py-4 border-b">
+                  <td key={cell.id} className={`px-5 py-4 border-b ${cell.column.columnDef.className || ''}`}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

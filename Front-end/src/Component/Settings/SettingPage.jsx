@@ -1,8 +1,8 @@
 import React from 'react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { PackageSearch,UserCog,IdCardLanyard } from 'lucide-react'
-import ProductType from './Pages/ProductType'
-import EmploisType from './Pages/EmploisType'
+import ProductType from './Pages/ProductType/ProductType'
+import EmploisType from './EmploisType/EmploisType'
 import Profile from './pages/Profil/Profile'
 export default function SettingPage() {
   return (
