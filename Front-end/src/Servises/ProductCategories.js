@@ -18,7 +18,7 @@ export const GetCategorys = async () => {
     }
 };
 
-export const UpdateCategory = async (id, data) => {
+export const UpdateCategory = async ({id, data}) => {
     try {
         const response = await axiosInstance.patch(`/categories/products/${id}`, data);
         return response.data;

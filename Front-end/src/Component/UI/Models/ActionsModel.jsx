@@ -10,9 +10,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator"
+import ErrorAlert from "@/Component/Ui/ErrorAlert";
 
 
-export function ActionsModel({ children, title = "Edit Profile",open, setIsOpen ,handleSubmit,isPending}) {
+export function ActionsModel({ children, title = "Edit Profile",open, setIsOpen ,handleSubmit,isPending, isError, error, errorTitle = "Erreur de validation"}) {
   return (
     <Dialog open={open} onOpenChange={setIsOpen}> 
  <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden flex flex-col max-h-[85vh]">
@@ -24,6 +25,12 @@ export function ActionsModel({ children, title = "Edit Profile",open, setIsOpen 
           
           {/* Main Content Area */}
           <div className="p-6">
+            {isError && (
+              <ErrorAlert
+                message={error?.message || "Une erreur est survenue lors du traitement."}
+                title={errorTitle}
+              />
+            )}
             {children}
           </div>
           <DialogFooter className="  flex items-center gap-2">

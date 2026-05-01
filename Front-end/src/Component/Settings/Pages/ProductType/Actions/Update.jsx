@@ -11,27 +11,32 @@ import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpdateCategory } from "@/Servises/ProductCategories";
-
+import { toast } from "sonner";
 export default function Update({ isUpdating, setIsUpdating, selectedType }) {
   const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     values: selectedType, // Pre-fill the form with selected item data
   });
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: (data) => UpdateCategory(selectedType.id, data),
+  const { mutate, isPending,error,isError } = useMutation({
+    mutationFn: UpdateCategory,
     onSuccess: () => {
       setIsUpdating(false);
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-    },
+        toast("Product type has been updated", { variant: "success"})
+        reset();
+        console.log('hello')
+
+      },
   });
 
   const onSubmit = (data) => {
-    mutate({ id: selectedType.id, data });
+    mutate( {id: selectedType._id, data} );
   };
 
   return (
@@ -43,6 +48,9 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
           title="Update Product Type"
           handleSubmit={handleSubmit(onSubmit)}
           isPending={isPending}
+          isError={isError}
+          error={error}
+          errorTitle="Échec de la mise à jour des données"
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FieldSet>

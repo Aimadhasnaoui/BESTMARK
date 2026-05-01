@@ -16,7 +16,7 @@ import {
 import { Search, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton"; 
 export function DataTable({
-  data,
+  data = [],
   columns,
   isAjouter = true,
   ButtonText = "Ajouter",
@@ -76,13 +76,13 @@ export function DataTable({
       {/* The Table UI */}
       <div className="h-[600px] overflow-auto  shadow-sm hide-scrollbar">
         <table className="min-w-full   bg-white border border-gray-200">
-          <thead className="bg-[#F8FAFC] sticky top-0 z-10 w-full">
+          <thead className="bg-[#2563EB] sticky top-0 z-10 w-full">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className={`px-6 py-5 border-b text-left text-[#64748B] ${header.column.columnDef.className || ''}`}
+                    className={`px-6 py-5 border-b text-left text-white ${header.column.columnDef.className || ''}`}
                   >
                     {flexRender(
                       header.column.columnDef.header,

@@ -9,23 +9,27 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { useMutation,useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddCategory } from "@/Servises/ProductCategories";
+import { toast } from "sonner";
 // import { Switch } from "@/components/ui/switch"
 export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm();
-  const {mutate,isPending} = useMutation({
+  const { mutate, isPending, error, isError } = useMutation({
     mutationFn: AddCategory,
     onSuccess: () => {
       setIsAdding(false);
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Product type has been added successfully");
+      reset();
     },
-  })
+  });
   const onSubmit = (data) => {
     console.log("Form Data:", data);
     // handleSubmitAdd(data);
@@ -41,6 +45,9 @@ export default function Add({ isAdding, setIsAdding }) {
           title="Add Product Type"
           handleSubmit={handleSubmit(onSubmit)}
           isPending={isPending}
+          isError={isError}
+          error={error}
+          errorTitle="Échec de l'ajout des données"
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FieldSet>

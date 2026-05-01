@@ -1,18 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Trash2, AlertTriangle, X } from "lucide-react";
-
+import ErrorAlert from "../ErrorAlert";
 export default function DeletModel({
   open,
   setIsOpen,
   handelDelet,
   title = "Supprimer ?",
   description,
-  loading = false,
+  isPending,
   itemName = "",
   haswaring = false,
   hasWaringMsg = "",
   DeleteMsg = "",
+  isError,
+  error,
+  errorTitle="Erreur de validation",
 }) {
   return (
     <Dialog open={open} onOpenChange={setIsOpen}>
@@ -20,6 +23,12 @@ export default function DeletModel({
         showCloseButton={false}
         className="sm:max-w-[420px] p-0 overflow-hidden border-none bg-white shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-300"
       >
+        {isError && (
+          <ErrorAlert
+            message={error?.message || "Une erreur est survenue lors du traitement."}
+            title={errorTitle}
+          />
+        )}
         <div className="flex flex-col items-center pt-12 pb-8 px-8 text-center">
           {/* Circular Trash Icon with Glow Effect */}
           <div className="relative mb-8">
@@ -70,10 +79,10 @@ export default function DeletModel({
             <Button
               type="button"
               onClick={handelDelet}
-              disabled={loading}
+              disabled={isPending}
               className="flex-1 py-7 bg-[#C21E1E] hover:bg-[#A61919] text-white shadow-lg shadow-red-100 transition-all duration-200 font-bold text-base rounded-2xl cursor-pointer"
             >
-              {loading ? (
+              {isPending ? (
                 <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 "Supprimer"
