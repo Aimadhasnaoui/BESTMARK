@@ -13,9 +13,11 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Search, AlertCircle } from "lucide-react";
+import { Search, AlertCircle, ArrowUpRight, ArrowDownLeft, Box, Layers, DollarSign, BarChart3, Archive, Bell, Truck, MoreHorizontal, Filter, ListFilter } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton"; 
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
+// import Filter from "./Actions/Filter";
+
 export default function ProductTable({
   data = [],
   TableTitle,
@@ -25,14 +27,48 @@ export default function ProductTable({
   onDelete,
   onEdit,
   onSee
-  
-  
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [filters, setFilters] = useState({
+    category: null,
+    supplier: null,
+    stockStatus: "all",
+    priceRange: [0, 20000],
+  });
+
+  const filteredData = useMemo(() => {
+    return data.filter((item) => {
+      // Category filter
+      if (filters.category && item.category?._id !== filters.category._id) return false;
+      
+      // Supplier filter
+      if (filters.supplier && item.supplier?._id !== filters.supplier._id) return false;
+      
+      // Stock Status filter
+      if (filters.stockStatus === "lowStock") {
+        if (!(item.quantity > 0 && item.quantity <= item.minStockAlert)) return false;
+      } else if (filters.stockStatus === "outOfStock") {
+        if (item.quantity > 0) return false;
+      } else if (filters.stockStatus === "inStock") {
+        if (item.quantity === 0) return false;
+      }
+      
+      // Price Range filter
+      if (item.sellingPrice < filters.priceRange[0] || item.sellingPrice > filters.priceRange[1]) return false;
+      
+      return true;
+    });
+  }, [data, filters]);
   const columns = useMemo(
     () => [
       {
-        header: "PRODUCT",
+        header: () => (
+          <div className="flex items-center gap-2">
+            <Box className="w-4 h-4 text-blue-600" />
+            <span>PRODUCT</span>
+          </div>
+        ),
         accessorKey: "image",
         cell: ({ row }) => (
           <div className='w-[300px] flex items-center gap-4'>
@@ -60,28 +96,60 @@ export default function ProductTable({
         ),
       },
       {
-        header: "CATEGORY",
+        header: () => (
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-indigo-600" />
+            <span>CATEGORY</span>
+          </div>
+        ),
         accessorKey: "category.name",
          cell: ({ row }) => (
-          <span className="font-semibold  text-gray-500">{row.original.category.name}</span>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100 uppercase tracking-wider">
+            {row.original.category.name}
+          </span>
         )
       },
     {
-        header: "PRICE",
+        header: () => (
+          <div className="flex items-center gap-2">
+            <DollarSign className="w-4 h-4 text-green-600" />
+            <span>PRICE</span>
+          </div>
+        ),
         accessorKey: "sellingPrice",
         cell: ({ row }) => (
-          <div className='flex flex-col gap-1 w-[100px] items-center'>
-            <p className='font-semibold'>{row.original.sellingPrice} DH</p>
-            <p className='text-xs text-gray-500'>{row.original.buyingPrice} DH</p>
+          <div className='flex flex-col gap-1.5 w-[110px]'>
+            <div className='flex items-center gap-2'>
+              <div className='flex items-center justify-center w-6 h-6 rounded-md bg-green-50 text-green-600'>
+                <ArrowUpRight className='w-3.5 h-3.5' />
+              </div>
+              <span className='font-bold text-[0.9rem] text-slate-800'>{row.original.sellingPrice} <span className='text-[0.7rem] text-slate-500 font-medium'>DH</span></span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <div className='flex items-center justify-center w-6 h-6 rounded-md bg-amber-50 text-amber-600'>
+                <ArrowDownLeft className='w-3.5 h-3.5' />
+              </div>
+              <span className='text-xs font-semibold text-slate-500'>{row.original.buyingPrice} <span className='text-[0.6rem] text-slate-400'>DH</span></span>
+            </div>
           </div>
         )
       },
       {
-        header: "Number of sales",
+        header: () => (
+          <div className="flex items-center gap-2">
+            <BarChart3 className="w-4 h-4 text-purple-600" />
+            <span>SALES</span>
+          </div>
+        ),
         accessorKey: "Number_of_sales",
       },
       {
-        header: "Quantity",
+        header: () => (
+          <div className="flex items-center gap-2">
+            <Archive className="w-4 h-4 text-emerald-600" />
+            <span>QUANTITY</span>
+          </div>
+        ),
         accessorKey: "quantity",
         cell: ({ row }) => (
           <span className={`font-bold ${row.original.quantity <= row.original.minStockAlert ? 'text-red-500' : ''}`}>
@@ -90,15 +158,39 @@ export default function ProductTable({
         )
       },
       {
-        header: "Min Stock Alert",
+        header: () => (
+          <div className="flex items-center gap-2">
+            <Bell className="w-4 h-4 text-orange-600" />
+            <span>ALERT</span>
+          </div>
+        ),
         accessorKey: "minStockAlert",
       },
-            {
-        header: "Supplier",
+      {
+        header: () => (
+          <div className="flex items-center gap-2">
+            <Truck className="w-4 h-4 text-amber-600" />
+            <span>SUPPLIER</span>
+          </div>
+        ),
         accessorKey: "supplier.name",
+         cell: ({ row }) => (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wider ${
+            row.original.supplier 
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
+              : 'bg-slate-50 text-slate-500 border-slate-200'
+          }`}>
+            {row.original.supplier?.name || "Aucun fournisseur"}
+          </span>
+        )
       },
       {
-        header: "Actions",
+        header: () => (
+          <div className="flex items-center gap-2">
+            <MoreHorizontal className="w-4 h-4 text-gray-600" />
+            <span>ACTIONS</span>
+          </div>
+        ),
         accessorKey: "actions",
         className: "sticky right-0 bg-white border-l",
         cell: ({ row }) => (
@@ -117,7 +209,7 @@ export default function ProductTable({
   );
   // 2. The "Brain" of the table
   const table = useReactTable({
-    data,
+    data: filteredData,
     columns,
     state: {
       globalFilter,
@@ -134,31 +226,47 @@ export default function ProductTable({
   });
 
   return (
-    <div className="p-6">
+    <div className="">
       {/* Search Input */}
-      <div className="flex justify-between items-center py-2 mb-4">
-        <InputGroup className="w-[350px] rounded-md bg-white">
-          <InputGroupAddon>
-            <Search className="w-4 h-4 text-gray-400" />
-          </InputGroupAddon>
-          <InputGroupInput
-            placeholder="Search..."
-            value={globalFilter ?? ""}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-          />
-        </InputGroup>
+      <div className="flex justify-between items-center p-2 border rounded-t-xl shadow-sm  bg-white">
+        <div className="flex items-center gap-2">
+          <InputGroup className="w-[350px] rounded-md bg-white">
+            <InputGroupAddon>
+              <Search className="w-4 h-4 text-gray-400" />
+            </InputGroupAddon>
+            <InputGroupInput
+              placeholder="Search products..."
+              value={globalFilter ?? ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            />
+          </InputGroup>
+
+        </div>
+        
+        {/* Quick info or view toggles can go here */}
+        <div className="flex items-center gap-2 px-2">
+ 
+                   <Button 
+            variant="outline" 
+            className="flex items-center gap-2 text-slate-600 border-slate-200 hover:bg-slate-50"
+            onClick={() => setIsFiltering(true)}
+          >
+            <Filter className="w-4 h-4" />
+            <span className="text-sm font-medium">Filtrer</span>
+          </Button>
+        </div>
       </div>
 
       {/* The Table UI */}
       <div className="h-[600px] w-full bg-white overflow-x-auto shadow-sm hide-scrollbar ">
-        <table className="min-w-full  w-full    bg-white  ">
-          <thead className="sticky top-0 z-10 w-full bg-[#e2e8f0a3]   ">
+        <table className="min-w-full  w-full  bg-white  ">
+          <thead className="sticky top-0 z-10 w-full bg-slate-100  ">
             {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
+              <tr key={headerGroup.id} >
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className={`px-6 py-5 border-b text-centre text-black ${header.column.columnDef.className || ''}`}
+                    className={`px-6 py-3 border-b text-left text-[0.9rem] font-semibold text-slate-700 border-l ${header.column.columnDef.className || ''}`}
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -197,9 +305,9 @@ export default function ProductTable({
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => (
-                  <tr key={row.id} className="hover:bg-gray-50 transition-colors cursor-pointer text-center">
+                  <tr key={row.id} className="hover:bg-gray-50 transition-colors cursor-pointer text-center  ">
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className={`px-5 py-4 border-b text-[#1E293B] ${cell.column.columnDef.className || ''}`}>
+                      <td key={cell.id} className={`px-5 py-4 border-b text-[#1E293B] border-l ${cell.column.columnDef.className || ''}`}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -210,65 +318,53 @@ export default function ProductTable({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-t">
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-t rounded-b-xl shadow-sm">
         <div className="flex gap-2 items-center">
-          {/* Page Info */}
           <span className="text-sm text-gray-700">
-            montrer{" "}
-            <strong className="font-semibold">
-              {table.getState().pagination.pageIndex + 1}
-            </strong>{" "}
-            dans <strong className="font-semibold">{table.getPageCount()}</strong>{" "}
-            des produits
+            Montrant <span className="font-semibold">{table.getRowModel().rows.length}</span> sur{" "}
+            <span className="font-semibold">{filteredData.length}</span> produits filtrés
           </span>
-
-          {/* Page Size Selector */}
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-            className="p-1 border rounded bg-white text-sm"
-          >
-            {[50, 100, 200].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                {pageSize}
-              </option>
-            ))}
-          </select>
         </div>
         <div className="flex gap-2">
-          {/* First & Previous Buttons */}
           <button
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            className="px-3 py-1 border rounded disabled:opacity-50 bg-white text-sm"
           >
             {"<<"}
           </button>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            className="px-3 py-1 border rounded disabled:opacity-50 bg-white text-sm"
           >
-            Previous
+            Précédent
           </button>
-
-          {/* Next & Last Buttons */}
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            className="px-3 py-1 border rounded disabled:opacity-50 bg-white text-sm"
           >
-            Next
+            Suivant
           </button>
           <button
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            className="px-3 py-1 border rounded disabled:opacity-50 bg-white text-sm"
           >
             {">>"}
           </button>
         </div>
       </div>
+
+      {/* {isFiltering && (
+        <Filter 
+          isFiltering={isFiltering} 
+          setIsFiltering={setIsFiltering} 
+          onApplyFilters={setFilters} 
+          currentFilters={filters}
+        />
+      )} */}
     </div>
   );
 }

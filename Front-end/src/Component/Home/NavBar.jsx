@@ -6,6 +6,7 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Search,Bell  } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Avatar,
   AvatarBadge,
