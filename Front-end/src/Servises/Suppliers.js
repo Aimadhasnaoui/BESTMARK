@@ -1,4 +1,4 @@
-﻿import axiosInstance from './axiosInstance';
+import axiosInstance from './axiosInstance';
 
 export const AddSupplier = async (data) => {
     try {
@@ -10,7 +10,8 @@ export const AddSupplier = async (data) => {
 };
 
 export const GetSuppliers = async ({ queryKey }) => {
-    const { filter } = queryKey[1];
+    console.log(queryKey);
+    const filter = queryKey[1]?.filter || {};
     try {
         const response = await axiosInstance.get("/suppliers", { params: filter });
         return response.data;

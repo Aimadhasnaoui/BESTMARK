@@ -5,6 +5,7 @@ import NoAccesPage from "./Component/ErrorPage/NoAccesPage";
 import SettingPage from "./Component/Settings/SettingPage";
 import ProductsPage from "./Component/Products/ProducstPage";
 import SuppliersPage from "./Component/Suppliers/SuppliersPage";
+import EmployeesPage from "./Component/Employees/EmployeesPage";
 export const router = createBrowserRouter([
 //   {
 //     path: "/login",
@@ -32,6 +33,10 @@ export const router = createBrowserRouter([
       ,{
         path:"/suppliers",
         element:<SuppliersPage/>
+      }
+      ,{
+        path:"/employees",
+        element:<EmployeesPage/>
       }
       
         

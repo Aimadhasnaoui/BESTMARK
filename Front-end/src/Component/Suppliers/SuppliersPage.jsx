@@ -15,7 +15,7 @@ export default function SuppliersPage() {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
 
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ['suppliers'],
+    queryKey: ['ALLsuppliers'],
     queryFn: GetSuppliers,
   });
 
