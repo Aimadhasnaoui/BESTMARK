@@ -8,12 +8,12 @@ export const CreateProduct = catchAsync(async (req, res, next) => {
 });
 
 export const GetProducts = catchAsync(async (req, res, next) => {
-  const products = await Product.find();
+  const products = await Product.find().populate("category","name");
   res.status(200).json({ success: true, products });
 });
 
 export const GetProduct = catchAsync(async (req, res, next) => {
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id).populate("category","name");
   if(!product){
     return next(new APPError(`Product with ID ${req.params.id} not found`, 404));
   }

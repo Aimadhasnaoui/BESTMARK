@@ -51,7 +51,7 @@ export function DataTable({
     <div className="p-6">
       {/* Search Input */}
       <div className="flex justify-between items-center py-2 mb-4">
-        <InputGroup className="w-[350px] rounded-md focus-visible:ring-amber-500">
+        <InputGroup className="w-[350px] rounded-md bg-white">
           <InputGroupAddon>
             <Search className="w-4 h-4 text-gray-400" />
           </InputGroupAddon>
@@ -74,8 +74,8 @@ export function DataTable({
       </div>
 
       {/* The Table UI */}
-      <div className="h-[600px] overflow-auto  shadow-sm hide-scrollbar">
-        <table className="min-w-full   bg-white border border-gray-200">
+      <div className="h-[600px] w-full bg-white overflow-x-auto shadow-sm hide-scrollbar">
+        <table className="min-w-full  w-full    bg-white border border-gray-200">
           <thead className="bg-[#2563EB] sticky top-0 z-10 w-full">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
@@ -134,7 +134,7 @@ export function DataTable({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-t">
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-t">
         <div className="flex gap-2 items-center">
           {/* Page Info */}
           <span className="text-sm text-gray-700">

@@ -37,13 +37,14 @@ export default function AppSidebar() {
   const [currentPage, setcurrentPage] = useState("dashboard");
 
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard,path: "/dashboard" },
-    { id: "products", label: "Products", icon: Package,path: "/products" },
-    { id: "stock", label: "Stock Management", icon: ClipboardList,path: "/stock" },
-    { id: "sales", label: "Sales & POS", icon: Receipt,path: "/sales" },
-    { id: "finance", label: "Finance", icon: Banknote,path: "/finance" },
-    { id: "suppliers", label: "Suppliers & Employees", icon: Users2,path: "/suppliers" },
-    { id: "requests", label: "Customer Requests", icon: HelpCircle,path: "/requests" },
+    { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, path: "/dashboard" },
+    { id: "products", label: "Produits", icon: Package, path: "/products" },
+    { id: "sales", label: "Ventes", icon: Receipt, path: "/sales" },
+    { id: "stock", label: "Gestion de Stock", icon: ClipboardList, path: "/stock" },
+    { id: "suppliers", label: "Fournisseurs", icon: Users2, path: "/suppliers" },
+    { id: "requests", label: "Demandes clients", icon: HelpCircle, path: "/requests" },
+    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
+    { id: "employees", label: "Employés", icon: User2, path: "/employees" },
   ];
 
   return (

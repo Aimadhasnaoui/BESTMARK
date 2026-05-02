@@ -6,9 +6,9 @@ function HomePage() {
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full">
+      <main className="flex-1 min-w-0 ">
         <NavBar />
-        <div className="flex-1 px-6 py-4">
+        <div className=" px-6 py-4 bg-[#f7f9fb] min-h-screen">
           <Outlet />
         </div>
       </main>

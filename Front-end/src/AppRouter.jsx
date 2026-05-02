@@ -3,6 +3,8 @@ import ErrorPage from "./Component/ErrorPage/ErrorPage";
 import HomePage from "./Component/Home/HomePage";
 import NoAccesPage from "./Component/ErrorPage/NoAccesPage";
 import SettingPage from "./Component/Settings/SettingPage";
+import ProductsPage from "./Component/Products/ProducstPage";
+import SuppliersPage from "./Component/Suppliers/SuppliersPage";
 export const router = createBrowserRouter([
 //   {
 //     path: "/login",
@@ -22,7 +24,16 @@ export const router = createBrowserRouter([
       {
         path:"/settings",
         element:<SettingPage/>
+      },
+      {
+        path:"/products",
+        element:<ProductsPage/>
       }
+      ,{
+        path:"/suppliers",
+        element:<SuppliersPage/>
+      }
+      
         
     ]
   },

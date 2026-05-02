@@ -1,21 +1,30 @@
-import { DataTable } from "@/Component/Ui/DataTable";
-import { useMemo, useState } from "react";
+import { DataTable } from "@/Component/UI/TablesUi/DataTable";
+import { useMemo, useState, useEffect } from "react";
 import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
-import { ActionButtons } from "@/Component/Ui/ActionButtons";
+import { ActionButtons } from "@/Component/UI/TablesUi/ActionButtons";
 import Delete from "./Actions/Delet";
-import {GetCategorys} from "@/Servises/ProductCategories"
-import {useQuery} from "@tanstack/react-query"
+import { GetCategorys } from "@/Servises/ProductCategories";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 export default function ProductType() {
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
-    const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["categories"],
     queryFn: GetCategorys,
+    retry: 2, // ✅ Retry failed requests twice
+    refetchOnWindowFocus: false, // ✅ Don't refetch just because user switched tabs
   });
+  // ✅ React to errors locally
+  useEffect(() => {
+    if (isError) {
+      toast.error(error?.message ?? "Une erreur s'est produite");
+    }
+  }, [isError, error]);
 
   const columns = useMemo(
     () => [
@@ -74,7 +83,6 @@ export default function ProductType() {
         setIsDeleting={setIsDeleting}
         selectedType={selectedType}
       />
-      
     </div>
   );
 }
