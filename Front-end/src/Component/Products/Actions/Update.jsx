@@ -7,14 +7,14 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { UpdateProduct } from "@/Servises/Products";
 import { GetCategorys } from "@/Servises/ProductCategories";
 import { GetSuppliers } from "@/Servises/Suppliers";
 import { toast } from "sonner";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
 
 export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
   const queryClient = useQueryClient();
@@ -23,6 +23,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
     handleSubmit,
     reset,
     watch,
+    control,
     formState: { errors },
   } = useForm();
 
@@ -70,7 +71,6 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
     mutate(data);
   };
 
-  const selectClass = "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm dark:bg-input/30";
 
   return (
     <div>
@@ -85,12 +85,12 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
           error={error}
           errorTitle="Échec de la mise à jour"
         >
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 max-h-[40vh] hide-scrollbar overflow-y-auto px-1">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4  hide-scrollbar overflow-y-auto px-1">
             <FieldSet>
               <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field className="md:col-span-2">
                   <FieldLabel htmlFor="name">Nom du produit</FieldLabel>
-                  <Input
+                  <TextField
                     id="name"
                     placeholder="Ex: iPhone 15 Pro"
                     {...register("name", { required: "Le nom est requis" })}
@@ -100,8 +100,10 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field className="md:col-span-2">
                   <FieldLabel htmlFor="description">Description</FieldLabel>
-                  <Textarea
+                  <TextField
                     id="description"
+                    multiline
+                    rows={3}
                     placeholder="Description détaillée du produit..."
                     {...register("description", { required: "La description est requise" })}
                   />
@@ -110,7 +112,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field>
                   <FieldLabel htmlFor="barcode">Code à barres</FieldLabel>
-                  <Input
+                  <TextField
                     id="barcode"
                     placeholder="Ex: 123456789012"
                     {...register("barcode")}
@@ -119,7 +121,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field>
                   <FieldLabel htmlFor="image">URL de l'image</FieldLabel>
-                  <Input
+                  <TextField
                     id="image"
                     placeholder="https://..."
                     {...register("image", { required: "L'URL de l'image est requise" })}
@@ -129,7 +131,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field>
                   <FieldLabel htmlFor="buyingPrice">Prix d'achat (DH)</FieldLabel>
-                  <Input
+                  <TextField
                     id="buyingPrice"
                     type="number"
                     step="0.01"
@@ -143,7 +145,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field>
                   <FieldLabel htmlFor="sellingPrice">Prix de vente (DH)</FieldLabel>
-                  <Input
+                  <TextField
                     id="sellingPrice"
                     type="number"
                     step="0.01"
@@ -157,17 +159,27 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field>
                   <FieldLabel htmlFor="category">Catégorie</FieldLabel>
-                  <select
-                    id="category"
-                    className={selectClass}
-                    {...register("category", { required: "La catégorie est requise" })}
-                  >
-                    <option value="">Sélectionner une catégorie</option>
-                    {categoriesData?.categories?.map((cat) => (
-                      <option key={cat._id} value={cat._id}>{cat.name}</option>
-                    ))}
-                  </select>
-                  {errors.category && <FieldError>{errors.category.message}</FieldError>}
+                  <Controller
+                    name="category"
+                    control={control}
+                    rules={{ required: "La catégorie est requise" }}
+                    render={({ field: { onChange, value } }) => (
+                      <Autocomplete
+                        disablePortal
+                        options={categoriesData?.categories || []}
+                        getOptionLabel={(option) => option.name || ""}
+                        isOptionEqualToValue={(option, val) => option._id === val || option._id === val?._id}
+                        value={categoriesData?.categories?.find((cat) => cat._id === value) || null}
+                        onChange={(_, newValue) => {
+                          onChange(newValue ? newValue._id : "");
+                        }}
+                        renderInput={(params) => <TextField {...params} />}
+                      />
+                    )}
+                  />
+                  {errors.category && (
+                    <FieldError>{errors.category.message}</FieldError>
+                  )}
                 </Field>
 
                 <Field className="flex flex-row items-center gap-2">
@@ -183,23 +195,35 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                 {hasSupplier && (
                   <Field>
                     <FieldLabel htmlFor="supplier">Fournisseur</FieldLabel>
-                    <select
-                      id="supplier"
-                      className={selectClass}
-                      {...register("supplier", { required: "Le fournisseur est requis quand 'A un fournisseur' est coché" })}
-                    >
-                      <option value="">Sélectionner un fournisseur</option>
-                      {suppliersData?.suppliers?.map((sup) => (
-                        <option key={sup._id} value={sup._id}>{sup.name}</option>
-                      ))}
-                    </select>
-                    {errors.supplier && <FieldError>{errors.supplier.message}</FieldError>}
+                    <Controller
+                      name="supplier"
+                      control={control}
+                      rules={{ 
+                        required: hasSupplier ? "Le fournisseur est requis quand 'A un fournisseur' est coché" : false 
+                      }}
+                      render={({ field: { onChange, value } }) => (
+                        <Autocomplete
+                          disablePortal
+                          options={suppliersData?.suppliers || []}
+                          getOptionLabel={(option) => option.name || ""}
+                          isOptionEqualToValue={(option, val) => option._id === val || option._id === val?._id}
+                          value={suppliersData?.suppliers?.find((sup) => sup._id === value) || null}
+                          onChange={(_, newValue) => {
+                            onChange(newValue ? newValue._id : "");
+                          }}
+                          renderInput={(params) => <TextField {...params} />}
+                        />
+                      )}
+                    />
+                    {errors.supplier && (
+                      <FieldError>{errors.supplier.message}</FieldError>
+                    )}
                   </Field>
                 )}
 
                 <Field>
                   <FieldLabel htmlFor="quantity">Quantité en stock</FieldLabel>
-                  <Input
+                  <TextField
                     id="quantity"
                     type="number"
                     {...register("quantity", { 
@@ -212,7 +236,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field>
                   <FieldLabel htmlFor="minStockAlert">Alerte stock faible</FieldLabel>
-                  <Input
+                  <TextField
                     id="minStockAlert"
                     type="number"
                     {...register("minStockAlert", { 
@@ -223,7 +247,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
                 <Field>
                   <FieldLabel htmlFor="Number_of_sales">Nombre de ventes</FieldLabel>
-                  <Input
+                  <TextField
                     id="Number_of_sales"
                     type="number"
                     {...register("Number_of_sales", { 

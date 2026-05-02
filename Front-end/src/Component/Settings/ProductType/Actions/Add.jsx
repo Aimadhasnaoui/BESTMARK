@@ -7,7 +7,7 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddCategory } from "@/Servises/ProductCategories";
@@ -54,7 +54,7 @@ export default function Add({ isAdding, setIsAdding }) {
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="name">Product Type Name</FieldLabel>
-                  <Input
+                  <TextField
                     id="name"
                     autoComplete="off"
                     placeholder="Product Type Name"
@@ -80,7 +80,7 @@ export default function Add({ isAdding, setIsAdding }) {
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="slug">Slug</FieldLabel>
-                  <Input
+                  <TextField
                     id="slug"
                     autoComplete="off"
                     placeholder="Slug"

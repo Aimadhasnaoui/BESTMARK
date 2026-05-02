@@ -7,7 +7,7 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpdateCategory } from "@/Servises/ProductCategories";
@@ -59,7 +59,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
                   <FieldLabel htmlFor="update-name">
                     Product Type Name
                   </FieldLabel>
-                  <Input
+                  <TextField
                     id="update-name"
                     autoComplete="off"
                     placeholder="Product Type Name"
@@ -88,7 +88,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
                 </Field>
                 <Field>
                   <FieldLabel htmlFor="update-slug">Slug</FieldLabel>
-                  <Input
+                  <TextField
                     id="update-slug"
                     autoComplete="off"
                     placeholder="Slug"

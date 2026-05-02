@@ -7,12 +7,13 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useForm, Controller } from "react-hook-form";
+import TextField from "@mui/material/TextField";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { UpdateSupplier } from "@/Servises/Suppliers";
+import { GetCategorys } from "@/Servises/ProductCategories";
 import { toast } from "sonner";
+import Autocomplete from "@mui/material/Autocomplete";
 
 export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) {
   const queryClient = useQueryClient();
@@ -20,8 +21,14 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm();
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ["categories"],
+    queryFn: GetCategorys,
+  });
 
   useEffect(() => {
     if (selectedSupplier) {
@@ -31,6 +38,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
         email: selectedSupplier.email,
         phone: selectedSupplier.phone,
         address: selectedSupplier.address,
+        productTypes: selectedSupplier.productTypes?.map(pt => pt._id || pt) || [],
       });
     }
   }, [selectedSupplier, reset]);
@@ -66,7 +74,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
               <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field className="md:col-span-2">
                   <FieldLabel htmlFor="name">Nom complet</FieldLabel>
-                  <Input
+                  <TextField
                     id="name"
                     placeholder="Ex: Jean Dupont"
                     {...register("name", { required: "Le nom est requis" })}
@@ -76,7 +84,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
 
                 <Field>
                   <FieldLabel htmlFor="company">Entreprise</FieldLabel>
-                  <Input
+                  <TextField
                     id="company"
                     placeholder="Ex: Tech Solutions SARL"
                     {...register("company")}
@@ -85,7 +93,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
 
                 <Field>
                   <FieldLabel htmlFor="phone">Téléphone</FieldLabel>
-                  <Input
+                  <TextField
                     id="phone"
                     placeholder="Ex: 06 12 34 56 78"
                     {...register("phone")}
@@ -94,7 +102,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
 
                 <Field className="md:col-span-2">
                   <FieldLabel htmlFor="email">Email</FieldLabel>
-                  <Input
+                  <TextField
                     id="email"
                     type="email"
                     placeholder="exemple@mail.com"
@@ -110,11 +118,38 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
 
                 <Field className="md:col-span-2">
                   <FieldLabel htmlFor="address">Adresse</FieldLabel>
-                  <Textarea
+                  <TextField
                     id="address"
+                    multiline
+                    rows={2}
                     placeholder="Adresse complète..."
                     {...register("address")}
                   />
+                </Field>
+                
+                <Field className="md:col-span-2">
+                  <FieldLabel>Types de produits fournis</FieldLabel>
+                  <Controller
+                    name="productTypes"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Autocomplete
+                        multiple
+                        disablePortal
+                        options={categoriesData?.categories || []}
+                        getOptionLabel={(option) => option.name || ""}
+                        isOptionEqualToValue={(option, val) => option._id === val || option._id === val?._id}
+                        value={categoriesData?.categories?.filter((cat) => value?.includes(cat._id)) || []}
+                        onChange={(_, newValue) => {
+                          onChange(newValue.map((v) => v._id));
+                        }}
+                        renderInput={(params) => <TextField {...params} placeholder="Sélectionner les catégories..." />}
+                      />
+                    )}
+                  />
+                  <p className="text-[0.8rem] text-muted-foreground mt-2">
+                    Sélectionnez les types de produits que ce fournisseur propose.
+                  </p>
                 </Field>
               </FieldGroup>
             </FieldSet>

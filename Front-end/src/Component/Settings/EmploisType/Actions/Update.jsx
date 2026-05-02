@@ -7,7 +7,7 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UpdateEmployeeType } from "@/Servises/EmployeeTypes";
@@ -61,7 +61,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
               <FieldGroup>
                 <Field>
                   <FieldLabel htmlFor="name">Name</FieldLabel>
-                  <Input
+                  <TextField
                     id="name"
                     autoComplete="off"
                     placeholder="Employee Type Name"

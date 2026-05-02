@@ -42,6 +42,25 @@ export default function SuppliersPage() {
         accessorKey: "address",
       },
       {
+        header: "Catégories",
+        accessorKey: "productTypes",
+        cell: ({ row }) => (
+          <div className="flex flex-wrap gap-1 max-w-[200px]">
+            {row.original.productTypes?.map((pt) => (
+              <span 
+                key={pt._id} 
+                className="inline-flex items-center rounded-md bg-primary/10 px-2 py-1 text-xs font-medium text-primary ring-1 ring-inset ring-primary/20"
+              >
+                {pt.name}
+              </span>
+            ))}
+            {(!row.original.productTypes || row.original.productTypes.length === 0) && (
+              <span className="text-muted-foreground text-xs italic">Aucune</span>
+            )}
+          </div>
+        ),
+      },
+      {
         header: "Actions",
         accessorKey: "actions",
         cell: ({ row }) => (

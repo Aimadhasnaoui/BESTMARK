@@ -6,6 +6,7 @@ const SupplierSchema = new mongoose.Schema({
   email: { type: String, trim: true },
   phone: { type: String, trim: true },
   address: { type: String, trim: true },
+  productTypes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
 }, { timestamps: true });
 
 module.exports = mongoose.model("Supplier", SupplierSchema);
