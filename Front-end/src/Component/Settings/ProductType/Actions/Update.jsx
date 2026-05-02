@@ -51,6 +51,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
           isError={isError}
           error={error}
           errorTitle="Échec de la mise à jour des données"
+          type="Update"
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FieldSet>

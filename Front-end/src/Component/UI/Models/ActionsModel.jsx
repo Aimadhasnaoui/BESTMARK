@@ -21,7 +21,8 @@ export function ActionsModel({
   isError,
   error,
   errorTitle = "Erreur de validation",
-  size="md"
+  size="md",
+  type="Add"
 }) {
   const handleClose = () => {
     setIsOpen(false);
@@ -88,7 +89,13 @@ export function ActionsModel({
             onClick={handleSubmit}
             className="bg-[#0050CB] hover:bg-[#0040a3] text-white px-8 cursor-pointer"
           >
-            {isPending ? "Saving..." : "Save changes"}
+            {
+              type === "Add" ? 
+              isPending ? "Ajout..." : "Ajouter"
+              : 
+              isPending ? "Modification..." : "Modifier"
+            }
+           
           </Button>
         </div>
       </DialogActions>

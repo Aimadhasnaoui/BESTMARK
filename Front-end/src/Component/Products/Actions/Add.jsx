@@ -41,8 +41,9 @@ export default function Add({ isAdding, setIsAdding }) {
   });
 
   const { data: suppliersData } = useQuery({
-    queryKey: ["suppliers"],
-    queryFn: GetSuppliers,
+    queryKey: ["suppliers", { filter: { productTypes: watch("category") } }],
+    queryFn: () => GetSuppliers({ queryKey: ["suppliers", { filter: { productTypes: watch("category") } }] }),
+    enabled: !!(hasSupplier && watch("category"))
   });
 
   const { mutate, isPending, error, isError } = useMutation({
@@ -58,6 +59,7 @@ export default function Add({ isAdding, setIsAdding }) {
   const onSubmit = (data) => {
     mutate(data);
   };
+
 
 
   return (

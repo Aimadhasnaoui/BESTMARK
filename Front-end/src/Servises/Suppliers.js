@@ -9,9 +9,10 @@ export const AddSupplier = async (data) => {
     }
 };
 
-export const GetSuppliers = async () => {
+export const GetSuppliers = async ({ queryKey }) => {
+    const { filter } = queryKey[1];
     try {
-        const response = await axiosInstance.get("/suppliers");
+        const response = await axiosInstance.get("/suppliers", { params: filter });
         return response.data;
     } catch (error) {
         throw error;

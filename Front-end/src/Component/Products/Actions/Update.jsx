@@ -36,7 +36,8 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
   const { data: suppliersData } = useQuery({
     queryKey: ["suppliers"],
-    queryFn: GetSuppliers,
+ queryFn: () => GetSuppliers({ queryKey: ["suppliers", { filter: { productTypes: watch("category") } }] }),
+    enabled: !!(hasSupplier && watch("category"))
   });
 
   useEffect(() => {
@@ -84,6 +85,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
           isError={isError}
           error={error}
           errorTitle="Échec de la mise à jour"
+          type="Update"
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4  hide-scrollbar overflow-y-auto px-1">
             <FieldSet>
