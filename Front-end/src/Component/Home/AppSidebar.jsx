@@ -17,9 +17,6 @@ import {
 import { Link } from "react-router-dom";
 import {
   User2,
-  Plus,
-  ChevronDown,
-  Home,
   LayoutDashboard,
   Package,
   ClipboardList,

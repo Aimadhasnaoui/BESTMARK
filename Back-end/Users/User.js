@@ -4,13 +4,13 @@ const bcrypt = require("bcrypt");
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String, required: [true, "Name is required"], trim: true,minlength:[3, "Name is too short"] },
-    password: { type: String, required: [true, "Password is required"],minlength:[8, "Password is too short"] },
+    phone: { type: Number, required: true, trim: true, unique: true },
     role: {
       type: String,
       required: [true, "Role is required"],
       enum: ["admin", "employee", "stock_manager"],
     },
-    phone: { type: Number, required: true, trim: true, unique: true },
+    password: { type: String, required: [true, "Password is required"],minlength:[8, "Password is too short"] },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true },
