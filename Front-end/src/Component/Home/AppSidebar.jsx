@@ -29,7 +29,9 @@ import {
   HelpCircle,
   Settings,
   LogOut,
-  ShoppingCart 
+  ShoppingCart,
+  ShoppingBag,
+  Truck 
 } from "lucide-react";
 import Logo from "@/assets/Logo/logo.png";
 import { Button } from "@/components/ui/button";
@@ -40,12 +42,14 @@ export default function AppSidebar() {
   const menuItems = [
     { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, path: "/dashboard" },
     { id: "products", label: "Produits", icon: Package, path: "/products" },
+    { id: "purchases", label: "Achats", icon: ShoppingBag, path: "/purchases" }, 
     { id: "sales", label: "Ventes", icon: Receipt, path: "/sales" },
     { id: "stock", label: "Gestion de Stock", icon: ClipboardList, path: "/stock" },
-    { id: "suppliers", label: "Fournisseurs", icon: Users2, path: "/suppliers" },
     { id: "requests", label: "Demandes clients", icon: HelpCircle, path: "/requests" },
-    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
+    { id: "suppliers", label: "Fournisseurs", icon: Users2, path: "/suppliers" },
     { id: "employees", label: "Employés", icon: User2, path: "/employees" },
+    { id: "delivery", label: "Livraisons", icon: Truck, path: "/delivery" },
+    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" }
   ];
 
   return (

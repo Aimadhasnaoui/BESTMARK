@@ -10,7 +10,6 @@ export const AddSupplier = async (data) => {
 };
 
 export const GetSuppliers = async ({ queryKey }) => {
-    console.log(queryKey);
     const filter = queryKey[1]?.filter || {};
     try {
         const response = await axiosInstance.get("/suppliers", { params: filter });

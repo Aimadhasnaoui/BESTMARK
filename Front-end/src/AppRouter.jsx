@@ -6,6 +6,10 @@ import SettingPage from "./Component/Settings/SettingPage";
 import ProductsPage from "./Component/Products/ProducstPage";
 import SuppliersPage from "./Component/Suppliers/SuppliersPage";
 import EmployeesPage from "./Component/Employees/EmployeesPage";
+import PurchasePage from "./Component/Purchase/PurchasePage";
+import StockPage from "./Component/Stock/StockPage";
+import SalesPage from "./Component/Sales/SalesPage";
+import DeliveryPage from "./Component/Delivery/DeliveryPage";
 export const router = createBrowserRouter([
 //   {
 //     path: "/login",
@@ -37,6 +41,22 @@ export const router = createBrowserRouter([
       ,{
         path:"/employees",
         element:<EmployeesPage/>
+      }
+      ,{
+        path:"/purchases",
+        element:<PurchasePage/>
+      },
+      {
+        path:"/stock",
+        element:<StockPage/>
+      },
+      {
+        path:"/sales",
+        element:<SalesPage/>
+      },
+      {
+        path:"/delivery",
+        element:<DeliveryPage/>
       }
       
         

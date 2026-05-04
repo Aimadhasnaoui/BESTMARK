@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const SaleSchema = new mongoose.Schema({
   invoiceNumber: { type: String, unique: true },  // INV-20240427-001
-  servedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-
+  servedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
   items: [
     {
       product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
       quantity: { type: Number, required: true },
       sellingPrice: { type: Number, required: true },
+      itemTotal: { type: Number } // ← quantity × buyingPrice, calculated on save
     }
   ],
 

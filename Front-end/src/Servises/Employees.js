@@ -9,9 +9,9 @@ export const AddEmployee = async (data) => {
     }
 };
 
-export const GetEmployees = async () => {
+export const GetEmployees = async (mission) => {
     try {
-        const response = await axiosInstance.get("/employees");
+        const response = await axiosInstance.get("/employees" , mission && {params:{mission}});
         return response.data;
     } catch (error) {
         throw error;

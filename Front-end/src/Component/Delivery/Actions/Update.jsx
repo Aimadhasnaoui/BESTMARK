@@ -1,0 +1,143 @@
+import React, { useEffect } from "react";
+import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from "@/components/ui/field";
+import { useForm, Controller } from "react-hook-form";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { UpdateDelivery } from "@/Servises/Delivery";
+import { GetSales } from "@/Servises/Sales";
+import { GetEmployees } from "@/Servises/Employees";
+import { toast } from "sonner";
+import Autocomplete from "@mui/material/Autocomplete";
+import TextField from "@mui/material/TextField";
+import { Truck, User, MapPin, Calendar } from "lucide-react";
+
+export default function Update({ isUpdating, setIsUpdating, selectedDelivery }) {
+  const queryClient = useQueryClient();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    control,
+    formState: { errors },
+  } = useForm();
+
+  useEffect(() => {
+    if (selectedDelivery) {
+      reset({
+        sale: selectedDelivery.sale?._id || selectedDelivery.sale,
+        deliveryMan: selectedDelivery.deliveryMan?._id || selectedDelivery.deliveryMan,
+        status: selectedDelivery.status,
+        estimatedArrival: selectedDelivery.estimatedArrival ? new Date(selectedDelivery.estimatedArrival).toISOString().split('T')[0] : "",
+        deliveryAddress: selectedDelivery.deliveryAddress || {}
+      });
+    }
+  }, [selectedDelivery, reset]);
+
+  const { data: employeesData } = useQuery({ queryKey: ["employees"], queryFn: GetEmployees });
+
+  const { mutate, isPending, error, isError } = useMutation({
+    mutationFn: (data) => UpdateDelivery(selectedDelivery._id, data),
+    onSuccess: () => {
+      setIsUpdating(false);
+      queryClient.invalidateQueries({ queryKey: ["deliveries"] });
+      toast.success("Livraison mise à jour");
+    },
+  });
+
+  return (
+    <div>
+      {isUpdating && (
+        <ActionsModel
+          open={isUpdating}
+          setIsOpen={setIsUpdating}
+          title="Modifier la Livraison"
+          handleSubmit={handleSubmit((data) => mutate(data))}
+          isPending={isPending}
+          isError={isError}
+          error={error}
+          type="Update"
+          size="lg"
+        >
+          <form className="space-y-6 max-h-[70vh] overflow-y-auto px-1 hide-scrollbar">
+            <FieldSet>
+              <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field>
+                  <FieldLabel className="flex items-center gap-2">
+                    <User className="w-4 h-4" /> Livreur
+                  </FieldLabel>
+                  <Controller
+                    name="deliveryMan"
+                    control={control}
+                    render={({ field: { onChange, value } }) => (
+                      <Autocomplete
+                        options={employeesData?.employees || []}
+                        getOptionLabel={(option) => option.name || ""}
+                        isOptionEqualToValue={(option, val) => option._id === val}
+                        value={employeesData?.employees?.find(e => e._id === value) || null}
+                        onChange={(_, newValue) => onChange(newValue?._id || "")}
+                        renderInput={(params) => <TextField {...params} size="small" />}
+                      />
+                    )}
+                  />
+                </Field>
+
+                <Field>
+                  <FieldLabel>Statut</FieldLabel>
+                  <Controller
+                    name="status"
+                    control={control}
+                    render={({ field }) => (
+                      <Autocomplete
+                        options={['pending', 'preparing', 'on_route', 'arrived', 'failed']}
+                        value={field.value}
+                        onChange={(_, newValue) => field.onChange(newValue)}
+                        renderInput={(params) => <TextField {...params} size="small" />}
+                      />
+                    )}
+                  />
+                </Field>
+
+                <Field>
+                  <FieldLabel className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4" /> Arrivée prévue
+                  </FieldLabel>
+                  <TextField type="date" {...register("estimatedArrival")} size="small" />
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+
+            <FieldSet>
+              <FieldLabel className="flex items-center gap-2 mb-2 font-bold text-slate-700">
+                <MapPin className="w-4 h-4" /> Adresse de livraison
+              </FieldLabel>
+              <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-4 rounded-lg bg-slate-50">
+                <Field>
+                  <FieldLabel>Ville</FieldLabel>
+                  <TextField {...register("deliveryAddress.city")} size="small" />
+                </Field>
+                <Field>
+                  <FieldLabel>Rue / Quartier</FieldLabel>
+                  <TextField {...register("deliveryAddress.street")} size="small" />
+                </Field>
+                <Field>
+                  <FieldLabel>Téléphone</FieldLabel>
+                  <TextField {...register("deliveryAddress.phone")} size="small" />
+                </Field>
+                <Field>
+                  <FieldLabel>Notes</FieldLabel>
+                  <TextField {...register("deliveryAddress.notes")} size="small" multiline rows={2} />
+                </Field>
+              </FieldGroup>
+            </FieldSet>
+          </form>
+        </ActionsModel>
+      )}
+    </div>
+  );
+}

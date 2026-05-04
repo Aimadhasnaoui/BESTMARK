@@ -8,12 +8,16 @@ export const CreateEmployee = catchAsync(async (req, res, next) => {
 });
 
 export const GetEmployees = catchAsync(async (req, res, next) => {
-  const employees = await Employee.find();
+  const filter ={}
+  if(req.query.mission){
+    filter.mission = req.query.mission;
+  }
+  const employees = await Employee.find(filter).populate("mission","name");
   res.status(200).json({ success: true, employees });
 });
 
 export const GetEmployee = catchAsync(async (req, res, next) => {
-  const employee = await Employee.findById(req.params.id);
+  const employee = await Employee.findById(req.params.id).populate("mission","name");
   if(!employee){
     return next(new APPError(`Employee with ID ${req.params.id} not found`, 404));
   }

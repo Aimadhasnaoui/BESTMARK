@@ -8,12 +8,12 @@ export const CreateSale = catchAsync(async (req, res, next) => {
 });
 
 export const GetSales = catchAsync(async (req, res, next) => {
-  const sales = await Sale.find();
+  const sales = await Sale.find().populate('servedBy','deliveryMan');
   res.status(200).json({ success: true, sales });
 });
 
 export const GetSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.findById(req.params.id);
+  const sale = await Sale.findById(req.params.id).populate('servedBy','deliveryMan');
   if(!sale){
     return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
   }

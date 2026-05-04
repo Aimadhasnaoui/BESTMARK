@@ -6,20 +6,15 @@ const StockMovementSchema = new mongoose.Schema({
     ref: "Product", 
     required: true 
   },
-  performedBy: { 
+  createdBy: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: "User", 
+    ref: "Employee", 
     required: true 
   },
   type: { 
     type: String, 
     enum: ["purchase", "sale", "return", "adjustment"], 
     required: true 
-  },
-  product:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Product",
-    required: true
   },
   quantity: { 
     type: Number, 
