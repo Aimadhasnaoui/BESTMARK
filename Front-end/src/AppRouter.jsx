@@ -11,6 +11,7 @@ import StockPage from "./Component/Stock/StockPage";
 import SalesPage from "./Component/Sales/SalesPage";
 import DeliveryPage from "./Component/Delivery/DeliveryPage";
 import CustomersPage from "./Component/Customers/CustomersPage";
+import TransactionsPage from "./Component/Transactions/TransactionsPage";
 export const router = createBrowserRouter([
 //   {
 //     path: "/login",
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
       {
         path:"/requests",
         element:<CustomersPage/>
+      },
+      {
+        path:"/finance",
+        element:<TransactionsPage/>
       }
       
         
