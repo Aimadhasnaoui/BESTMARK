@@ -39,7 +39,7 @@ export default function StockPage() {
       />
       
       <StockTable
-        data={data?.movements || []}
+        data={data?.stockMovements || []}
         isError={isError}
         error={error}
         isLoading={isPending}

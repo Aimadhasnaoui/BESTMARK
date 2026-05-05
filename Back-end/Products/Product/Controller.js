@@ -8,7 +8,15 @@ export const CreateProduct = catchAsync(async (req, res, next) => {
 });
 
 export const GetProducts = catchAsync(async (req, res, next) => {
-  const products = await Product.find().populate("category","name").populate("supplier","name");
+  const filter ={}
+  const { supplier,category } = req.query
+  if(supplier){
+    filter.supplier = supplier
+  }
+  if(category){
+    filter.category = category
+  }
+  const products = await Product.find(filter).populate("category","name").populate("supplier","name");
   res.status(200).json({ success: true, products });
 });
 

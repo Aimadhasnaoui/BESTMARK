@@ -92,9 +92,9 @@ export default function TransactionsTable({
         accessorKey: "note",
         header: "Note",
         cell: ({ row }) => (
-          <div className="flex items-center gap-2 text-gray-500 max-w-[200px] truncate">
-            <FileText className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="text-xs">{row.getValue("note")}</span>
+          <div className="flex items-start gap-2 text-gray-500 max-w-[250px] whitespace-normal break-words">
+            <FileText className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+            <span className="text-xs leading-relaxed">{row.getValue("note")}</span>
           </div>
         ),
       },
@@ -114,7 +114,7 @@ export default function TransactionsTable({
 
   return (
     <DataTable
-      data={data}
+      data={data.reverse()}
       columns={columns}
       isLoading={isLoading}
       isError={isError}

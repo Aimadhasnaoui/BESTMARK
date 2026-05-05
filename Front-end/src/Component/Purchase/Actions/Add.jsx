@@ -34,6 +34,7 @@ export default function Add({ isAdding, setIsAdding }) {
     watch,
     control,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -60,12 +61,15 @@ export default function Add({ isAdding, setIsAdding }) {
     queryKey: ["suppliers"],
     queryFn: GetSuppliers,
   });
-
+const selectedSupplier = watch("supplier");
   const { data: productsData } = useQuery({
-    queryKey: ["products"],
-    queryFn: GetProducts,
+    queryKey: ["products", selectedSupplier],
+    queryFn: () => GetProducts({ supplier: selectedSupplier }),
+    enabled: !!selectedSupplier,
   });
-
+  useEffect(() => {
+    console.log(productsData)
+  }, [productsData]);
   const watchItems = watch("items");
   const paidAmount = watch("paidAmount");
 
@@ -108,7 +112,8 @@ export default function Add({ isAdding, setIsAdding }) {
             ? "partial"
             : "unpaid",
     };
-    mutate(formattedData);
+    console.log(formattedData)
+    mutate({...formattedData,user:"69f65879f5edb8544b105f4c"});
   };
   useEffect(() => {
     console.log(errors);
@@ -289,13 +294,19 @@ export default function Add({ isAdding, setIsAdding }) {
                       </FieldError>
                     )}
                   </div>
-                  <div className="md:col-span-2 flex justify-end">
+                  <div className="md:col-span-2">
+                    <FieldLabel>Prix Total (DH)</FieldLabel>
+                    <div className="flex items-center h-full font-bold text-blue-600">
+                        {(watchItems[index]?.buyingPrice || 0) * (watchItems[index]?.quantity || 0)}
+                    </div>
+                  </div>
+                  <div className="md:col-span-1 flex justify-center">
                     <Button
                       type="button"
                       variant="ghost"
                       size="icon"
                       onClick={() => remove(index)}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50 cursor-pointer mt-1"
                       disabled={fields.length === 1}
                     >
                       <Trash2 className="w-4 h-4" />

@@ -9,9 +9,9 @@ export const AddProduct = async (data) => {
     }
 };
 
-export const GetProducts = async () => {
+export const GetProducts = async (filters) => {
     try {
-        const response = await axiosInstance.get("/products");
+        const response = await axiosInstance.get("/products", { params: filters });
         return response.data;
     } catch (error) {
         throw error;

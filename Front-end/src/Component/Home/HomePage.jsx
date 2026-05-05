@@ -8,10 +8,11 @@ import AddButton from "./AddButton";
 function HomePage() {
   const [buttonAppear, setbuttoAppear] = useState(false);
   const [buyerModalOpen, setBuyerModalOpen] = useState(false);
-
+  const [currentPage, setcurrentPage] = useState("dashboard");
+  
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar currentPage={currentPage} setcurrentPage={setcurrentPage} />
       <main className="flex-1 min-w-0 relative">
         <NavBar />
         <div className=" px-6 py-4 bg-[#f7f9fb] min-h-screen ">

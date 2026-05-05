@@ -28,13 +28,13 @@ import {
   LogOut,
   ShoppingCart,
   ShoppingBag,
-  Truck 
+  Truck
 } from "lucide-react";
 import Logo from "@/assets/Logo/logo.png";
 import { Button } from "@/components/ui/button";
-export default function AppSidebar() {
+export default function AppSidebar({ currentPage, setcurrentPage }) {
   const { state, setOpen } = useSidebar();
-  const [currentPage, setcurrentPage] = useState("dashboard");
+
 
   const menuItems = [
     { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, path: "/dashboard" },
@@ -48,6 +48,9 @@ export default function AppSidebar() {
     { id: "delivery", label: "Livraisons", icon: Truck, path: "/delivery" },
     { id: "finance", label: "Finance", icon: Banknote, path: "/finance" }
   ];
+
+
+
 
   return (
     <Sidebar

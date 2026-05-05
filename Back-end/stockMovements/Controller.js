@@ -8,12 +8,12 @@ export const CreateStockMovement = catchAsync(async (req, res, next) => {
 });
 
 export const GetStockMovements = catchAsync(async (req, res, next) => {
-  const stockMovements = await StockMovement.find();
+  const stockMovements = await StockMovement.find().populate("product", "name").populate("createdBy", "name");
   res.status(200).json({ success: true, stockMovements });
 });
 
 export const GetStockMovement = catchAsync(async (req, res, next) => {
-  const stockMovement = await StockMovement.findById(req.params.id);
+  const stockMovement = await StockMovement.findById(req.params.id).populate("product", "name").populate("createdBy", "name");
   if(!stockMovement){
     return next(new APPError(`Stock movement with ID ${req.params.id} not found`, 404));
   }
