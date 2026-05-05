@@ -10,6 +10,7 @@ import PurchasePage from "./Component/Purchase/PurchasePage";
 import StockPage from "./Component/Stock/StockPage";
 import SalesPage from "./Component/Sales/SalesPage";
 import DeliveryPage from "./Component/Delivery/DeliveryPage";
+import CustomersPage from "./Component/Customers/CustomersPage";
 export const router = createBrowserRouter([
 //   {
 //     path: "/login",
@@ -57,6 +58,10 @@ export const router = createBrowserRouter([
       {
         path:"/delivery",
         element:<DeliveryPage/>
+      },
+      {
+        path:"/requests",
+        element:<CustomersPage/>
       }
       
         

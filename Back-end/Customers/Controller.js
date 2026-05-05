@@ -8,12 +8,12 @@ export const CreateCustomerRequest = catchAsync(async (req, res, next) => {
 });
 
 export const GetCustomerRequests = catchAsync(async (req, res, next) => {
-  const customerRequests = await CustomerRequest.find();
+  const customerRequests = await CustomerRequest.find().populate('product', 'name barcode');
   res.status(200).json({ success: true, customerRequests });
 });
 
 export const GetCustomerRequest = catchAsync(async (req, res, next) => {
-  const customerRequest = await CustomerRequest.findById(req.params.id);
+  const customerRequest = await CustomerRequest.findById(req.params.id).populate('product', 'name barcode');
   if(!customerRequest){
     return next(new APPError(`Customer request with ID ${req.params.id} not found`, 404));
   }

@@ -73,14 +73,7 @@ export default function AppSidebar() {
       </SidebarHeader>
       {/* sidebar content */}
       <SidebarContent className="py-4">
-              <Button 
-            variant="outline" 
-            className="flex items-center gap-2 bg-[#2563EB] text-white h-10 border-slate-200 hover:bg-white hover:text-[#2563EB] hover:border-[#2563EB] mx-3 my-2 cursor-pointer"
-            // onClick={() => setIsFiltering(true)}
-          >
-            <ShoppingCart  className="w-4 h-4" />
-            <span className="text-sm font-medium">New Sell</span>
-          </Button>
+
         <SidebarMenu className="gap-2">
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.id}>
