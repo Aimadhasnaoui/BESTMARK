@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/field";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { UpdateStockMovement } from "@/Servises/StockMovements";
+import { UpdateStockMovement  } from "@/Servises/StockMovements";
 import { GetProducts } from "@/Servises/Products";
 import { toast } from "sonner";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
-import { Package, ArrowRightLeft, ClipboardList, FileText } from "lucide-react";
+import { Package, ArrowRightLeft, ClipboardList, FileText, Banknote, Info } from "lucide-react";
 
 export default function Update({ isUpdating, setIsUpdating, selectedMovement }) {
   const queryClient = useQueryClient();
@@ -33,6 +33,8 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
     queryFn: GetProducts,
   });
 
+  const movementType = watch("type");
+
   useEffect(() => {
     if (selectedMovement) {
       console.log("selectedMovement", selectedMovement);
@@ -40,25 +42,31 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
         product: selectedMovement.product?._id || selectedMovement.product,
         type: selectedMovement.type,
         quantity: selectedMovement.quantity,
+        price: selectedMovement.price || 0,
         referenceModel: selectedMovement.referenceModel,
         note: selectedMovement.note || "",
-        quantityBefore: selectedMovement.quantityBefore,
-        quantityAfter: selectedMovement.quantityAfter,
       });
     }
   }, [selectedMovement, reset]);
 
   const { mutate, isPending, error, isError } = useMutation({
-    mutationFn: (data) => UpdateStockMovement(selectedMovement._id, data),
+    mutationFn: UpdateStockMovement,
     onSuccess: () => {
       setIsUpdating(false);
       queryClient.invalidateQueries({ queryKey: ["stockMovements"] });
-      toast.success("Le mouvement de stock a été modifié avec succès");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Le mouvement a été recalculé et mis à jour avec succès");
     },
   });
 
   const onSubmit = (data) => {
-    mutate(data);
+    const formattedData = {
+       price:data.price ,
+       quantity:data.quantity  ,
+       createdBy:selectedMovement.createdBy,
+       prodcutQantity : selectedMovement.type === "return" ? selectedMovement.quantityBefore - Number(quantity) : selectedMovement.quantityBefore + Number(quantity),
+      };
+    mutate(selectedMovement._id,formattedData);
   };
 
   return (
@@ -80,6 +88,14 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-6"
           >
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-700 leading-relaxed">
+                  <span className="font-bold">Instruction :</span> Pour modifier le produit ou le type de mouvement, vous devez supprimer cet enregistrement et en créer un nouveau. Seules la quantité, le prix et la note sont modifiables pour garantir l'intégrité de vos données d'inventaire.
+                </p>
+              </div>
+            </div>
             <FieldSet>
               <FieldGroup className="grid grid-cols-1 gap-4">
                 <Field>
@@ -94,6 +110,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
                     render={({ field: { onChange, value }, fieldState: { error } }) => (
                       <>
                         <Autocomplete
+                          disabled
                           options={productsData?.products || []}
                           getOptionLabel={(option) => option.name || ""}
                           isOptionEqualToValue={(option, val) => option._id === val || option._id === (val?._id || val)}
@@ -118,16 +135,13 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
                       control={control}
                       render={({ field }) => (
                         <Autocomplete
+                          disabled
                           options={[
-                            { label: "Achat", value: "purchase" },
-                            { label: "Vente", value: "sale" },
                             { label: "Retour", value: "return" },
                             { label: "Ajustement", value: "adjustment" },
                           ]}
                           getOptionLabel={(option) => option.label}
                           value={[
-                            { label: "Achat", value: "purchase" },
-                            { label: "Vente", value: "sale" },
                             { label: "Retour", value: "return" },
                             { label: "Ajustement", value: "adjustment" },
                           ].find(o => o.value === field.value)}
@@ -147,36 +161,50 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
                       id="quantity"
                       type="number"
                       size="small"
-                      {...register("quantity", { required: "Requis" })}
+                      onWheel={(e) => e.target.blur()}
+                      {...register("quantity", { 
+                        required: "Requis",
+                        validate: (val) => {
+                          const num = Number(val);
+                          if (num === 0) return "La quantité ne peut pas être 0";
+                          if (movementType === "return" && num < 1) {
+                            return "Pour un retour, la quantité doit être au moins 1";
+                          }
+                          return true;
+                        }
+                      })}
                     />
                   </Field>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {movementType === "return" && (
                   <Field>
-                    <FieldLabel htmlFor="quantityBefore" className="flex items-center gap-2">
-                      <ClipboardList className="w-4 h-4 text-emerald-600" />
-                      Quantité avant
+                    <FieldLabel htmlFor="price" className="flex items-center gap-2">
+                      <Banknote className="w-4 h-4 text-emerald-600" />
+                      Prix à rembourser au client
                     </FieldLabel>
                     <TextField
-                      id="quantityBefore"
+                      id="price"
                       type="number"
                       size="small"
-                      {...register("quantityBefore", { required: "Requis" })}
+                      onWheel={(e) => e.target.blur()}
+                      {...register("price", {
+                        required: "Requis pour un retour",
+                        min: { value: 1, message: "Le prix doit être au moins 1" }
+                      })}
                     />
+                    {errors.price && <FieldError>{errors.price.message}</FieldError>}
                   </Field>
-                  <Field>
-                    <FieldLabel htmlFor="quantityAfter" className="flex items-center gap-2">
-                      <ClipboardList className="w-4 h-4 text-emerald-600" />
-                      Quantité après
-                    </FieldLabel>
-                    <TextField
-                      id="quantityAfter"
-                      type="number"
-                      size="small"
-                      {...register("quantityAfter", { required: "Requis" })}
-                    />
-                  </Field>
-                </div>
+                )}
+                <Field>
+                  <FieldLabel htmlFor="referenceModel">Modèle de Référence (Auto)</FieldLabel>
+                  <TextField
+                    id="referenceModel"
+                    size="small"
+                    disabled
+                    {...register("referenceModel")}
+                  />
+                </Field>
 
                 <Field>
                   <FieldLabel htmlFor="note" className="flex items-center gap-2">

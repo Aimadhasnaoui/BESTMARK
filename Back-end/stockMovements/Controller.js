@@ -1,12 +1,53 @@
 import StockMovement from "./StockMovement.js";
 import Purchases from "../Purchases/Purchases.js";
-import { catchAsync } from "../utils/CatchFunction.js";
+import { catchAsync, transactional } from "../utils/CatchFunction.js";
 import APPError from "../utils/ErrorHandler.js";
+import Products from "../Products/Product/Products.js";
+import Transactions from "../Transactions/Transaction.js";
+import mongoose from "mongoose";
 
-export const CreateStockMovement = catchAsync(async (req, res, next) => {
-  const stockMovement = await StockMovement.create(req.body);
-  res.status(201).json({ success: true, stockMovement });
-});
+export const CreateStockMovement = transactional(
+  async (req, res, next, session) => {
+    const { product, type, quantity, price, note } = req.body;
+    const [stock] = await StockMovement.create([{ ...req.body }], { session });
+    console.log(stock);
+    switch (type) {
+      case "return":
+        await Products.findByIdAndUpdate(
+          product,
+          { quantity: req.body.quantityAfter },
+          { session },
+        );
+        break;
+      case "adjustment":
+        await Products.findByIdAndUpdate(
+          product,
+          { quantity: req.body.quantityAfter },
+          { session },
+        );
+        break;
+    }
+    if (type === "return") {
+      await Transactions.create(
+        [
+          {
+            type: "return",
+            amount: price,
+            direction: "out",
+            note: `${note}`,
+            referenceId: stock._id,
+            referenceModel: "return",
+            performedBy: stock.createdBy,
+          },
+        ],
+        { session },
+      );
+    }
+    res
+      .status(201)
+      .json({ success: true, message: "Operation  passe en  success" });
+  },
+);
 
 export const GetStockMovements = catchAsync(async (req, res, next) => {
   const stockMovements = await StockMovement.find()
@@ -28,40 +69,101 @@ export const GetStockMovement = catchAsync(async (req, res, next) => {
   res.status(200).json({ success: true, stockMovement });
 });
 
-export const UpdateStockMovement = catchAsync(async (req, res, next) => {
-  const stockMovement = await StockMovement.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    { new: true },
-  );
-  if (!stockMovement) {
-    return next(
-      new APPError(`Stock movement with ID ${req.params.id} not found`, 404),
-    );
-  }
-  res.status(200).json({ success: true, stockMovement });
-});
+export const UpdateStockMovement = transactional(
+  async (req, res, next, session) => {
+    const { quantity, price, note, prodcutQantity } = req.body;
 
-export const DeleteStockMovement = catchAsync(async (req, res, next) => {
-  const stockMovement = await StockMovement.findById(req.params.id);
-  if (!stockMovement) {
-    return next(
-      new APPError(`Stock movement with ID ${req.params.id} not found`, 404),
+    // 1. Get the current stock movement
+    let stockMovement = await StockMovement.findById(req.params.id).session(
+      session,
     );
-  }
+    if (!stockMovement) {
+      throw new APPError(`Mouvement de stock non trouvé`, 404);
+    }
 
-  if (stockMovement.referenceModel === "Purchase" && stockMovement.referenceId) {
-    const purchase = await Purchases.findById(stockMovement.referenceId);
-    if (purchase) {
-      return next(
-        new APPError(
-          "Ce mouvement de stock est lié à un achat. Vous devez supprimer l'achat pour que ce mouvement soit supprimé automatiquement.",
-          400,
-        ),
+    // 2. Calculate the new quantityAfter based on original quantityBefore
+    // If it's a return, we subtract from quantityBefore. If adjustment, we add.
+
+    // 3. Update the StockMovement record
+    stockMovement = await StockMovement.findByIdAndUpdate(
+      req.params.id,
+      {
+        quantity: Number(quantity),
+        price: Number(price),
+        note: note,
+        quantityAfter: prodcutQantity,
+      },
+      { new: true, session },
+    );
+
+    // 4. Update the Product stock to match the new calculation
+    await Products.findByIdAndUpdate(
+      stockMovement.product,
+      { quantity: prodcutQantity },
+      { session },
+    );
+
+    // 5. Update the associated Transaction amount if it's a return
+    if (price !== undefined) {
+      await Transactions.findOneAndUpdate(
+        { referenceId: stockMovement._id },
+        {
+          amount: Number(price),
+          note: note,
+        },
+        { session },
       );
     }
-  }
 
-  await StockMovement.findByIdAndDelete(req.params.id);
-  res.status(200).json({ success: true, stockMovement });
-});
+    res.status(200).json({ success: true, stockMovement });
+  },
+);
+
+export const DeleteStockMovement = transactional(
+  async (req, res, next, session) => {
+    const stockMovement = await StockMovement.findById(req.params.id).session(
+      session,
+    );
+
+    if (!stockMovement) {
+      throw new APPError(`Mouvement de stock non trouvé`, 404);
+    }
+
+    // 1. Check if linked to an active Purchase
+    if (
+      stockMovement.referenceModel === "Purchase" &&
+      stockMovement.referenceId
+    ) {
+      const purchase = await Purchases.findById(
+        stockMovement.referenceId,
+      ).session(session);
+      if (purchase) {
+        throw new APPError(
+          "Ce mouvement est lié à un achat. Supprimez l'achat pour que ce mouvement soit supprimé automatiquement.",
+          400,
+        );
+      }
+    }
+
+    // 2. Restore Product Quantity (Rollback the movement)
+    await Products.findByIdAndUpdate(
+      stockMovement.product,
+      { quantity: stockMovement.quantityBefore },
+      { session },
+    );
+
+    // 3. Delete associated Transaction (e.g., for returns)
+    await Transactions.findOneAndDelete(
+      { referenceId: stockMovement._id },
+      { session },
+    );
+
+    // 4. Finally, delete the movement itself
+    await StockMovement.findByIdAndDelete(req.params.id).session(session);
+
+    res.status(200).json({
+      success: true,
+      message: "Mouvement supprimé et stock restauré avec succès",
+    });
+  },
+);

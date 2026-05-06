@@ -30,11 +30,16 @@ const StockMovementSchema = new mongoose.Schema({
   },
   referenceModel: { 
     type: String, 
-    enum: ["Sale", "Purchase"], 
+    enum: ["Sale", "Purchase",'manual'], 
     required: true 
   },
   referenceId: {
-    type: mongoose.Schema.Types.ObjectId,ref:'Purchase',required:true},
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Purchase",
+    required: function () {
+      return this.referenceModel !== "manual";
+    },
+  },
   note: { 
     type: String 
   },

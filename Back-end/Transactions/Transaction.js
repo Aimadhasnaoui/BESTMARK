@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const TransactionSchema = new mongoose.Schema({
   type: {
     type: String,
-    enum: ['sale', 'expense', 'purchase'],
+    enum: ['sale', 'expense', 'purchase','return'],
     required:true
   },
   direction: {
@@ -15,7 +15,7 @@ const TransactionSchema = new mongoose.Schema({
   referenceId: {type:mongoose.Schema.Types.ObjectId},
   referenceModel: {
     type: String,
-    enum: ['Sale', 'Expense', 'Purchase']
+    enum: ['Sale', 'Expense', 'Purchase','adjustment','return']
   },
   performedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   date: {type:Date,required:true,default:Date.now},

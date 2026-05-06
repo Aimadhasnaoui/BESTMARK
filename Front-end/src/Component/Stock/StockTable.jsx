@@ -89,15 +89,16 @@ export default function StockTable({
         accessorKey: "quantity",
         cell: ({ row }) => {
           const qty = row.original.quantity;
+          const type = row.original.type;
           return (
             <div className="flex items-center gap-2">
-              {qty > 0 ? (
+              {(qty > 0  && type !== 'return') ? (
                 <TrendingUp className="w-4 h-4 text-emerald-500" />
               ) : (
                 <TrendingDown className="w-4 h-4 text-red-500" />
               )}
-              <span className={`font-bold ${qty > 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                {qty > 0 ? `+${qty}` : qty}
+              <span className={`font-bold ${(qty > 0 && type !== 'return' ) ? 'text-emerald-600' : 'text-red-600'}`}>
+                {(qty > 0 && type !== 'return') ? `+${qty}` : -qty}
               </span>
             </div>
           );

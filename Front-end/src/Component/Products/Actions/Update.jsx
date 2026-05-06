@@ -36,8 +36,14 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
 
   const { data: suppliersData } = useQuery({
     queryKey: ["suppliers"],
- queryFn: () => GetSuppliers({ queryKey: ["suppliers", { filter: { productTypes: watch("category") } }] }),
-    enabled: !!(hasSupplier && watch("category"))
+    queryFn: () =>
+      GetSuppliers({
+        queryKey: [
+          "suppliers",
+          { filter: { productTypes: watch("category") } },
+        ],
+      }),
+    enabled: !!(hasSupplier && watch("category")),
   });
 
   useEffect(() => {
@@ -72,7 +78,6 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
     mutate(data);
   };
 
-
   return (
     <div>
       {isUpdating && (
@@ -87,7 +92,10 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
           errorTitle="Échec de la mise à jour"
           type="Update"
         >
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4  hide-scrollbar overflow-y-auto px-1">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4  hide-scrollbar overflow-y-auto px-1"
+          >
             <FieldSet>
               <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field className="md:col-span-2">
@@ -97,7 +105,9 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                     placeholder="Ex: iPhone 15 Pro"
                     {...register("name", { required: "Le nom est requis" })}
                   />
-                  {errors.name && <FieldError>{errors.name.message}</FieldError>}
+                  {errors.name && (
+                    <FieldError>{errors.name.message}</FieldError>
+                  )}
                 </Field>
 
                 <Field className="md:col-span-2">
@@ -107,9 +117,13 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                     multiline
                     rows={3}
                     placeholder="Description détaillée du produit..."
-                    {...register("description", { required: "La description est requise" })}
+                    {...register("description", {
+                      required: "La description est requise",
+                    })}
                   />
-                  {errors.description && <FieldError>{errors.description.message}</FieldError>}
+                  {errors.description && (
+                    <FieldError>{errors.description.message}</FieldError>
+                  )}
                 </Field>
 
                 <Field>
@@ -126,37 +140,49 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                   <TextField
                     id="image"
                     placeholder="https://..."
-                    {...register("image", { required: "L'URL de l'image est requise" })}
+                    {...register("image", {
+                      required: "L'URL de l'image est requise",
+                    })}
                   />
-                  {errors.image && <FieldError>{errors.image.message}</FieldError>}
+                  {errors.image && (
+                    <FieldError>{errors.image.message}</FieldError>
+                  )}
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="buyingPrice">Prix d'achat (DH)</FieldLabel>
+                  <FieldLabel htmlFor="buyingPrice">
+                    Prix d'achat (DH)
+                  </FieldLabel>
                   <TextField
                     id="buyingPrice"
                     type="number"
                     step="0.01"
-                    {...register("buyingPrice", { 
-                        required: "Le prix d'achat est requis",
-                        min: { value: 0, message: "Le prix doit être positif" }
+                    {...register("buyingPrice", {
+                      required: "Le prix d'achat est requis",
+                      min: { value: 0, message: "Le prix doit être positif" },
                     })}
                   />
-                  {errors.buyingPrice && <FieldError>{errors.buyingPrice.message}</FieldError>}
+                  {errors.buyingPrice && (
+                    <FieldError>{errors.buyingPrice.message}</FieldError>
+                  )}
                 </Field>
 
                 <Field>
-                  <FieldLabel htmlFor="sellingPrice">Prix de vente (DH)</FieldLabel>
+                  <FieldLabel htmlFor="sellingPrice">
+                    Prix de vente (DH)
+                  </FieldLabel>
                   <TextField
                     id="sellingPrice"
                     type="number"
                     step="0.01"
-                    {...register("sellingPrice", { 
-                        required: "Le prix de vente est requis",
-                        min: { value: 0, message: "Le prix doit être positif" }
+                    {...register("sellingPrice", {
+                      required: "Le prix de vente est requis",
+                      min: { value: 0, message: "Le prix doit être positif" },
                     })}
                   />
-                  {errors.sellingPrice && <FieldError>{errors.sellingPrice.message}</FieldError>}
+                  {errors.sellingPrice && (
+                    <FieldError>{errors.sellingPrice.message}</FieldError>
+                  )}
                 </Field>
 
                 <Field>
@@ -170,8 +196,14 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                         disablePortal
                         options={categoriesData?.categories || []}
                         getOptionLabel={(option) => option.name || ""}
-                        isOptionEqualToValue={(option, val) => option._id === val || option._id === val?._id}
-                        value={categoriesData?.categories?.find((cat) => cat._id === value) || null}
+                        isOptionEqualToValue={(option, val) =>
+                          option._id === val || option._id === val?._id
+                        }
+                        value={
+                          categoriesData?.categories?.find(
+                            (cat) => cat._id === value,
+                          ) || null
+                        }
                         onChange={(_, newValue) => {
                           onChange(newValue ? newValue._id : "");
                         }}
@@ -191,7 +223,9 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     {...register("hassupplier")}
                   />
-                  <FieldLabel htmlFor="hassupplier" className="mb-0">A un fournisseur ?</FieldLabel>
+                  <FieldLabel htmlFor="hassupplier" className="mb-0">
+                    A un fournisseur ?
+                  </FieldLabel>
                 </Field>
 
                 {hasSupplier && (
@@ -200,16 +234,24 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                     <Controller
                       name="supplier"
                       control={control}
-                      rules={{ 
-                        required: hasSupplier ? "Le fournisseur est requis quand 'A un fournisseur' est coché" : false 
+                      rules={{
+                        required: hasSupplier
+                          ? "Le fournisseur est requis quand 'A un fournisseur' est coché"
+                          : false,
                       }}
                       render={({ field: { onChange, value } }) => (
                         <Autocomplete
                           disablePortal
                           options={suppliersData?.suppliers || []}
                           getOptionLabel={(option) => option.name || ""}
-                          isOptionEqualToValue={(option, val) => option._id === val || option._id === val?._id}
-                          value={suppliersData?.suppliers?.find((sup) => sup._id === value) || null}
+                          isOptionEqualToValue={(option, val) =>
+                            option._id === val || option._id === val?._id
+                          }
+                          value={
+                            suppliersData?.suppliers?.find(
+                              (sup) => sup._id === value,
+                            ) || null
+                          }
                           onChange={(_, newValue) => {
                             onChange(newValue ? newValue._id : "");
                           }}
@@ -222,38 +264,18 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                     )}
                   </Field>
                 )}
-
                 <Field>
-                  <FieldLabel htmlFor="quantity">Quantité en stock</FieldLabel>
-                  <TextField
-                    id="quantity"
-                    type="number"
-                    {...register("quantity", { 
-                        required: "La quantité est requise",
-                        min: { value: 0, message: "La quantité doit être positive" }
-                    })}
-                  />
-                  {errors.quantity && <FieldError>{errors.quantity.message}</FieldError>}
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="minStockAlert">Alerte stock faible</FieldLabel>
+                  <FieldLabel htmlFor="minStockAlert">
+                    Alerte stock faible
+                  </FieldLabel>
                   <TextField
                     id="minStockAlert"
                     type="number"
-                    {...register("minStockAlert", { 
-                        min: { value: 0, message: "La valeur doit être positive" }
-                    })}
-                  />
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="Number_of_sales">Nombre de ventes</FieldLabel>
-                  <TextField
-                    id="Number_of_sales"
-                    type="number"
-                    {...register("Number_of_sales", { 
-                        min: { value: 0, message: "La valeur doit être positive" }
+                    {...register("minStockAlert", {
+                      min: {
+                        value: 0,
+                        message: "La valeur doit être positive",
+                      },
                     })}
                   />
                 </Field>
