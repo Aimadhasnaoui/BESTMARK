@@ -104,7 +104,7 @@ export const UpdateStockMovement = transactional(
     );
 
     // 5. Update the associated Transaction amount if it's a return
-    if (price !== undefined) {
+    if (price !== undefined && stockMovement.type === "return") {
       await Transactions.findOneAndUpdate(
         { referenceId: stockMovement._id },
         {
