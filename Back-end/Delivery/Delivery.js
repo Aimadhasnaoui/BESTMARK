@@ -21,11 +21,10 @@ const DeliverySchema = new mongoose.Schema({
     phone: String,
     notes: String
   },
-  estimatedArrival: {type:Date,required:true},
-  actualArrival: {type:Date,required:true},
-  createdAt: {type:Date,default:Date.now},
-  updatedAt: {type:Date,default:Date.now}
-    
+  estimatedArrival: {type:Date,required:true,default:()=>new Date(Date.now() + 168 * 60 * 60 * 1000)},
+  actualArrival: {type:Date},
+},{
+  timestamps:true
 })
 
 

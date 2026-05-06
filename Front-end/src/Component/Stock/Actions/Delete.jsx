@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import DeletModel from "@/Component/Ui/Models/DeletModel";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteStockMovement } from "@/Servises/StockMovements";
@@ -16,6 +16,13 @@ export default function Delete({ isDeleting, setIsDeleting, selectedMovement }) 
     },
   });
 
+  useEffect(()=>{
+    if(isError){
+      console.log("Full Error:", error)
+      console.log("Server Message:", error?.response?.data?.message)
+    }
+  },[isError])
+
   return (
     <DeletModel
       open={isDeleting}
@@ -23,7 +30,8 @@ export default function Delete({ isDeleting, setIsDeleting, selectedMovement }) 
       handelDelet={mutate}
       isPending={isPending}
       isError={isError}
-      error={error}
+      // error={error}
+      errorMessage={error?.response?.data?.message}
       title="Supprimer le mouvement ?"
       itemName={selectedMovement ? `Mouvement de ${selectedMovement.product?.name}` : ""}
       DeleteMsg="Voulez-vous vraiment supprimer cet enregistrement de mouvement ? Attention, cela ne modifiera pas automatiquement le stock actuel du produit."

@@ -31,6 +31,7 @@ export default function Delete({ isDeleting, setIsDeleting, selectedType }) {
           confirmText="Supprimer"
           cancelText="Annuler"
           variant="destructive"
+          errorMessage={error?.response?.data?.message}
         >
           <div className="py-4">
             <p className="text-sm text-gray-500">

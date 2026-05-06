@@ -67,9 +67,6 @@ const selectedSupplier = watch("supplier");
     queryFn: () => GetProducts({ supplier: selectedSupplier }),
     enabled: !!selectedSupplier,
   });
-  useEffect(() => {
-    console.log(productsData)
-  }, [productsData]);
   const watchItems = watch("items");
   const paidAmount = watch("paidAmount");
 
@@ -95,6 +92,9 @@ const selectedSupplier = watch("supplier");
     onSuccess: () => {
       setIsAdding(false);
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      queryClient.invalidateQueries({ queryKey: ["stockMovements"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("L'achat a été ajouté avec succès");
       reset();
     },
@@ -112,7 +112,6 @@ const selectedSupplier = watch("supplier");
             ? "partial"
             : "unpaid",
     };
-    console.log(formattedData)
     mutate({...formattedData,user:"69f65879f5edb8544b105f4c"});
   };
   useEffect(() => {

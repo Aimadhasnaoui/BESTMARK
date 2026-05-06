@@ -35,12 +35,15 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
 
   useEffect(() => {
     if (selectedMovement) {
+      console.log("selectedMovement", selectedMovement);
       reset({
         product: selectedMovement.product?._id || selectedMovement.product,
         type: selectedMovement.type,
         quantity: selectedMovement.quantity,
         referenceModel: selectedMovement.referenceModel,
         note: selectedMovement.note || "",
+        quantityBefore: selectedMovement.quantityBefore,
+        quantityAfter: selectedMovement.quantityAfter,
       });
     }
   }, [selectedMovement, reset]);
@@ -145,6 +148,32 @@ export default function Update({ isUpdating, setIsUpdating, selectedMovement }) 
                       type="number"
                       size="small"
                       {...register("quantity", { required: "Requis" })}
+                    />
+                  </Field>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="quantityBefore" className="flex items-center gap-2">
+                      <ClipboardList className="w-4 h-4 text-emerald-600" />
+                      Quantité avant
+                    </FieldLabel>
+                    <TextField
+                      id="quantityBefore"
+                      type="number"
+                      size="small"
+                      {...register("quantityBefore", { required: "Requis" })}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="quantityAfter" className="flex items-center gap-2">
+                      <ClipboardList className="w-4 h-4 text-emerald-600" />
+                      Quantité après
+                    </FieldLabel>
+                    <TextField
+                      id="quantityAfter"
+                      type="number"
+                      size="small"
+                      {...register("quantityAfter", { required: "Requis" })}
                     />
                   </Field>
                 </div>

@@ -9,8 +9,11 @@ import {
   TrendingDown, 
   ClipboardList,
   AlertCircle,
-  FileText
+  FileText,
+  Calendar
 } from "lucide-react";
+import dayjs from "dayjs";
+
 
 export default function StockTable({
   data = [],
@@ -22,6 +25,16 @@ export default function StockTable({
 }) {
   const columns = useMemo(
     () => [
+          {
+        accessorKey: "createdAt",
+        header: "Date",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2 text-gray-600">
+            <Calendar className="w-4 h-4 text-gray-400" />
+            {dayjs(row.getValue("createdAt")).format("DD/MM/YYYY HH:mm")}
+          </div>
+        ),
+      },
       {
         header: () => (
           <div className="flex items-center gap-2">
@@ -113,7 +126,7 @@ export default function StockTable({
         ),
         accessorKey: "createdBy.name",
         cell: ({ row }) => (
-          <span className="text-sm text-slate-600">{row.original.createdBy?.name || "N/A"}</span>
+          <span className="text-sm text-slate-800 ">{row.original.createdBy?.name || "N/A"}</span>
         ),
       },
       {

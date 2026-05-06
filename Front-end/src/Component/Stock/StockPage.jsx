@@ -54,11 +54,15 @@ export default function StockPage() {
         setIsUpdating={setIsUpdating}
         selectedMovement={selectedMovement}
       />
-      <Delete
-        isDeleting={isDeleting}
-        setIsDeleting={setIsDeleting}
-        selectedMovement={selectedMovement}
-      />
+      {
+        isDeleting && (
+          <Delete
+            isDeleting={isDeleting}
+            setIsDeleting={setIsDeleting}
+            selectedMovement={selectedMovement}
+          />
+        )
+      }
     </div>
   );
 }

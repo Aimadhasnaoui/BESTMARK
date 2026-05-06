@@ -8,30 +8,38 @@ export const CreateCategory = catchAsync(async (req, res, next) => {
 });
 
 export const GetCategories = catchAsync(async (req, res, next) => {
-  const categories = await Category.find();
+  const categories = await Category.find().sort({ createdAt: -1 });
   res.status(200).json({ success: true, categories });
 });
 
 export const GetCategory = catchAsync(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
-  if(!category){
-    return next(new APPError(`Category with ID ${req.params.id} not found`, 404));
+  if (!category) {
+    return next(
+      new APPError(`Category with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, category });
 });
 
 export const UpdateCategory = catchAsync(async (req, res, next) => {
-  const category = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if(!category){
-    return next(new APPError(`Category with ID ${req.params.id} not found`, 404));
+  const category = await Category.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  if (!category) {
+    return next(
+      new APPError(`Category with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, category });
 });
 
 export const DeleteCategory = catchAsync(async (req, res, next) => {
   const category = await Category.findByIdAndDelete(req.params.id);
-  if(!category){
-    return next(new APPError(`Category with ID ${req.params.id} not found`, 404));
+  if (!category) {
+    return next(
+      new APPError(`Category with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, category });
 });

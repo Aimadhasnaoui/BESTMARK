@@ -23,7 +23,11 @@ function HomePage() {
           setbuttoAppear={setbuttoAppear}
           setBuyerModalOpen={setBuyerModalOpen}
         />
-        <Add isAdding={buyerModalOpen} setIsAdding={setBuyerModalOpen} />
+        {
+          buttonAppear && (
+            <Add isAdding={buyerModalOpen} setIsAdding={setBuyerModalOpen} />
+          )
+        }
       </main>
     </SidebarProvider>
   );

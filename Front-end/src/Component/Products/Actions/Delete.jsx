@@ -32,6 +32,7 @@ export default function Delete({ isDeleting, setIsDeleting, selectedProduct }) {
           isError={isError}
           error={error}
           errorTitle='Échec de la suppression des données'
+           errorMessage={error?.response?.data?.message}
         >
         </DeletModel>
       )}

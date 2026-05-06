@@ -12,6 +12,9 @@ export default function Delete({ isDeleting, setIsDeleting, selectedPurchase }) 
     onSuccess: () => {
       setIsDeleting(false);
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      queryClient.invalidateQueries({ queryKey: ["stockMovements"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Achat supprimé avec succès");
     },
   });
@@ -25,6 +28,7 @@ export default function Delete({ isDeleting, setIsDeleting, selectedPurchase }) 
       isError={isError}
       error={error}
       title="Supprimer l'achat ?"
+      errorMessage={error?.response?.data?.message}
       itemName={selectedPurchase ? `Achat ${selectedPurchase.code}` : ""}
       DeleteMsg="Voulez-vous vraiment supprimer cet enregistrement d'achat ?"
     />

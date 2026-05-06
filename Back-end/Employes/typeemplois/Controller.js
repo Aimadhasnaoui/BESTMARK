@@ -8,30 +8,40 @@ export const CreateEmployeeType = catchAsync(async (req, res, next) => {
 });
 
 export const GetEmployeeTypes = catchAsync(async (req, res, next) => {
-  const employeeTypes = await EmployeeType.find();
+  const employeeTypes = await EmployeeType.find().sort({ createdAt: -1 });
   res.status(200).json({ success: true, employeeTypes });
 });
 
 export const GetEmployeeType = catchAsync(async (req, res, next) => {
   const employeeType = await EmployeeType.findById(req.params.id);
-  if(!employeeType){
-    return next(new APPError(`Employee type with ID ${req.params.id} not found`, 404));
+  if (!employeeType) {
+    return next(
+      new APPError(`Employee type with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, employeeType });
 });
 
 export const UpdateEmployeeType = catchAsync(async (req, res, next) => {
-  const employeeType = await EmployeeType.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if(!employeeType){
-    return next(new APPError(`Employee type with ID ${req.params.id} not found`, 404));
+  const employeeType = await EmployeeType.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true },
+  );
+  if (!employeeType) {
+    return next(
+      new APPError(`Employee type with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, employeeType });
 });
 
 export const DeleteEmployeeType = catchAsync(async (req, res, next) => {
   const employeeType = await EmployeeType.findByIdAndDelete(req.params.id);
-  if(!employeeType){
-    return next(new APPError(`Employee type with ID ${req.params.id} not found`, 404));
+  if (!employeeType) {
+    return next(
+      new APPError(`Employee type with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, employeeType });
 });

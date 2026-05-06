@@ -29,6 +29,7 @@ export default function Delet({isDeleting,setIsDeleting,selectedType}) {
           isError={isError}
           error={error}
           errorTitle='Échec de la suppression des données'
+          errorMessage={error?.response?.data?.message}
         />
       )}
     </div>

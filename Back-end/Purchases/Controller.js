@@ -16,6 +16,7 @@ export const CreatePurchase = async (req, res, next) => {
       }
 
       const [purchase] = await Purchases.create([req.body], { session });
+      const ProdcutsName = [];
 
       await supplier.save({ session });
       for (const item of req.body.items) {
@@ -23,7 +24,10 @@ export const CreatePurchase = async (req, res, next) => {
         if (!product) {
           return next(new APPError("Product not found", 404));
         }
-        product.quantity += item.quantity;
+        ProdcutsName.push(
+          `(${product.name}) pour un montant de ${item.buyingPrice}`,
+        );
+        product.quantity += Number(item.quantity);
         await product.save({ session });
 
         await StockMovement.create(
@@ -33,10 +37,11 @@ export const CreatePurchase = async (req, res, next) => {
               createdBy: req.user?.id ?? null,
               type: "purchase",
               quantity: item.quantity,
-              quantityBefore: product.quantity - item.quantity,
+              quantityBefore: product.quantity - Number(item.quantity),
               quantityAfter: product.quantity,
               referenceModel: "Purchase",
-              createdBy:req.body.user
+              createdBy: req.body.user,
+              referenceId: purchase._id,
             },
           ],
           { session },
@@ -51,7 +56,7 @@ export const CreatePurchase = async (req, res, next) => {
             amount: req.body.totalAmount,
             referenceModel: "Purchase",
             performedBy: req.user?.id ?? null,
-            note: `acheter  le produit  pour un montant de ${req.body.totalAmount} a  fournisseur : ${supplier.name}`,
+            note: `acheter  les  produits (${ProdcutsName.join(",")})  pour un montant de ${req.body.totalAmount} a  fournisseur : ${supplier.name}`,
             referenceId: purchase._id,
           },
         ],
@@ -69,8 +74,7 @@ export const CreatePurchase = async (req, res, next) => {
 };
 
 export const GetPurchases = catchAsync(async (req, res, next) => {
-  const session = await mongoose.startSession();
-  const purchases = await Purchases.find();
+  const purchases = await Purchases.find().sort({ createdAt: -1 });
 
   res.status(200).json({ success: true, purchases });
 });
@@ -98,7 +102,37 @@ export const UpdatePurchase = catchAsync(async (req, res, next) => {
 });
 
 export const DeletePurchase = catchAsync(async (req, res, next) => {
-  const purchase = await Purchases.findByIdAndDelete(req.params.id);
+  const session = await mongoose.startSession();
+  let purchase;
+  try {
+    await session.withTransaction(async () => {
+      purchase = await Purchases.findByIdAndDelete(req.params.id).session(
+        session,
+      );
+      if (!purchase) {
+        return next(
+          new APPError(`Purchase with ID ${req.params.id} not found`, 404),
+        );
+      }
+      for (const item of purchase.items) {
+        const product = await Products.findById(item.product);
+        if (!product) {
+          return next(new APPError("Product not found", 404));
+        }
+        product.quantity -= Number(item.quantity);
+        await product.save({ session });
+      }
+
+      await StockMovement.findOneAndDelete({ referenceId: req.params.id }).session(session);
+      await TranTransaction.findOneAndDelete({ referenceId: req.params.id }).session(
+        session,
+      );
+    });
+  } catch (error) {
+    return next(new APPError(error.message, 500));
+  } finally {
+    session.endSession();
+  }
   if (!purchase) {
     return next(
       new APPError(`Purchase with ID ${req.params.id} not found`, 404),

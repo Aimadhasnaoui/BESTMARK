@@ -8,21 +8,28 @@ export const CreateSale = catchAsync(async (req, res, next) => {
 });
 
 export const GetSales = catchAsync(async (req, res, next) => {
-  const sales = await Sale.find().populate('servedBy','deliveryMan');
+  const sales = await Sale.find()
+    .sort({ createdAt: -1 })
+    .populate("servedBy", "deliveryMan");
   res.status(200).json({ success: true, sales });
 });
 
 export const GetSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.findById(req.params.id).populate('servedBy','deliveryMan');
-  if(!sale){
+  const sale = await Sale.findById(req.params.id).populate(
+    "servedBy",
+    "deliveryMan",
+  );
+  if (!sale) {
     return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
   }
   res.status(200).json({ success: true, sale });
 });
 
 export const UpdateSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if(!sale){
+  const sale = await Sale.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  if (!sale) {
     return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
   }
   res.status(200).json({ success: true, sale });
@@ -30,7 +37,7 @@ export const UpdateSale = catchAsync(async (req, res, next) => {
 
 export const DeleteSale = catchAsync(async (req, res, next) => {
   const sale = await Sale.findByIdAndDelete(req.params.id);
-  if(!sale){
+  if (!sale) {
     return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
   }
   res.status(200).json({ success: true, sale });

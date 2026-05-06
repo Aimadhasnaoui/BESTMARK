@@ -33,6 +33,7 @@ export default function Delete({ isDeleting, setIsDeleting, selectedSupplier }) 
           isError={isError}
           error={error}
           errorTitle="Échec de la suppression"
+           errorMessage={error?.response?.data?.message}
         />
       )}
     </div>

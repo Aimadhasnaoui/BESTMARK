@@ -33,6 +33,8 @@ const StockMovementSchema = new mongoose.Schema({
     enum: ["Sale", "Purchase"], 
     required: true 
   },
+  referenceId: {
+    type: mongoose.Schema.Types.ObjectId,ref:'Purchase',required:true},
   note: { 
     type: String 
   },

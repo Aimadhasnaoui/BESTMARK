@@ -8,30 +8,38 @@ export const CreateExpense = catchAsync(async (req, res, next) => {
 });
 
 export const GetExpenses = catchAsync(async (req, res, next) => {
-  const expenses = await Expense.find();
+  const expenses = await Expense.find().sort({ createdAt: -1 });
   res.status(200).json({ success: true, expenses });
 });
 
 export const GetExpense = catchAsync(async (req, res, next) => {
   const expense = await Expense.findById(req.params.id);
-  if(!expense){
-    return next(new APPError(`Expense with ID ${req.params.id} not found`, 404));
+  if (!expense) {
+    return next(
+      new APPError(`Expense with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, expense });
 });
 
 export const UpdateExpense = catchAsync(async (req, res, next) => {
-  const expense = await Expense.findByIdAndUpdate(req.params.id, req.body, { new: true });
-  if(!expense){
-    return next(new APPError(`Expense with ID ${req.params.id} not found`, 404));
+  const expense = await Expense.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  if (!expense) {
+    return next(
+      new APPError(`Expense with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, expense });
 });
 
 export const DeleteExpense = catchAsync(async (req, res, next) => {
   const expense = await Expense.findByIdAndDelete(req.params.id);
-  if(!expense){
-    return next(new APPError(`Expense with ID ${req.params.id} not found`, 404));
+  if (!expense) {
+    return next(
+      new APPError(`Expense with ID ${req.params.id} not found`, 404),
+    );
   }
   res.status(200).json({ success: true, expense });
 });

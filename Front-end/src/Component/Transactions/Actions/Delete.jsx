@@ -4,7 +4,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeleteTransaction } from "@/Servises/Transactions";
 import { toast } from "sonner";
 
-export default function Delete({ isDeleting, setIsDeleting, selectedTransaction }) {
+export default function Delete({
+  isDeleting,
+  setIsDeleting,
+  selectedTransaction,
+}) {
   const queryClient = useQueryClient();
 
   const { mutate, isPending, isError, error } = useMutation({
@@ -27,6 +31,7 @@ export default function Delete({ isDeleting, setIsDeleting, selectedTransaction 
       DeleteMsg={`Êtes-vous sûr de vouloir supprimer cette transaction d'un montant de ${selectedTransaction?.amount} MAD ? Cette action est irréversible.`}
       isError={isError}
       error={error}
+      errorMessage={error?.response?.data?.message}
     />
   );
 }

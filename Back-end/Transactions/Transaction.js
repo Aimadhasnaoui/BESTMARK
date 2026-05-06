@@ -20,6 +20,7 @@ const TransactionSchema = new mongoose.Schema({
   performedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   date: {type:Date,required:true,default:Date.now},
   note: {type:String,required:true}
+  
 },{timestamps:true});
 
 module.exports = mongoose.model("Transaction", TransactionSchema);

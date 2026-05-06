@@ -15,7 +15,8 @@ export default function DeletModel({
   DeleteMsg = "",
   isError,
   error,
-  errorTitle="Erreur de validation",
+  errorTitle = "Erreur de suppression",
+  errorMessage,
 }) {
   return (
     <Dialog open={open} onOpenChange={setIsOpen}>
@@ -24,10 +25,14 @@ export default function DeletModel({
         className="sm:max-w-[420px] p-0 overflow-hidden border-none bg-white shadow-2xl rounded-3xl animate-in fade-in zoom-in duration-300"
       >
         {isError && (
-          <ErrorAlert
-            message={error?.message || "Une erreur est survenue lors du traitement."}
-            title={errorTitle}
-          />
+          <div className="px-4">
+            <ErrorAlert
+              message={
+                errorMessage || "Une erreur est survenue lors du traitement."
+              }
+              title={errorTitle}
+            />
+          </div>
         )}
         <div className="flex flex-col items-center pt-12 pb-8 px-8 text-center">
           {/* Circular Trash Icon with Glow Effect */}
@@ -59,7 +64,8 @@ export default function DeletModel({
                       <span className="text-[#C21E1E] underline italic decoration-1 underline-offset-4 font-medium">
                         est irréversible
                       </span>{" "}
-                      et peut affecter les enregistrements d'inventaire, l'historique des rapports et les alertes de stock.
+                      et peut affecter les enregistrements d'inventaire,
+                      l'historique des rapports et les alertes de stock.
                     </>
                   )}
                 </>
@@ -94,7 +100,8 @@ export default function DeletModel({
           <div className="bg-[#F8FAFC] py-5 px-8 flex items-center gap-3 border-t border-[#F1F5F9]">
             <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
             <p className="text-[11px] font-extrabold text-[#94A3B8] leading-tight tracking-[0.05em] uppercase text-left">
-              {hasWaringMsg || "ATTENTION : LES ÉLÉMENTS ASSOCIÉS PERDRONT CETTE CATÉGORIE."}
+              {hasWaringMsg ||
+                "ATTENTION : LES ÉLÉMENTS ASSOCIÉS PERDRONT CETTE CATÉGORIE."}
             </p>
           </div>
         )}

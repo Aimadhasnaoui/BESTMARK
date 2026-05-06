@@ -2,6 +2,7 @@ import React, { useMemo } from "react";
 import { DataTable } from "../UI/TablesUi/DataTable";
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
 import { Badge } from "@/components/ui/badge";
+import dayjs from "dayjs";
 import { 
   ArrowUpCircle, 
   ArrowDownCircle, 
@@ -27,7 +28,7 @@ export default function TransactionsTable({
         cell: ({ row }) => (
           <div className="flex items-center gap-2 text-gray-600">
             <Calendar className="w-4 h-4 text-gray-400" />
-            {new Date(row.getValue("date")).toLocaleDateString("fr-FR")}
+            {dayjs(row.getValue("date")).format("DD/MM/YYYY HH:mm")}
           </div>
         ),
       },

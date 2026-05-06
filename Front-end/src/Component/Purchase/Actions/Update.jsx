@@ -72,6 +72,9 @@ export default function Update({ isUpdating, setIsUpdating, selectedPurchase }) 
     onSuccess: () => {
       setIsUpdating(false);
       queryClient.invalidateQueries({ queryKey: ["purchases"] });
+      queryClient.invalidateQueries({ queryKey: ["stockMovements"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("L'achat a été modifié avec succès");
     },
   });
