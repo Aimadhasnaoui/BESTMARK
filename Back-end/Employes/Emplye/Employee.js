@@ -1,23 +1,26 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const validator = require('validator');
 const EmployeeSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
-  email: { type: String, trim: true, unique: true },
-  phone: { type: String, required: true, trim: true },
+  email: { type: String, trim: true, unique: true, validate: [validator.isEmail, "Please enter a valid email"] },
+  phone: { type: String, required: true, trim: true, validate: [validator.isMobilePhone, "Please enter a valid phone number"] },
   address: { type: String },
   mission: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: "EmployeeType", 
     required: true 
   },
+  image:{type:String},
   salary: { type: Number, required: true },
   password: { type: String, required: [true, "Password is required"],minlength:[8, "Password is too short"] },
   isActive: { type: Boolean, default: true },
 }, { timestamps: true });
 EmployeeSchema.pre("save", async function () {
+  //only if the password change
   if (!this.isModified("password")) return ;
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  // encrypt the password
+  this.password = await bcrypt.hash(this.password, 12);
 });
 
 // Method to compare password
