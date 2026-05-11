@@ -17,6 +17,22 @@ export const GetTransactions = async () => {
         throw error;
     }
 };
+export const GetTransactionsbyid = async (id) => {
+    try {
+        const response = await axiosInstance.get(`/transactions/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+export const GetTransactionsbyref = async (ref) => {
+    try {
+        const response = await axiosInstance.get(`/transactions/reference/${ref}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
 
 export const UpdateTransaction = async (id, data) => {
     try {

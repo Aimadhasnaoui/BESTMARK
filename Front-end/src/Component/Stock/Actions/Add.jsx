@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
 import {
   Field,
@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 
 export default function Add({ isAdding, setIsAdding }) {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient(); 
   const {
     register,
     handleSubmit,
@@ -31,7 +31,7 @@ export default function Add({ isAdding, setIsAdding }) {
     watch,
     control,
     setValue,
-    formState: { errors },
+    formState: { errors,dirtyFields  },
   } = useForm({
     defaultValues: {
       type: "adjustment",
@@ -50,30 +50,35 @@ export default function Add({ isAdding, setIsAdding }) {
   const selectedProductId = watch("product");
   const quantityMovement = watch("quantity");
   const movementType = watch("type");
+  const priceMovementvalue = watch("price");
+
   const selectedProduct = productsData?.products?.find(
     (p) => p._id === selectedProductId,
   );
 
   useEffect(() => {
-    if (movementType === "return" && quantityMovement && selectedProduct) {
+if (movementType === "return" && quantityMovement && selectedProduct) {
+    console.log('quantity chnage')
       const price =
-        Number(quantityMovement) * Number(selectedProduct?.buyingPrice);
+        Number(quantityMovement) * Number(selectedProduct?.sellingPrice);
       setValue("price", price);
       setValue(
         "note",
         `Retour de ${quantityMovement} unités du produit ${selectedProduct?.name} a la date du ${new Date().toLocaleDateString()} est remboursement de ${price} `,
       );
     }
-    if (movementType == "adjustment") {
+
+    else if (movementType == "adjustment") {
       setValue(
         "note",
         `Ajustement le  produit ${selectedProduct?.name} par ${quantityMovement > 0 ? "une augmentation" : "une diminution"} de ${quantityMovement}`,
       );
-    } else {
+    } 
+    else {
       setValue("price", 0);
       setValue("note", ``);
     }
-  }, [movementType, quantityMovement, selectedProduct]);
+  }, [movementType, quantityMovement, selectedProduct,setValue]);
 
   const { mutate, isPending, error, isError } = useMutation({
     mutationFn: AddStockMovement,
@@ -249,12 +254,21 @@ export default function Add({ isAdding, setIsAdding }) {
                       type="number"
                       size="small"
                       placeholder="0.00"
+
                       onWheel={(e) => e.target.blur()}
                       {...register("price", {
                         required: "Requis pour un retour",
                         min: {
                           value: 1,
                           message: "Le prix doit être au moins 1",
+                        },
+                        onChange: (e) => {
+                          const priceMovementvalue = e.target.value;
+
+                          setValue(
+                            "note",
+                            `Retour de ${quantityMovement} unités du produit ${selectedProduct?.name} a la date du ${new Date().toLocaleDateString()} est remboursement de ${priceMovementvalue} `,
+                          );
                         },
                       })}
                     />

@@ -92,38 +92,29 @@ export const UpdatePurchase = catchAsync(async (req, res, next) => {
   res.status(200).json({ success: true, purchase });
 });
 
-export const DeletePurchase = catchAsync(async (req, res, next) => {
-  const session = await mongoose.startSession();
-  let purchase;
-  try {
-    await session.withTransaction(async () => {
-      purchase = await Purchases.findByIdAndDelete(req.params.id).session(
-        session,
-      );
-      if (!purchase) {
-        return next(
-          new APPError(`Purchase with ID ${req.params.id} not found`, 404),
-        );
-      }
-      for (const item of purchase.items) {
-        const product = await Products.findById(item.product);
-        if (!product) {
-          return next(new APPError("Product not found", 404));
-        }
-        product.quantity -= Number(item.quantity);
-        await product.save({ session });
-      }
-
-      await StockMovement.findOneAndDelete({ referenceId: req.params.id }).session(session);
-      await TranTransaction.findOneAndDelete({ referenceId: req.params.id }).session(
-        session,
-      );
-    });
-  } catch (error) {
-    return next(new APPError(error.message, 500));
-  } finally {
-    session.endSession();
+export const DeletePurchase = transactional(async (req, res, next, session) => {
+  let purchase = await Purchases.findByIdAndDelete(req.params.id).session(
+    session,
+  );
+  if (!purchase) {
+    return next(
+      new APPError(`Purchase with ID ${req.params.id} not found`, 404),
+    );
   }
+  for (const item of purchase.items) {
+    const product = await Products.findById(item.product);
+    if (!product) {
+      return next(new APPError("Product not found", 404));
+    }
+    product.quantity -= Number(item.quantity);
+    await product.save({ session });
+  }
+  await StockMovement.findOneAndDelete({ referenceId: req.params.id }).session(
+    session,
+  );
+  await TranTransaction.findOneAndDelete({
+    referenceId: req.params.id,
+  }).session(session);
   if (!purchase) {
     return next(
       new APPError(`Purchase with ID ${req.params.id} not found`, 404),

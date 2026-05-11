@@ -22,6 +22,15 @@ export const GetTransaction = catchAsync(async (req, res, next) => {
   }
   res.status(200).json({ success: true, transaction });
 });
+export const GetTransactionByRef = catchAsync(async (req, res, next) => {
+  const transaction = await Transaction.findOne({ referenceId: req.params.ref });
+  if (!transaction) {
+    return next(
+      new APPError(`Transaction with ID ${req.params.ref} not found`, 404),
+    );
+  }
+  res.status(200).json({ success: true, transaction });
+});
 
 export const UpdateTransaction = catchAsync(async (req, res, next) => {
   const transaction = await Transaction.findByIdAndUpdate(

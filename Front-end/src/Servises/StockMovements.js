@@ -18,9 +18,9 @@ export const GetStockMovements = async () => {
     }
 };
 
-export const UpdateStockMovement = async (id, data) => {
+export const UpdateStockMovement = async ({id, data}) => {
     try {
-        const response = await axiosInstance.patch(`/stock-movements/${id}`, data);
+        const response = await axiosInstance.put(`/stock-movements/${id}`, data);
         return response.data;
     } catch (error) {
         throw error;

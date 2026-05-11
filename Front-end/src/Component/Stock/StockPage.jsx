@@ -49,11 +49,15 @@ export default function StockPage() {
 
       {/* Action Modals */}
       <Add isAdding={isAdding} setIsAdding={setIsAdding} />
+      {
+        isUpdating && (
       <Update
         isUpdating={isUpdating}
         setIsUpdating={setIsUpdating}
         selectedMovement={selectedMovement}
       />
+        )
+      }
       {
         isDeleting && (
           <Delete

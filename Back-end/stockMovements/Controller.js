@@ -72,7 +72,7 @@ export const GetStockMovement = catchAsync(async (req, res, next) => {
 export const UpdateStockMovement = transactional(
   async (req, res, next, session) => {
     const { quantity, price, note, prodcutQantity } = req.body;
-
+    console.log(price);
     // 1. Get the current stock movement
     let stockMovement = await StockMovement.findById(req.params.id).session(
       session,
@@ -81,27 +81,24 @@ export const UpdateStockMovement = transactional(
       throw new APPError(`Mouvement de stock non trouvé`, 404);
     }
 
-    // 2. Calculate the new quantityAfter based on original quantityBefore
-    // If it's a return, we subtract from quantityBefore. If adjustment, we add.
-
-    // 3. Update the StockMovement record
     stockMovement = await StockMovement.findByIdAndUpdate(
       req.params.id,
       {
         quantity: Number(quantity),
         price: Number(price),
         note: note,
-        quantityAfter: prodcutQantity,
+        quantityAfter: Number(prodcutQantity),
       },
       { new: true, session },
     );
-
+    console.log('stock get updated');
     // 4. Update the Product stock to match the new calculation
     await Products.findByIdAndUpdate(
       stockMovement.product,
-      { quantity: prodcutQantity },
+      { quantity: Number(prodcutQantity) },
       { session },
     );
+    console.log('product get updated');
 
     // 5. Update the associated Transaction amount if it's a return
     if (price !== undefined && stockMovement.type === "return") {
@@ -114,6 +111,7 @@ export const UpdateStockMovement = transactional(
         { session },
       );
     }
+    console.log('price get updated');
 
     res.status(200).json({ success: true, stockMovement });
   },
