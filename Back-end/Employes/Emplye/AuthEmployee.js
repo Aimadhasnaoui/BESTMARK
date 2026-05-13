@@ -9,8 +9,7 @@ export const LoginEmplois = catchAsync(async (req, res, next) => {
     return next(new APPError("Please enter your name and password", 400));
   }
   const employee = await Employee.findOne({ name: username }).select(
-    "+password",
-  );
+    "+password +isActive");
   if (!employee) {
     return next(new APPError("le nom d'employe   est incorrect ", 401));
   }
@@ -57,7 +56,9 @@ export const Protect = catchAsync(async (req, res, next) => {
   }
   token = req.headers.authorization.split(" ")[1];
   const decodedToken = jwt.verify(token, process.env.SecureTokenKey);
-  const userexist = await Employee.findById(decodedToken.id);
+  const userexist = await Employee.findById(decodedToken.id).select(
+    "+isActive"
+  );;
   if (!userexist || !userexist.isActive) {
     return next(
       new APPError("l'accès de l'utilisateur a été  desactiver", 401),

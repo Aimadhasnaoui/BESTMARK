@@ -14,7 +14,7 @@ const EmployeeSchema = new mongoose.Schema({
   image:{type:String},
   salary: { type: Number, required: true },
   password: { type: String, required: [true, "Password is required"],minlength:[8, "Password is too short"],select:false },
-  isActive: { type: Boolean, default: true },
+  isActive: { type: Boolean, default: true ,select:false},
   passwordchangeafter:{type:Date,defaul:new Date()}
 }, { timestamps: true });
 EmployeeSchema.pre("save", async function () {
