@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const validator = require('validator');
 const EmployeeSchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
+  name: { type: String, required: true, trim: true ,unique: true},
   email: { type: String, trim: true, unique: true, validate: [validator.isEmail, "Please enter a valid email"] },
-  phone: { type: String, required: true, trim: true, validate: [validator.isMobilePhone, "Please enter a valid phone number"] },
+  phone: { type: String, required: true, trim: true },
   address: { type: String },
   mission: { 
     type: mongoose.Schema.Types.ObjectId, 
@@ -13,8 +13,9 @@ const EmployeeSchema = new mongoose.Schema({
   },
   image:{type:String},
   salary: { type: Number, required: true },
-  password: { type: String, required: [true, "Password is required"],minlength:[8, "Password is too short"] },
+  password: { type: String, required: [true, "Password is required"],minlength:[8, "Password is too short"],select:false },
   isActive: { type: Boolean, default: true },
+  passwordchangeafter:{type:Date,defaul:new Date()}
 }, { timestamps: true });
 EmployeeSchema.pre("save", async function () {
   //only if the password change
@@ -27,4 +28,14 @@ EmployeeSchema.pre("save", async function () {
 EmployeeSchema.methods.matchPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
+EmployeeSchema.methods.isPaswordchnageAfterToekn = async function (tokentime){
+  const timestampInSeconds = Math.floor(this.passwordchangeafter/ 1000);
+  console.log(this.passwordchangeafter)
+  console.log(tokentime)
+  console.log( timestampInSeconds > tokentime)
+  if(this.passwordchangeafter){
+return timestampInSeconds > tokentime
+  }
+  return false
+} 
 module.exports = mongoose.model("Employee", EmployeeSchema);

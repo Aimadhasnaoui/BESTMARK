@@ -20,6 +20,7 @@ import Product from "./Products/Product/Router.js";
 import Category from "./Products/Productcategories/Router.js";
 import Expense from "./expenses/expense/Router.js";
 import ExpenseType from "./expenses/ExpensesType/Router.js";
+import { LoginEmplois, Protect } from "./Employes/Emplye/AuthEmployee.js";
 
 const app = express();
 dotenv.config();
@@ -36,19 +37,20 @@ app.use(cors());
 app.disable("x-powered-by");
 
 app.use("/api/users", User);
-app.use("/api/transactions", Transaction);
-app.use("/api/stock-movements", StockMovement);
-app.use("/api/customers", Customer);
-app.use("/api/delivery", Delivery);
-app.use("/api/purchases", Purchase);
+app.use("/api/transactions", Protect, Transaction);
+app.use("/api/stock-movements", Protect, StockMovement);
+app.use("/api/customers", Protect, Customer);
+app.use("/api/delivery", Protect, Delivery);
+app.use("/api/purchases", Protect, Purchase);
 app.use("/api/suppliers", Supplier);
 app.use("/api/sales", Sale);
-app.use("/api/employees", Employee);
+app.use("/api/employees",Protect, Employee);
 app.use("/api/employee-types", EmployeeType);
 app.use("/api/products", Product);
 app.use("/api/categories/products", Category);
 app.use("/api/expenses", Expense);
 app.use("/api/expense-types", ExpenseType);
+app.post("/api/auth/login", LoginEmplois);
 
 app.all(/.*/, handeUnhanledRoute);
 app.use(globalErrorHandler);
