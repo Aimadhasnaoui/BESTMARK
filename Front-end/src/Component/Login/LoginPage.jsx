@@ -3,30 +3,12 @@ import LoginForm from './LoginForm'
 import {
   ShoppingCart,
 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
-import { me } from "@/Servises/Autontification";
-import LoaderApp from "@/Component/UI/LoaderApp";
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Outlet } from "react-router-dom";
-export default function LoginPage() {
-    const navigate = useNavigate();
-  const { isPending, isSuccess } = useQuery({
-    queryKey: ["me"],
-    queryFn: () => me(),
-    retry: false, // Ne pas réessayer si on a une erreur 401
-  });
 
-  useEffect(() => {
-    if (isSuccess) {
-      navigate("/");
-    }
-  }, [isSuccess]);
+export default function LoginPage() {
+
   return (
     <>
-      {isPending ? (
-        <LoaderApp />
-      ) : (
+
         <div className="w-full flex h-screen">
           <div className="LoginBackground relative w-[45%]">
             <div className="m-4 flex gap-1 items-center">
@@ -41,7 +23,6 @@ export default function LoginPage() {
           </div>
           <LoginForm />
         </div>
-      )}
     </>
   );
 }

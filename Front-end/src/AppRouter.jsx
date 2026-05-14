@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "./Component/ErrorPage/ErrorPage";
-import HomePage from "./Component/Home/HomePage";
 import NoAccesPage from "./Component/ErrorPage/NoAccesPage";
+import HomePage from "./Component/Home/HomePage";
 import SettingPage from "./Component/Settings/SettingPage";
 import ProductsPage from "./Component/Products/ProducstPage";
 import SuppliersPage from "./Component/Suppliers/SuppliersPage";
@@ -13,11 +13,43 @@ import DeliveryPage from "./Component/Delivery/DeliveryPage";
 import CustomersPage from "./Component/Customers/CustomersPage";
 import TransactionsPage from "./Component/Transactions/TransactionsPage";
 import LoginPage from "./Component/Login/LoginPage";
+import { useQuery } from "@tanstack/react-query";
+import { me } from "@/Servises/Autontification";
+import LoaderApp from "@/Component/UI/LoaderApp";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+function RederirectLogin() {
+  const navigate = useNavigate();
+  const { isPending, isSuccess, isError } = useQuery({
+    queryKey: ["me"],
+    queryFn: () => me(),
+    retry: false, // Ne pas réessayer si on a une erreur 401
+  });
+
+  useEffect(() => {
+    if (isSuccess) {
+      navigate("/");
+    }
+  }, [isSuccess]);
+  return (
+    <>
+      {isPending && <LoaderApp></LoaderApp>}
+      {isError && <Outlet></Outlet>}
+    </>
+  );
+}
 
 export const router = createBrowserRouter([
   {
     path: "/login",
-    element: <LoginPage />,
+    element: <RederirectLogin></RederirectLogin>,
+    children: [
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+    ],
   },
   {
     path: "/",
@@ -65,8 +97,4 @@ export const router = createBrowserRouter([
       },
     ],
   },
-  //     {
-  //   path: "*",
-  //   element: <HomePage></HomePage>,
-  // },
 ]);
