@@ -7,7 +7,7 @@ import {
   UpdateEmployee,
   DeleteEmployee,
 } from "./Controller.js";
-import { ChnageUserPaword, DesactiverAccount, me } from "./AuthEmployee.js";
+import { ChnageUserPaword, DesactiverAccount, me ,Logout} from "./AuthEmployee.js";
 
 router.route("/").post(CreateEmployee).get(GetEmployees);
 router
@@ -18,5 +18,6 @@ router
 router.get("/me", me);
 router.put("/password/:id", ChnageUserPaword);
 router.put("/Desactiver/Account/:id", DesactiverAccount);
+router.post('/logout',Logout)
 
 export default router;

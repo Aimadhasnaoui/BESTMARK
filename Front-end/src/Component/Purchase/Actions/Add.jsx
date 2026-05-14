@@ -114,9 +114,6 @@ const selectedSupplier = watch("supplier");
     };
     mutate({...formattedData,user:"69f65879f5edb8544b105f4c"});
   };
-  useEffect(() => {
-    console.log(errors);
-  }, [errors]);
 
   return (
     <div>

@@ -36,7 +36,6 @@ export const globalErrorHandler = (err, req, res, next) => {
         }
         if (err.name === 'ValidationError'){
           const errors = Object.values(err.errors).map(error => error.message);
-          console.log(errors)
             res.status(400).send(errors);
        
         }

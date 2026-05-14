@@ -2,10 +2,6 @@ import Employee from "./Employee.js";
 import { catchAsync } from "../../utils/CatchFunction.js";
 import APPError from "../../utils/ErrorHandler.js";
 import jwt from "jsonwebtoken";
-const CookiesParametr = {
-  expires: new Date(Date.now() + process.env.CookieseXPIRE),
-  httpOnly: true,
-};
 //login Controller
 export const LoginEmplois = catchAsync(async (req, res, next) => {
   const { username, password } = req.body;
@@ -22,13 +18,13 @@ export const LoginEmplois = catchAsync(async (req, res, next) => {
   );
   if (!employee) {
     return next(
-      new APPError("le nom d'employe ou le password  est incorrect ", 401),
+      new APPError("le nom d'employe ou le password  est incorrect ", 404),
     );
   }
   const isMatch = await employee.matchPassword(password);
   if (!isMatch) {
     return next(
-      new APPError(" le nom d'employe ou le password est incorrect  ", 401),
+      new APPError(" le nom d'employe ou le password est incorrect  ", 404),
     );
   }
   if (!employee.isActive) {
@@ -38,11 +34,34 @@ export const LoginEmplois = catchAsync(async (req, res, next) => {
   const token = jwt.sign(paylouad, process.env.SecureTokenKey, {
     expiresIn: process.env.tOKENeXPIRE,
   });
-  if (process.env.envirement === production) CookiesParametr.secure = true;
+
+  const cookieExpiresInDays = parseInt(process.env.CookieseXPIRE, 10) || 30;
+  const CookiesParametr = {
+    expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
+    httpOnly: true,
+      sameSite: "strict"
+  };
+  if (process.env.envirement === "production") CookiesParametr.secure = true;
   res.cookie("jwt", token, CookiesParametr);
 
   res.status(200).json({ message: "Connexion réussie pour l'utilisateur" });
 });
+
+//logout controller
+export const Logout = catchAsync(async (req, res, next) => {
+
+  res.cookie("jwt", "", {
+    expires: new Date(0),
+    httpOnly: true,
+    secure: process.env.envirement === "production",
+    sameSite: "strict",
+  });
+
+  res.status(200).json({
+    message: "Déconnexion réussie",
+  });
+});
+
 
 // changer password controller
 export const ChnageUserPaword = catchAsync(async (req, res, next) => {
@@ -92,11 +111,14 @@ export const me = catchAsync(async (req, res, next) => {
 // verify token midelware
 export const Protect = catchAsync(async (req, res, next) => {
   let token;
-  if (!req?.headers?.authorization || !req.headers) {
-    console.log("accès refusé");
+  if (req?.cookies?.jwt) {
+    token = req.cookies.jwt;
+  } else if (req?.headers?.authorization?.startsWith("Bearer ")) {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  if (!token) {
     return next(new APPError("accès refusé", 401));
   }
-  token = req.headers.authorization.split(" ")[1];
   const decodedToken = jwt.verify(token, process.env.SecureTokenKey);
   const userexist = await Employee.findById(decodedToken.id).select(
     "+isActive",

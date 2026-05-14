@@ -148,3 +148,14 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+.LoginBackground {
+  background-image: linear-gradient(
+      to top,
+      rgba(37, 99, 235, 0.8) 0%,
+      rgba(37, 99, 235, 0.2) 100%
+    ),
+    url(./assets/LoginBackground.png);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}

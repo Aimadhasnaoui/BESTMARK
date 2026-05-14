@@ -58,8 +58,6 @@ export default function Update({
   );
   useEffect(() => {
     if (selectedMovement) {
-      console.log("selectedMovement", selectedMovement);
-      console.log("transactionData", transactionData?.transaction?.amount);
       reset({
         product: selectedMovement.product?._id || selectedMovement.product,
         type: selectedMovement.type,
@@ -75,7 +73,6 @@ export default function Update({
     if (movementType === "return" && quantityMovement && selectedProduct) {
       const price =
         Number(quantityMovement) * Number(selectedProduct?.sellingPrice);
-      console.log(price);
       setValue("price", price);
       setValue(
         "note",
@@ -114,9 +111,6 @@ export default function Update({
       note: data.note,
     };
     mutate({ id: selectedMovement._id, data: formattedData });
-    console.log("formattedData", formattedData);
-    console.log("selectedMovement", selectedMovement);
-    console.log("selectedMovement._id", selectedMovement._id);
   };
 
   return (

@@ -12,6 +12,7 @@ import SalesPage from "./Component/Sales/SalesPage";
 import DeliveryPage from "./Component/Delivery/DeliveryPage";
 import CustomersPage from "./Component/Customers/CustomersPage";
 import TransactionsPage from "./Component/Transactions/TransactionsPage";
+import LoginPage from "./Component/Login/LoginPage";
 export const router = createBrowserRouter([
 //   {
 //     path: "/login",
@@ -23,7 +24,10 @@ export const router = createBrowserRouter([
 //       },
 //     ],
 //   },
-
+  {
+        path:'/login',
+        element:<LoginPage></LoginPage>
+      },
   {
     path:'/',
     element: <HomePage/>,
@@ -67,14 +71,15 @@ export const router = createBrowserRouter([
       {
         path:"/finance",
         element:<TransactionsPage/>
-      }
+      },
+    
       
         
     ]
   },
-      {
-    path: "*",
-    element: <HomePage></HomePage>,
-  },
+  //     {
+  //   path: "*",
+  //   element: <HomePage></HomePage>,
+  // },
 
 ])

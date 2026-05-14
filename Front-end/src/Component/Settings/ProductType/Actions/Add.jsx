@@ -31,9 +31,6 @@ export default function Add({ isAdding, setIsAdding }) {
     },
   });
   const onSubmit = (data) => {
-    console.log("Form Data:", data);
-    // handleSubmitAdd(data);
-    console.log(data)
     mutate(data)
   };
   return (

@@ -58,7 +58,6 @@ export default function Add({ isAdding, setIsAdding }) {
 
   useEffect(() => {
 if (movementType === "return" && quantityMovement && selectedProduct) {
-    console.log('quantity chnage')
       const price =
         Number(quantityMovement) * Number(selectedProduct?.sellingPrice);
       setValue("price", price);

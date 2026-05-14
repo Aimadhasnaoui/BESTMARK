@@ -23,9 +23,8 @@ import ExpenseType from "./expenses/ExpensesType/Router.js";
 import { LoginEmplois, Protect } from "./Employes/Emplye/AuthEmployee.js";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-import mongoSanitize from "express-mongo-sanitize";
-import xss from "xss-clean";
 import hpp from "hpp";
+import cookieParser from 'cookie-parser'
 const app = express();
 dotenv.config();
 app.use(helmet());
@@ -41,38 +40,64 @@ mongoose
 // Configuration des middlewares de sécurité et de protection
 
 app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
+app.use(
   express.json({
     limit: "10kb",
   }),
 );
-app.use(mongoSanitize());
-app.use(xss());
+app.use(cookieParser())
+
+// Nettoyage in-place sécurisé pour bloquer les injections NoSQL ($) sans réassignation
+const sanitizeObject = (obj) => {
+  if (obj && typeof obj === "object") {
+    Object.keys(obj).forEach((key) => {
+      if (key.startsWith("$")) {
+        delete obj[key];
+      } else {
+        sanitizeObject(obj[key]);
+      }
+    });
+  }
+};
+const mongoSanitizeSafe = (req, res, next) => {
+  sanitizeObject(req.body);
+  sanitizeObject(req.query);
+  sanitizeObject(req.params);
+  next();
+};
+app.use(mongoSanitizeSafe);
+
 app.use(hpp());
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000, // 1 heure
-  message: "Trop de requêtes venant de cette adresse IP, veuillez réessayer plus tard.",
-});
-app.use("/api", limiter);
-app.use(cors());
+// const limiter = rateLimit({
+//   max: 100,
+//   windowMs: 60 * 60 * 1000, // 1 heure
+//   message:
+//     "Trop de requêtes venant de cette adresse IP, veuillez réessayer plus tard.",
+// });
+// app.use("/api", limiter);
 app.disable("x-powered-by");
 // Fin de la configuration des middlewares de sécurité
 
 // Définition des routes de l'API
-app.use("/api/users", User);
+app.use("/api/users",Protect, User);
 app.use("/api/transactions", Protect, Transaction);
 app.use("/api/stock-movements", Protect, StockMovement);
 app.use("/api/customers", Protect, Customer);
 app.use("/api/delivery", Protect, Delivery);
 app.use("/api/purchases", Protect, Purchase);
-app.use("/api/suppliers", Supplier);
-app.use("/api/sales", Sale);
+app.use("/api/suppliers",Protect, Supplier);
+app.use("/api/sales",Protect, Sale);
 app.use("/api/employees", Protect, Employee);
-app.use("/api/employee-types", EmployeeType);
-app.use("/api/products", Product);
-app.use("/api/categories/products", Category);
-app.use("/api/expenses", Expense);
-app.use("/api/expense-types", ExpenseType);
+app.use("/api/employee-types",Protect, EmployeeType);
+app.use("/api/products",Protect,Product);
+app.use("/api/categories/products",Protect,Category);
+app.use("/api/expenses",Protect,Expense);
+app.use("/api/expense-types",Protect,ExpenseType);
 app.post("/api/auth/login", LoginEmplois);
 // Fin des routes de l'API
 

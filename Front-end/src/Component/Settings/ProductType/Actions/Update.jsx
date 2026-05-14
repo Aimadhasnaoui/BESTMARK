@@ -30,8 +30,6 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
         toast("Product type has been updated", { variant: "success"})
         reset();
-        console.log('hello')
-
       },
   });
 

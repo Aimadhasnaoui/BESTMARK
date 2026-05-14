@@ -16,12 +16,7 @@ export default function Delete({ isDeleting, setIsDeleting, selectedMovement }) 
     },
   });
 
-  useEffect(()=>{
-    if(isError){
-      console.log("Full Error:", error)
-      console.log("Server Message:", error?.response?.data?.message)
-    }
-  },[isError])
+
 
   return (
     <DeletModel

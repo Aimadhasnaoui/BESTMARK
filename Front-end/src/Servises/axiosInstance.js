@@ -1,20 +1,21 @@
 import axios from "axios";
 
-export const axiosInstance=axios.create({
-    baseURL:import.meta.env.VITE_BASE_URL,
-})
+export const axiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_BASE_URL,
+  withCredentials: true, // Obligatoire pour envoyer automatiquement les cookies HttpOnly au serveur
+});
 
-// Attach token to outgoing requests
-// axiosInstance.interceptors.request.use(
-//   (config) => {
-//     const user = getUserFromCookies();
-//     if (user?.token) {
-//       config.headers.Authorization = `Bearer ${user.token}`;
-//     }
-//     return config;
-//   },
-//   (error) => Promise.reject(error)
-// );
+// Intercepteur de RÉPONSE pour capturer les erreurs HTTP entrantes (ex: 401 Unauthorized)
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    console.log(error);
+    if (error?.response?.status === 401) {
+      window.location.href = "/login"; // Utiliser = pour assigner et rediriger (et non ==)
+    }
 
+    return Promise.reject(error);
+  },
+);
 
-export default axiosInstance
+export default axiosInstance;

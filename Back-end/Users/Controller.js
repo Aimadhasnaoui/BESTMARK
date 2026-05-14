@@ -4,7 +4,6 @@ import APPError from "../utils/ErrorHandler.js";
 
 export const CreatUser = catchAsync(async (req, res, next) => {
   const existUser = await User.find({ phone: req.body.phone });
-  console.log(existUser);
   if (existUser.length > 0) {
     return next(
       new APPError(

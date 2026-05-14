@@ -44,9 +44,6 @@ EmployeeSchema.methods.matchPassword = async function (password) {
 };
 EmployeeSchema.methods.isPaswordchnageAfterToekn = async function (tokentime) {
   const timestampInSeconds = Math.floor(this.passwordchangeafter / 1000);
-  console.log(this.passwordchangeafter);
-  console.log(tokentime);
-  console.log(timestampInSeconds > tokentime);
   if (this.passwordchangeafter) {
     return timestampInSeconds > tokentime;
   }

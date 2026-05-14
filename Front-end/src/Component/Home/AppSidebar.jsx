@@ -26,31 +26,55 @@ import {
   HelpCircle,
   Settings,
   LogOut,
-  ShoppingCart,
   ShoppingBag,
-  Truck
+  Truck,
 } from "lucide-react";
 import Logo from "@/assets/Logo/logo.png";
-import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { LogOutUser } from "@/Servises/Autontification";
+import { useNavigate } from "react-router-dom";
 export default function AppSidebar({ currentPage, setcurrentPage }) {
   const { state, setOpen } = useSidebar();
-
+  const navigate = useNavigate();
+  const { mutate, isError } = useMutation({
+    mutationFn: LogOutUser,
+    onSuccess: () => {
+      navigate("/login");
+    },
+  });
 
   const menuItems = [
-    { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, path: "/dashboard" },
+    {
+      id: "dashboard",
+      label: "Tableau de bord",
+      icon: LayoutDashboard,
+      path: "/dashboard",
+    },
     { id: "products", label: "Produits", icon: Package, path: "/products" },
-    { id: "purchases", label: "Achats", icon: ShoppingBag, path: "/purchases" }, 
+    { id: "purchases", label: "Achats", icon: ShoppingBag, path: "/purchases" },
     { id: "sales", label: "Ventes", icon: Receipt, path: "/sales" },
-    { id: "stock", label: "Gestion de Stock", icon: ClipboardList, path: "/stock" },
-    { id: "requests", label: "Demandes clients", icon: HelpCircle, path: "/requests" },
-    { id: "suppliers", label: "Fournisseurs", icon: Users2, path: "/suppliers" },
+    {
+      id: "stock",
+      label: "Gestion de Stock",
+      icon: ClipboardList,
+      path: "/stock",
+    },
+    {
+      id: "requests",
+      label: "Demandes clients",
+      icon: HelpCircle,
+      path: "/requests",
+    },
+    {
+      id: "suppliers",
+      label: "Fournisseurs",
+      icon: Users2,
+      path: "/suppliers",
+    },
     { id: "employees", label: "Employés", icon: User2, path: "/employees" },
     { id: "delivery", label: "Livraisons", icon: Truck, path: "/delivery" },
-    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" }
+    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
   ];
-
-
-
 
   return (
     <Sidebar
@@ -76,12 +100,12 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       </SidebarHeader>
       {/* sidebar content */}
       <SidebarContent className="py-4">
-
         <SidebarMenu className="gap-2">
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton asChild>
-                <Link to={item.path}
+                <Link
+                  to={item.path}
                   onClick={() => setcurrentPage(item.id)}
                   className={`rounded-none cursor-pointer transition-all  ${
                     currentPage === item.id
@@ -106,7 +130,8 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
         <SidebarMenu className="gap-2">
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link to="/settings"
+              <Link
+                to="/settings"
                 onClick={() => setcurrentPage("settings")}
                 className={`rounded-none cursor-pointer transition-all ${
                   currentPage === "settings"
@@ -124,8 +149,8 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <button
-                href="#"
-                // onClick={handleLogout}
+                // href="#"
+                onClick={mutate}
                 className="rounded-none cursor-pointer transition-all border-l-4 border-transparent !hover:bg-red-100 text-red-500 !hover:text-white"
               >
                 <LogOut size={24} />
