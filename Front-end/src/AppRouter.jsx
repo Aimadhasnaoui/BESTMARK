@@ -13,73 +13,60 @@ import DeliveryPage from "./Component/Delivery/DeliveryPage";
 import CustomersPage from "./Component/Customers/CustomersPage";
 import TransactionsPage from "./Component/Transactions/TransactionsPage";
 import LoginPage from "./Component/Login/LoginPage";
+
 export const router = createBrowserRouter([
-//   {
-//     path: "/login",
-//     element: <LoginPageWithRedirect />,
-//     children: [
-//       {
-//         path: "/login",
-//         element: <LoginPage />,
-//       },
-//     ],
-//   },
   {
-        path:'/login',
-        element:<LoginPage></LoginPage>
-      },
+    path: "/login",
+    element: <LoginPage />,
+  },
   {
-    path:'/',
-    element: <HomePage/>,
-    children:[
+    path: "/",
+    element: <HomePage />,
+    children: [
       {
-        path:"/settings",
-        element:<SettingPage/>
+        path: "/settings",
+        element: <SettingPage />,
       },
       {
-        path:"/products",
-        element:<ProductsPage/>
-      }
-      ,{
-        path:"/suppliers",
-        element:<SuppliersPage/>
-      }
-      ,{
-        path:"/employees",
-        element:<EmployeesPage/>
-      }
-      ,{
-        path:"/purchases",
-        element:<PurchasePage/>
+        path: "/products",
+        element: <ProductsPage />,
       },
       {
-        path:"/stock",
-        element:<StockPage/>
+        path: "/suppliers",
+        element: <SuppliersPage />,
       },
       {
-        path:"/sales",
-        element:<SalesPage/>
+        path: "/employees",
+        element: <EmployeesPage />,
       },
       {
-        path:"/delivery",
-        element:<DeliveryPage/>
+        path: "/purchases",
+        element: <PurchasePage />,
       },
       {
-        path:"/requests",
-        element:<CustomersPage/>
+        path: "/stock",
+        element: <StockPage />,
       },
       {
-        path:"/finance",
-        element:<TransactionsPage/>
+        path: "/sales",
+        element: <SalesPage />,
       },
-    
-      
-        
-    ]
+      {
+        path: "/delivery",
+        element: <DeliveryPage />,
+      },
+      {
+        path: "/requests",
+        element: <CustomersPage />,
+      },
+      {
+        path: "/finance",
+        element: <TransactionsPage />,
+      },
+    ],
   },
   //     {
   //   path: "*",
   //   element: <HomePage></HomePage>,
   // },
-
-])
+]);

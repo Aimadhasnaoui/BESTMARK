@@ -17,3 +17,11 @@ export const LogOutUser = async () => {
     throw err;
   }
 };
+export const me = async () => {
+  try {
+    const response = await axiosInstance.get("/employees/me");
+     return response.data;
+  } catch (err) {
+    throw err;
+  }
+};

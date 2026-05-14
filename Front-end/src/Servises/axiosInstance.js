@@ -10,8 +10,8 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     console.log(error);
-    if (error?.response?.status === 401) {
-      window.location.href = "/login"; // Utiliser = pour assigner et rediriger (et non ==)
+    if (error?.response?.status === 401 && window.location.pathname !== "/login") {
+      window.location.href = "/login";
     }
 
     return Promise.reject(error);
