@@ -2,6 +2,10 @@ import Employee from "./Employee.js";
 import { catchAsync } from "../../utils/CatchFunction.js";
 import APPError from "../../utils/ErrorHandler.js";
 import jwt from "jsonwebtoken";
+const CookiesParametr = {
+  expires: new Date(Date.now() + process.env.CookieseXPIRE),
+  httpOnly: true,
+};
 //login Controller
 export const LoginEmplois = catchAsync(async (req, res, next) => {
   const { username, password } = req.body;
@@ -34,8 +38,10 @@ export const LoginEmplois = catchAsync(async (req, res, next) => {
   const token = jwt.sign(paylouad, process.env.SecureTokenKey, {
     expiresIn: process.env.tOKENeXPIRE,
   });
+  if (process.env.envirement === production) CookiesParametr.secure = true;
+  res.cookie("jwt", token, CookiesParametr);
 
-  res.status(200).json({ success: true, employee, token });
+  res.status(200).json({ message: "Connexion réussie pour l'utilisateur" });
 });
 
 // changer password controller
