@@ -2,7 +2,7 @@ import React from "react";
 import DeletModel from "@/Component/Ui/Models/DeletModel";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { DeletePurchase } from "@/Servises/Purchases";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 
 export default function Delete({ isDeleting, setIsDeleting, selectedPurchase }) {
   const queryClient = useQueryClient();

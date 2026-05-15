@@ -12,7 +12,7 @@ import TextField from "@mui/material/TextField";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { AddSupplier } from "@/Servises/Suppliers";
 import { GetCategorys } from "@/Servises/ProductCategories";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import Autocomplete from "@mui/material/Autocomplete";
 
 export default function Add({ isAdding, setIsAdding }) {

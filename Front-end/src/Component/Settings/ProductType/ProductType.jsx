@@ -7,7 +7,7 @@ import { ActionButtons } from "@/Component/UI/TablesUi/ActionButtons";
 import Delete from "./Actions/Delet";
 import { GetCategorys } from "@/Servises/ProductCategories";
 import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 export default function ProductType() {
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);

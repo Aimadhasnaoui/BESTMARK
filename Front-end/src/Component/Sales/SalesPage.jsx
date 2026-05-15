@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { GetSales, DeleteSale } from '@/Servises/Sales';
 import SalesTable from './SalesTable';
 import DeletModel from '../UI/Models/DeletModel';
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 
 export default function SalesPage() {
   const queryClient = useQueryClient();

@@ -91,12 +91,12 @@ export const DesactiverAccount = catchAsync(async (req, res, next) => {
   if (!employer) {
     return next(new APPError("Aucun employé trouvé avec cet ID", 404));
   }
-  employer.isActive = false;
+  employer.isActive = !employer.isActive;
   employer.AccountDesactivateDate = new Date();
   await employer.save();
 
   res.status(200).json({
-    message: "L'account a été désactivé avec succès",
+    message: `account a été ${employer.isActive ? "activé" : "désactivé"} avec succès`,
   });
 });
 

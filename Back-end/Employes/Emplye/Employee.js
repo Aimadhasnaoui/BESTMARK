@@ -25,7 +25,7 @@ const EmployeeSchema = new mongoose.Schema(
       minlength: [8, "Password is too short"],
       select: false,
     },
-    isActive: { type: Boolean, default: true, select: false },
+    isActive: { type: Boolean, default: true },
     passwordchangeafter: { type: Date, defaul: new Date() },
     AccountDesactivateDate: { type: Date, default: null },
   },

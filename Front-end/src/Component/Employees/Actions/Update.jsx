@@ -11,11 +11,15 @@ import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { UpdateEmployee } from "@/Servises/Employees";
 import { GetEmployeeTypes } from "@/Servises/EmployeeTypes";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 
-export default function Update({ isUpdating, setIsUpdating, selectedEmployee }) {
+export default function Update({
+  isUpdating,
+  setIsUpdating,
+  selectedEmployee,
+}) {
   const queryClient = useQueryClient();
   const {
     register,
@@ -39,7 +43,6 @@ export default function Update({ isUpdating, setIsUpdating, selectedEmployee }) 
         address: selectedEmployee.address,
         mission: selectedEmployee.mission?._id || selectedEmployee.mission,
         salary: selectedEmployee.salary,
-        isActive: selectedEmployee.isActive,
       });
     }
   }, [selectedEmployee, reset]);
@@ -55,7 +58,8 @@ export default function Update({ isUpdating, setIsUpdating, selectedEmployee }) 
 
   const onSubmit = (data) => {
     // On update, we usually don't send the password unless it's being changed
-    if (!data.password) delete data.password;
+    if (data.password) delete data.password;
+    delete data.isActive;
     mutate(data);
   };
 
@@ -131,15 +135,23 @@ export default function Update({ isUpdating, setIsUpdating, selectedEmployee }) 
                     options={typesData?.employeeTypes || []}
                     getOptionLabel={(option) => option.name || ""}
                     isOptionEqualToValue={(option, val) => option._id === val}
-                    value={typesData?.employeeTypes?.find((t) => t._id === value) || null}
+                    value={
+                      typesData?.employeeTypes?.find((t) => t._id === value) ||
+                      null
+                    }
                     onChange={(_, newValue) => onChange(newValue?._id || "")}
                     renderInput={(params) => (
-                      <TextField {...params} placeholder="Sélectionner une mission" />
+                      <TextField
+                        {...params}
+                        placeholder="Sélectionner une mission"
+                      />
                     )}
                   />
                 )}
               />
-              {errors.mission && <FieldError>{errors.mission.message}</FieldError>}
+              {errors.mission && (
+                <FieldError>{errors.mission.message}</FieldError>
+              )}
             </Field>
 
             <Field>
@@ -148,35 +160,14 @@ export default function Update({ isUpdating, setIsUpdating, selectedEmployee }) 
                 id="salary"
                 type="number"
                 fullWidth
-                {...register("salary", { 
-                    required: "Le salaire est requis",
-                    min: { value: 0, message: "Le salaire doit être positif" }
+                {...register("salary", {
+                  required: "Le salaire est requis",
+                  min: { value: 0, message: "Le salaire doit être positif" },
                 })}
               />
-              {errors.salary && <FieldError>{errors.salary.message}</FieldError>}
-            </Field>
-
-            <Field>
-              <FieldLabel htmlFor="password">Mot de passe (Laisser vide pour ne pas changer)</FieldLabel>
-              <TextField
-                id="password"
-                type="password"
-                fullWidth
-                {...register("password", { 
-                    minLength: { value: 8, message: "Minimum 8 caractères" }
-                })}
-              />
-              {errors.password && <FieldError>{errors.password.message}</FieldError>}
-            </Field>
-
-            <Field className="flex flex-row items-center gap-2 mt-4">
-              <input
-                id="isActive"
-                type="checkbox"
-                className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                {...register("isActive")}
-              />
-              <FieldLabel htmlFor="isActive" className="mb-0">Compte actif</FieldLabel>
+              {errors.salary && (
+                <FieldError>{errors.salary.message}</FieldError>
+              )}
             </Field>
           </FieldGroup>
         </FieldSet>

@@ -12,7 +12,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { UpdatePurchase } from "@/Servises/Purchases";
 import { GetSuppliers } from "@/Servises/Suppliers";
 import { GetProducts } from "@/Servises/Products";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Plus, Trash2, ShoppingCart } from "lucide-react";

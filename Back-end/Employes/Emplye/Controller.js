@@ -31,8 +31,8 @@ export const GetEmployee = catchAsync(async (req, res, next) => {
 
 export const UpdateEmployee = catchAsync(async (req, res, next) => {
   // don't allow chnaging password here
-  if (req.body.password || req.body.isActive) {
-    return next(new APPError(`you can't chnage the password here`, 401));
+  if (req.body.password  || req.body.isActive ) {
+    return next(new APPError(`you can't procces whit the chnage here`, 400));
   }
   const employee = await Employee.findByIdAndUpdate(req.params.id, req.body, {
     new: true,

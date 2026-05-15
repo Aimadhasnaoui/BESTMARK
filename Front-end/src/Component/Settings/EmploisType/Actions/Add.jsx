@@ -11,7 +11,7 @@ import TextField from "@mui/material/TextField";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddEmployeeType } from "@/Servises/EmployeeTypes";
-import { toast } from "sonner";
+import { toast } from "react-hot-toast";
 
 export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();

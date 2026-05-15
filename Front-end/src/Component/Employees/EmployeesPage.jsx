@@ -1,23 +1,41 @@
 import React, { useState, useMemo } from "react";
 import { DataTable } from "../UI/TablesUi/DataTable";
-import { useQuery } from "@tanstack/react-query";
-import { GetEmployees } from "@/Servises/Employees";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { GetEmployees, DesactiverAccount } from "@/Servises/Employees";
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
+import { toast } from "react-hot-toast";
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
+import PasswordReset from "./Actions/PasswordReset";
 
 export default function EmployeesPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError,error } = useQuery({
     queryKey: ["employees"],
     queryFn: GetEmployees,
   });
-
+  const { mutate, isPending, isError:desactiveError,error:errordesactiveError } = useMutation({
+    mutationFn: DesactiverAccount,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      toast.success(data.message);
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Une erreur est survenue");
+    }
+  });
+  const handleTogleActivation = (user)=>{
+    console.log(user)
+     mutate(user._id)
+  }
   const columns = useMemo(
     () => [
       {
@@ -78,6 +96,16 @@ export default function EmployeesPage() {
             onSee={() => {
               // Optional: Add view details logic if needed
             }}
+            onPassword={() => {
+              setSelectedEmployee(row.original);
+              setIsResettingPassword(true);
+            }}
+            onToggleActive={
+              ()=>{
+               handleTogleActivation(row.original)
+              }
+            }
+            isActive={row.original.isActive}
           />
         ),
       },
@@ -87,6 +115,13 @@ export default function EmployeesPage() {
 
   return (
     <div className="w-full">
+      {isResettingPassword && (
+        <PasswordReset
+          isUpdating={isResettingPassword}
+          setIsUpdating={setIsResettingPassword}
+          selectedEmployee={selectedEmployee}
+        />
+      )}
       <DataTable
         data={data?.employees || []}
         columns={columns}
