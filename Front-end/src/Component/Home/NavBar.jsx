@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect ,useContext} from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   InputGroup,
@@ -14,9 +14,11 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 import { useLocation } from "react-router-dom";
+import { DataContext } from "../Data/contextApi";
 export default function NavBar() {
   const[PageName,setPageName] = useState("Dashboard")
   const location = useLocation();
+  const {userInfo} = useContext(DataContext)
   useEffect(() => {
     switch (location.pathname) {
       case "/dashboard":
@@ -66,8 +68,8 @@ export default function NavBar() {
           <Bell className="text-muted-foreground cursor-pointer" />
           <div className="flex items-center gap-2 border-l border-slate-200 px-3">
               <div className="flex flex-col">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-sm text-muted-foreground">Owner</p>
+                  <p className="text-sm font-medium">{userInfo?.name}</p>
+                  <p className="text-sm text-muted-foreground">{userInfo?.mission?.name}</p>
               </div>
         <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />

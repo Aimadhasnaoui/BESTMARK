@@ -2,33 +2,39 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "./AppSidebar";
 import NavBar from "./NavBar";
 import { Outlet } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useContext } from "react";
 import Add from "../Purchase/Actions/Add";
 import AddButton from "./AddButton";
 import { useQuery } from "@tanstack/react-query";
 import { me } from "@/Servises/Autontification";
 import LoaderApp from "../UI/LoaderApp";
-
+import {DataContext} from '@/Component/Data/contextApi'
 import { useNavigate } from "react-router-dom";
-
+import AddSlle from "../Sales/Actions/AddSlle";
 function HomePage() {
   const [buttonAppear, setbuttoAppear] = useState(false);
-  const [buyerModalOpen, setBuyerModalOpen] = useState(false);
+  // const [buyerModalOpen, setBuyerModalOpen] = useState(false);
   const [currentPage, setcurrentPage] = useState("dashboard");
   const navigate = useNavigate();
+  const {openAddBuyerModal, setOpenAddBuyerModal,setuserInfo} = useContext(DataContext)
 
-  const { isPending, isError } = useQuery({
+  const { isPending, isError ,isSuccess,data} = useQuery({
     queryKey: ["me"],
     queryFn: () => me(),
     retry: false, // Ne pas réessayer si on a une erreur 401
   });
+
+useEffect(()=>{
+if(isSuccess){
+  setuserInfo(data.userInfo)
+}
+},[isSuccess])
 
   useEffect(() => {
     if (isError) {
       navigate("/login");
     }
   }, [isError, navigate]);
-
 
   return (
     <>
@@ -48,14 +54,10 @@ function HomePage() {
             <AddButton
               buttonAppear={buttonAppear}
               setbuttoAppear={setbuttoAppear}
-              setBuyerModalOpen={setBuyerModalOpen}
+              setBuyerModalOpen={setOpenAddBuyerModal}
             />
-            {buttonAppear && (
-              <Add
-                isAdding={buyerModalOpen}
-                setIsAdding={setBuyerModalOpen}
-              />
-            )}
+              <Add isAdding={openAddBuyerModal} setIsAdding={setOpenAddBuyerModal} />
+              <AddSlle></AddSlle>
           </main>
         </SidebarProvider>
       )}
@@ -64,4 +66,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

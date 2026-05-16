@@ -29,8 +29,8 @@ const SaleSchema = new mongoose.Schema({
 
   paidAmount:   { type: Number, required: true }, // how much customer gave you
   remainAmount: { type: Number, default: 0 },     // totalAmount - paidAmount ← the credit
-  customerName:  { type: String },
-  customerPhone: { type: String },
+  customerName:  { type: String ,default:null},
+  customerPhone: { type: String,default:null },
   requiresDelivery: { type: Boolean, default: false },
   deliveryId : {type : mongoose.Schema.Types.ObjectId,ref:'Delivery',required:function(){
     return this.requiresDelivery == true

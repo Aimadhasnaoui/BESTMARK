@@ -61,6 +61,7 @@ export default function Add({ isAdding, setIsAdding }) {
     queryKey: ["suppliers"],
     queryFn: GetSuppliers,
   });
+  
 const selectedSupplier = watch("supplier");
   const { data: productsData } = useQuery({
     queryKey: ["products", selectedSupplier],

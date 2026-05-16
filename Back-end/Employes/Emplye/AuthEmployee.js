@@ -39,7 +39,7 @@ export const LoginEmplois = catchAsync(async (req, res, next) => {
   const CookiesParametr = {
     expires: new Date(Date.now() + cookieExpiresInDays * 24 * 60 * 60 * 1000),
     httpOnly: true,
-      sameSite: "strict"
+    sameSite: "strict",
   };
   if (process.env.envirement === "production") CookiesParametr.secure = true;
   res.cookie("jwt", token, CookiesParametr);
@@ -49,7 +49,6 @@ export const LoginEmplois = catchAsync(async (req, res, next) => {
 
 //logout controller
 export const Logout = catchAsync(async (req, res, next) => {
-
   res.cookie("jwt", "", {
     expires: new Date(0),
     httpOnly: true,
@@ -61,7 +60,6 @@ export const Logout = catchAsync(async (req, res, next) => {
     message: "Déconnexion réussie",
   });
 });
-
 
 // changer password controller
 export const ChnageUserPaword = catchAsync(async (req, res, next) => {
@@ -120,9 +118,9 @@ export const Protect = catchAsync(async (req, res, next) => {
     return next(new APPError("accès refusé", 401));
   }
   const decodedToken = jwt.verify(token, process.env.SecureTokenKey);
-  const userexist = await Employee.findById(decodedToken.id).select(
-    "+isActive",
-  );
+  const userexist = await Employee.findById(decodedToken.id)
+    .select("+isActive")
+    .populate("mission", "name");
   if (!userexist || !userexist.isActive) {
     return next(
       new APPError("l'accès de l'utilisateur a été  desactiver", 401),

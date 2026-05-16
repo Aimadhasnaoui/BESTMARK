@@ -24,7 +24,7 @@ import { LoginEmplois, Protect } from "./Employes/Emplye/AuthEmployee.js";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import hpp from "hpp";
-import cookieParser from 'cookie-parser'
+import cookieParser from "cookie-parser";
 const app = express();
 dotenv.config();
 app.use(helmet());
@@ -50,7 +50,7 @@ app.use(
     limit: "10kb",
   }),
 );
-app.use(cookieParser())
+app.use(cookieParser());
 
 // Nettoyage in-place sécurisé pour bloquer les injections NoSQL ($) sans réassignation
 const sanitizeObject = (obj) => {
@@ -84,20 +84,20 @@ app.disable("x-powered-by");
 // Fin de la configuration des middlewares de sécurité
 
 // Définition des routes de l'API
-app.use("/api/users",Protect, User);
+app.use("/api/users", Protect, User);
 app.use("/api/transactions", Protect, Transaction);
 app.use("/api/stock-movements", Protect, StockMovement);
 app.use("/api/customers", Protect, Customer);
 app.use("/api/delivery", Protect, Delivery);
 app.use("/api/purchases", Protect, Purchase);
-app.use("/api/suppliers",Protect, Supplier);
-app.use("/api/sales",Protect, Sale);
+app.use("/api/suppliers", Protect, Supplier);
+app.use("/api/sales", Protect, Sale);
 app.use("/api/employees", Protect, Employee);
-app.use("/api/employee-types",Protect, EmployeeType);
-app.use("/api/products",Protect,Product);
-app.use("/api/categories/products",Protect,Category);
-app.use("/api/expenses",Protect,Expense);
-app.use("/api/expense-types",Protect,ExpenseType);
+app.use("/api/employee-types", Protect, EmployeeType);
+app.use("/api/products", Protect, Product);
+app.use("/api/categories/products", Protect, Category);
+app.use("/api/expenses", Protect, Expense);
+app.use("/api/expense-types", Protect, ExpenseType);
 app.post("/api/auth/login", LoginEmplois);
 // Fin des routes de l'API
 

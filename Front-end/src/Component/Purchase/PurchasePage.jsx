@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import HeaderPage from '../UI/HeaderPage';
 import { useQuery } from "@tanstack/react-query";
 import { GetPurchases } from '@/Servises/Purchases';
@@ -6,12 +6,13 @@ import PurchaseTable from './PurchaseTable';
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
+import { DataContext } from '../Data/contextApi';
 
 export default function PurchasePage() {
-  const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
+  const {setOpenAddBuyerModal}  =useContext(DataContext)
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['purchases'],
@@ -35,7 +36,7 @@ export default function PurchasePage() {
         description="Gérez les achats auprès de vos fournisseurs, suivez les paiements et les dettes."
         isAjouter={true}
         ButtonText="Ajouter un achat"
-        onButtonClick={() => setIsAdding(true)}
+        onButtonClick={() => setOpenAddBuyerModal(true)}
       />
       
       <PurchaseTable
@@ -48,7 +49,6 @@ export default function PurchasePage() {
       />
 
       {/* Action Modals */}
-      <Add isAdding={isAdding} setIsAdding={setIsAdding} />
       <Update
         isUpdating={isUpdating}
         setIsUpdating={setIsUpdating}
