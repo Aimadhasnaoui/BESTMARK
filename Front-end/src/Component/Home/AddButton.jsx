@@ -6,6 +6,7 @@ export default function AddButton({
   buttonAppear,
   setbuttoAppear,
   setBuyerModalOpen,
+  setOpenAddSellerModal
 }) {
   return (
     <div
@@ -15,7 +16,11 @@ export default function AddButton({
     >
       {buttonAppear && (
         <div className="flex flex-col gap-4 items-end  mb-4">
-          <Button className="bg-white shadow-xl cursor-pointer  px-4 py-2 rounded-md text-gray-600 hover:border  hover:border-green-400">
+          <Button 
+            onClick={() => {
+              setOpenAddSellerModal(true);
+            }}
+          className="bg-white shadow-xl cursor-pointer  px-4 py-2 rounded-md text-gray-600 hover:border  hover:border-green-400">
             <ShoppingBag
               size={18}
               className="inline-block mr-2 text-green-400"

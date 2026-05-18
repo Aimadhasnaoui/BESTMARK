@@ -1,10 +1,75 @@
 import Sale from "./sales.js";
-import { catchAsync } from "../utils/CatchFunction.js";
+import { catchAsync, transactional } from "../utils/CatchFunction.js";
 import APPError from "../utils/ErrorHandler.js";
-
-export const CreateSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.create(req.body);
-  res.status(201).json({ success: true, sale });
+import Delivery from "../Delivery/Delivery.js";
+import Products from "../Products/Product/Products.js";
+import TranTransaction from "../Transactions/Transaction.js";
+import StockMovement from "../stockMovements/StockMovement.js";
+export const CreateSale = transactional(async (req, res, next, session) => {
+  const {
+    requiresDelivery,
+    items,
+    deliveryfees,
+    deliveryAddress,
+    deliveryMan,
+  } = req.body;
+  const [saledata] = await Sale.create([req.body], session);
+    const ProdcutsName = [];
+    for (const item of items) {
+      const product = await Products.findById(item.product).session(session);
+      if (!product) {
+        throw new APPError("Product not found", 404);
+      }
+      ProdcutsName.push(
+        `(${product.name}) pour un montant de ${item.buyingPrice}`,
+      );
+      product.quantity -= Number(item.quantity);
+      await product.save({ session });
+  
+      await StockMovement.create(
+        [
+          {
+            product: item.product,
+            createdBy: req.user?.id ?? null,
+            type: "sale",
+            quantity: item.quantity,
+            quantityBefore: product.quantity - Number(item.quantity),
+            quantityAfter: product.quantity,
+            referenceModel: "Sale",
+            createdBy: req.body.servedBy,
+            referenceId: saledata._id,
+          },
+        ],
+        { session },
+      );
+    }
+  
+    await TranTransaction.create(
+      [
+        {
+          type: "sale",
+          direction: "in",
+          amount: req.body.paidAmount,
+          referenceModel: "sale",
+          performedBy: req.body.servedBy ?? null,
+          note: `vendre  les  produits (${ProdcutsName.join(",")})  pour un montant de ${req.body.paidAmount} a  fournisseur : ${supplier.name}`,
+          referenceId: saledata._id,
+        },
+      ],
+      { session },
+    );
+  if (requiresDelivery) {
+    const [Deliverydata] = await Delivery.create([
+      {
+        sale: saledata._id,
+        deliveryMan: deliveryMan,
+        deliveryAddress: deliveryAddress,
+        deliveryfees: deliveryfees,
+      },
+      session,
+    ]);
+  }
+  res.status(201).json({ success: true, saledata });
 });
 
 export const GetSales = catchAsync(async (req, res, next) => {

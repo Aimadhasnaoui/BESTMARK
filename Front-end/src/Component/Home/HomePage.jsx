@@ -16,7 +16,7 @@ function HomePage() {
   // const [buyerModalOpen, setBuyerModalOpen] = useState(false);
   const [currentPage, setcurrentPage] = useState("dashboard");
   const navigate = useNavigate();
-  const {openAddBuyerModal, setOpenAddBuyerModal,setuserInfo} = useContext(DataContext)
+  const {openAddBuyerModal, setOpenAddBuyerModal,setuserInfo,setOpenAddSellerModal} = useContext(DataContext)
 
   const { isPending, isError ,isSuccess,data} = useQuery({
     queryKey: ["me"],
@@ -55,6 +55,7 @@ if(isSuccess){
               buttonAppear={buttonAppear}
               setbuttoAppear={setbuttoAppear}
               setBuyerModalOpen={setOpenAddBuyerModal}
+              setOpenAddSellerModal={setOpenAddSellerModal}
             />
               <Add isAdding={openAddBuyerModal} setIsAdding={setOpenAddBuyerModal} />
               <AddSlle></AddSlle>

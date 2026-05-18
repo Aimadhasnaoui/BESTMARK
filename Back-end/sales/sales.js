@@ -15,6 +15,7 @@ const SaleSchema = new mongoose.Schema({
   subtotal:     { type: Number },     
   discount:     { type: Number, default: 0 }, 
   totalAmount:  { type: Number },      
+  deliveryfees:  { type: Number },      
 
   paymentMethod: { 
     type: String, 
@@ -23,7 +24,7 @@ const SaleSchema = new mongoose.Schema({
   },
   paymentStatus: { 
     type: String, 
-    enum: ['paid', 'partial', 'refunded'],
+    enum: ['paid', 'partial', 'refunded',"unpaid"],
     default: 'paid'
   },
 
