@@ -13,6 +13,28 @@ export const CreateSale = transactional(async (req, res, next, session) => {
     deliveryAddress,
     deliveryMan,
   } = req.body;
+
+  // Generate unique sequential invoice number: INV-YYYYMMDD-XXX
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  const dateStr = `${year}${month}${day}`;
+
+  const startOfDay = new Date();
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date();
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const salesCountToday = await Sale.countDocuments({
+    createdAt: { $gte: startOfDay, $lte: endOfDay },
+  }).session(session);
+
+  const sequenceNum = String(salesCountToday + 1).padStart(3, "0");
+  const invoiceNumber = `INV-${dateStr}-${sequenceNum}`;
+
+  req.body.invoiceNumber = invoiceNumber;
+
   const [saledata] = await Sale.create([req.body], session);
   const ProdcutsName = [];
 
