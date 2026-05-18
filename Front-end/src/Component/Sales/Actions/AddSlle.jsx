@@ -255,7 +255,7 @@ export default function AddSlle() {
       {isSuccess ? (
         <>
           <DialogContent className="flex flex-col items-center justify-center py-12 text-center bg-slate-950/5">
-            <div className="bg-emerald-50 text-emerald-500 p-4 rounded-full mb-4 animate-bounce">
+            <div className="bg-emerald-50 text-emerald-500 p-4 rounded-full mb-4">
               <CheckCircle size={48} />
             </div>
             <Typography variant="h5" className="text-slate-800 font-bold mb-2">

@@ -14,50 +14,51 @@ export const CreateSale = transactional(async (req, res, next, session) => {
     deliveryMan,
   } = req.body;
   const [saledata] = await Sale.create([req.body], session);
-    const ProdcutsName = [];
-    for (const item of items) {
-      const product = await Products.findById(item.product).session(session);
-      if (!product) {
-        throw new APPError("Product not found", 404);
-      }
-      ProdcutsName.push(
-        `(${product.name}) pour un montant de ${item.buyingPrice}`,
-      );
-      product.quantity -= Number(item.quantity);
-      await product.save({ session });
-  
-      await StockMovement.create(
-        [
-          {
-            product: item.product,
-            createdBy: req.user?.id ?? null,
-            type: "sale",
-            quantity: item.quantity,
-            quantityBefore: product.quantity - Number(item.quantity),
-            quantityAfter: product.quantity,
-            referenceModel: "Sale",
-            createdBy: req.body.servedBy,
-            referenceId: saledata._id,
-          },
-        ],
-        { session },
-      );
+  const ProdcutsName = [];
+
+  for (const item of items) {
+    const product = await Products.findById(item.product).session(session);
+    if (!product) {
+      throw new APPError("Product not found", 404);
     }
-  
-    await TranTransaction.create(
+    ProdcutsName.push(
+      `(${product.name}) pour un montant de ${item.buyingPrice}`,
+    );
+    product.quantity -= Number(item.quantity);
+    await product.save({ session });
+
+    await StockMovement.create(
       [
         {
+          product: item.product,
+          createdBy: req.user?.id ?? null,
           type: "sale",
-          direction: "in",
-          amount: req.body.paidAmount,
-          referenceModel: "sale",
-          performedBy: req.body.servedBy ?? null,
-          note: `vendre  les  produits (${ProdcutsName.join(",")})  pour un montant de ${req.body.paidAmount} a  fournisseur : ${supplier.name}`,
+          quantity: item.quantity,
+          quantityAfter: product.quantity - Number(item.quantity),
+          quantityBefore: product.quantity ,
+          referenceModel: "Sale",
+          createdBy: req.body.servedBy,
           referenceId: saledata._id,
         },
       ],
       { session },
     );
+  }
+
+  await TranTransaction.create(
+    [
+      {
+        type: "sale",
+        direction: "in",
+        amount: req.body.paidAmount,
+        referenceModel: "Sale",
+        performedBy: req.body.servedBy ?? null,
+        note: `vendre  les  produits (${ProdcutsName.join(",")})  pour un montant de ${req.body.paidAmount} a  client : ${req.body.customerName}`,
+        referenceId: saledata._id,
+      },
+    ],
+    { session },
+  );
   if (requiresDelivery) {
     const [Deliverydata] = await Delivery.create([
       {

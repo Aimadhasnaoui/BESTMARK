@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const SaleSchema = new mongoose.Schema({
-  invoiceNumber: { type: String, unique: true },  // INV-20240427-001
+  // invoiceNumber: { type: String, unique: true },  // INV-20240427-001
   servedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
   items: [
     {
