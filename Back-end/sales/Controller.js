@@ -56,7 +56,7 @@ export const CreateSale = transactional(async (req, res, next, session) => {
           createdBy: req.user?.id ?? null,
           type: "sale",
           quantity: -Number(item.quantity),
-          quantityAfter: product.quantity ,
+          quantityAfter: product.quantity,
           quantityBefore: product.quantity + Number(item.quantity),
           referenceModel: "Sale",
           createdBy: req.body.servedBy,
@@ -82,15 +82,17 @@ export const CreateSale = transactional(async (req, res, next, session) => {
     { session },
   );
   if (requiresDelivery) {
-    const [Deliverydata] = await Delivery.create([
-      {
-        sale: saledata._id,
-        deliveryMan: deliveryMan,
-        deliveryAddress: deliveryAddress,
-        deliveryfees: deliveryfees,
-      },
-      session,
-    ]);
+    const [Deliverydata] = await Delivery.create(
+      [
+        {
+          sale: saledata._id,
+          deliveryMan: deliveryMan,
+          deliveryAddress: deliveryAddress,
+          deliveryfees: deliveryfees,
+        },
+      ],
+      { session },
+    );
   }
   res.status(201).json({ success: true, saledata });
 });
@@ -98,15 +100,15 @@ export const CreateSale = transactional(async (req, res, next, session) => {
 export const GetSales = catchAsync(async (req, res, next) => {
   const sales = await Sale.find()
     .sort({ createdAt: -1 })
-    .populate("servedBy", "deliveryMan");
+    .populate("servedBy", "name")
+    .populate("deliveryId", "name");
   res.status(200).json({ success: true, sales });
 });
 
 export const GetSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.findById(req.params.id).populate(
-    "servedBy",
-    "deliveryMan",
-  );
+  const sale = await Sale.findById(req.params.id)
+    .populate("servedBy", "name")
+    .populate("deliveryId", "name");
   if (!sale) {
     return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
   }

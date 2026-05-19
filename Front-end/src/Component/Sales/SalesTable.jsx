@@ -20,23 +20,34 @@ export default function SalesTable({
 }) {
   const columns = useMemo(
     () => [
-      {
+            {
         header: () => (
           <div className="flex items-center gap-2">
-            <FileText className="w-4 h-4" />
-            <span>FACTURE</span>
+            <Calendar className="w-4 h-4" />
+            <span>DATE</span>
           </div>
         ),
-        accessorKey: "invoiceNumber",
+        accessorKey: "saleDate",
         cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-slate-800 rounded-lg shadow-sm">
-              <FileText className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-slate-800">{row.original.invoiceNumber}</span>
-          </div>
+          <span className="text-sm text-slate-500">
+            {new Date(row.original.saleDate).toLocaleDateString('fr-FR')}
+          </span>
         ),
       },
+      // {
+      //   header: () => (
+      //     <div className="flex items-center gap-2">
+      //       <FileText className="w-4 h-4" />
+      //       <span>FACTURE</span>
+      //     </div>
+      //   ),
+      //   accessorKey: "invoiceNumber",
+      //   cell: ({ row }) => (
+      //     <div className="flex items-center gap-3">
+      //       <span className="font-bold text-slate-800">{row.original.invoiceNumber}</span>
+      //     </div>
+      //   ),
+      // },
       {
         header: () => (
           <div className="flex items-center gap-2">
@@ -47,9 +58,6 @@ export default function SalesTable({
         accessorKey: "servedBy.name",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-600 rounded-lg shadow-sm">
-              <User className="w-4 h-4 text-white" />
-            </div>
             <span className="text-sm text-slate-600">{row.original.servedBy?.name || "N/A"}</span>
           </div>
         ),
@@ -66,9 +74,6 @@ export default function SalesTable({
           const { totalAmount, paidAmount, remainAmount } = row.original;
           return (
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-600 rounded-lg shadow-sm">
-                <CreditCard className="w-4 h-4 text-white" />
-              </div>
               <div className="flex flex-col gap-1">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium text-slate-400 w-12">Total:</span>
@@ -124,20 +129,6 @@ export default function SalesTable({
             )}
           </div>
         )
-      },
-      {
-        header: () => (
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span>DATE</span>
-          </div>
-        ),
-        accessorKey: "saleDate",
-        cell: ({ row }) => (
-          <span className="text-sm text-slate-500">
-            {new Date(row.original.saleDate).toLocaleDateString('fr-FR')}
-          </span>
-        ),
       },
       {
         header: "ACTIONS",

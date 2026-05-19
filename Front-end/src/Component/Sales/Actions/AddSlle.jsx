@@ -46,7 +46,8 @@ import CustomerPart from "./AddSelleParts/CustomerPart";
 import PaymentPart from "./AddSelleParts/PaymentPart";
 import FactureSell from "./AddSelleParts/FactureSell";
 export default function AddSlle() {
-  const { openAddSellerModal, setOpenAddSellerModal,userInfo } = useContext(DataContext);
+  const { openAddSellerModal, setOpenAddSellerModal, userInfo } =
+    useContext(DataContext);
   const [NeedDelevry, setNeedDelevry] = useState(false);
   const [pages, setpages] = useState({
     currentPage: 0,
@@ -97,7 +98,14 @@ export default function AddSlle() {
     queryFn: () => GetEmployees(),
   });
   const queryClient = useQueryClient();
-  const { mutate, isPending, isSuccess, isError, error, reset: resetMutation } = useMutation({
+  const {
+    mutate,
+    isPending,
+    isSuccess,
+    isError,
+    error,
+    reset: resetMutation,
+  } = useMutation({
     mutationFn: AddSale,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sales"] });
@@ -105,7 +113,11 @@ export default function AddSlle() {
       toast.success("La vente a été enregistrée avec succès !");
     },
     onError: (err) => {
-      toast.error(err?.response?.data?.message || err?.message || "Une erreur est survenue lors de l'enregistrement.");
+      toast.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Une erreur est survenue lors de l'enregistrement.",
+      );
     },
   });
 
@@ -210,16 +222,18 @@ export default function AddSlle() {
     });
   }
   const onSubmit = (data) => {
-    delete data.product
+    delete data.product;
     const sendData = {
       ...data,
-      subtotal:price.subtotal,
-      remainAmount:price.remainAmount,
-      servedBy:userInfo?._id,
-      requiresDelivery:NeedDelevry,
-    }
+      subtotal: price.subtotal,
+      remainAmount: price.remainAmount,
+      servedBy: userInfo?._id,
+      requiresDelivery: NeedDelevry,
+      totalAmount: price.totalAmount,
+      deliveryId:data.deliveryMan,
+    };
     console.log(sendData);
-    mutate(sendData)
+    mutate(sendData);
   };
 
   return (
@@ -261,25 +275,35 @@ export default function AddSlle() {
             <Typography variant="h5" className="text-slate-800 font-bold mb-2">
               Vente Enregistrée avec Succès !
             </Typography>
-            <Typography variant="body2" className="text-slate-500 max-w-md mb-6">
-              La vente a été enregistrée dans le système, le stock a été mis à jour et la transaction financière a été créée.
+            <Typography
+              variant="body2"
+              className="text-slate-500 max-w-md mb-6"
+            >
+              La vente a été enregistrée dans le système, le stock a été mis à
+              jour et la transaction financière a été créée.
             </Typography>
 
             <div className="bg-slate-50 border border-slate-200 rounded-lg p-5 w-full max-w-sm mb-6 space-y-3">
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500 font-medium">Montant Total :</span>
+                <span className="text-slate-500 font-medium">
+                  Montant Total :
+                </span>
                 <span className="font-bold text-slate-800">
                   {price.totalAmount.toFixed(2)} DH
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500 font-medium">Montant Payé :</span>
+                <span className="text-slate-500 font-medium">
+                  Montant Payé :
+                </span>
                 <span className="font-bold text-emerald-600">
                   {(watch("paidAmount") || 0).toFixed(2)} DH
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-slate-500 font-medium">Reste à payer :</span>
+                <span className="text-slate-500 font-medium">
+                  Reste à payer :
+                </span>
                 <span className="font-bold text-amber-600">
                   {price.remainAmount.toFixed(2)} DH
                 </span>
@@ -380,13 +404,11 @@ export default function AddSlle() {
                   onClick={() => ToglePages("next")}
                   disabled={isPending}
                 >
-                  {isPending ? (
-                    "Enregistrement..."
-                  ) : pages.currentPage === pages.maxPage ? (
-                    "Confirmer la vente"
-                  ) : (
-                    "Prochaine étape"
-                  )}
+                  {isPending
+                    ? "Enregistrement..."
+                    : pages.currentPage === pages.maxPage
+                      ? "Confirmer la vente"
+                      : "Prochaine étape"}
                   {!isPending && pages.currentPage !== pages.maxPage && (
                     <ArrowRight size={12}></ArrowRight>
                   )}
