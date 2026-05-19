@@ -16,7 +16,8 @@ export default function SalesTable({
   isError,
   ErrorMessage = 'Erreur lors de la récupération des ventes',
   onDelete,
-  onSee
+  onSee,
+  onEdit
 }) {
   const columns = useMemo(
     () => [
@@ -136,13 +137,14 @@ export default function SalesTable({
         cell: ({ row }) => (
           <ActionButtons
             onSee={() => onSee(row.original)}
+            onEdit={() => onEdit(row.original)}
             onDelete={() => onDelete(row.original)}
             isSee={true}
           />
         ),
       },
     ],
-    [onDelete, onSee]
+    [onDelete, onSee, onEdit]
   );
 
   return (

@@ -6,12 +6,19 @@ import SalesTable from "./SalesTable";
 import DeletModel from "../UI/Models/DeletModel";
 import { toast } from "react-hot-toast";
 import SellFacture from "./Actions/SellFacture";
+import EditSale from "./Actions/EditSale";
+
 export default function SalesPage() {
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
+  
   const [openFactue, setopenFactue] = useState(false);
   const [FactureData, setFactureData] = useState({});
+
+  const [isEditingSale, setIsEditingSale] = useState(false);
+  const [editingSale, setEditingSale] = useState(null);
+
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["sales"],
     queryFn: GetSales,
@@ -25,6 +32,7 @@ export default function SalesPage() {
       toast.success("Vente supprimée avec succès");
     },
   });
+
   function handsefunction(item) {
     console.log(item);
     setFactureData(item);
@@ -34,6 +42,11 @@ export default function SalesPage() {
   const handleDeleteClick = (sale) => {
     setSelectedSale(sale);
     setIsDeleting(true);
+  };
+
+  const handleEditClick = (sale) => {
+    setEditingSale(sale);
+    setIsEditingSale(true);
   };
 
   return (
@@ -51,6 +64,7 @@ export default function SalesPage() {
         isLoading={isPending}
         onDelete={handleDeleteClick}
         onSee={handsefunction}
+        onEdit={handleEditClick}
       />
 
       <DeletModel
@@ -62,11 +76,18 @@ export default function SalesPage() {
         itemName={selectedSale?.invoiceNumber}
         DeleteMsg="Êtes-vous sûr de vouloir supprimer cette vente ? Cette action peut impacter vos rapports financiers."
       />
+
       <SellFacture
         openFactue={openFactue}
         setopenFactue={setopenFactue}
         FactureData={FactureData}
-      ></SellFacture>
+      />
+
+      <EditSale
+        open={isEditingSale}
+        setIsOpen={setIsEditingSale}
+        saleData={editingSale}
+      />
     </div>
   );
 }

@@ -125,10 +125,32 @@ export const UpdateSale = catchAsync(async (req, res, next) => {
   res.status(200).json({ success: true, sale });
 });
 
-export const DeleteSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.findByIdAndDelete(req.params.id);
+export const DeleteSale = transactional(async (req, res, next, session) => {
+  const sale = await Sale.findById(req.params.id).session(session);
   if (!sale) {
-    return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
+    throw new APPError(`Sale with ID ${req.params.id} not found`, 404);
   }
+
+  // Delete associated StockMovement records if they exist
+  const stockMovementsExist = await StockMovement.exists({ referenceId: sale._id });
+  if (stockMovementsExist) {
+    await StockMovement.deleteMany({ referenceId: sale._id }).session(session);
+  }
+
+  // Delete associated TranTransaction records if they exist
+  const transactionsExist = await TranTransaction.exists({ referenceId: sale._id });
+  if (transactionsExist) {
+    await TranTransaction.deleteMany({ referenceId: sale._id }).session(session);
+  }
+
+  // Delete associated Delivery records if they exist
+  const deliveryExists = await Delivery.exists({ sale: sale._id });
+  if (deliveryExists) {
+    await Delivery.deleteMany({ sale: sale._id }).session(session);
+  }
+
+  // Delete the Sale document itself
+  await Sale.findByIdAndDelete(sale._id).session(session);
+
   res.status(200).json({ success: true, sale });
 });
