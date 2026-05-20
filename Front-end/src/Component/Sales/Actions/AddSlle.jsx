@@ -173,7 +173,8 @@ export default function AddSlle() {
           "customerName",
           "customerPhone",
           "deliveryId",
-          "deliveryAddress",
+          "street",
+          "city",
           "deliveryfees",
         ]
       : ["customerName", "customerPhone"],

@@ -39,9 +39,6 @@ export default function DeliveryTable({
               <span className="font-bold text-slate-800">
                 {row.original.sale?.invoiceNumber || "N/A"}
               </span>
-              <span className="text-[10px] text-slate-400">
-                Réf: {row.original._id}
-              </span>
             </div>
           </div>
         ),
@@ -84,9 +81,7 @@ export default function DeliveryTable({
         accessorKey: "deliveryMan.name",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-600 rounded-lg shadow-sm">
-              <User className="w-4 h-4 text-white" />
-            </div>
+
             <span className="text-sm font-medium text-slate-600">
               {row.original.deliveryMan?.name || "Non assigné"}
             </span>
@@ -105,9 +100,6 @@ export default function DeliveryTable({
           const addr = row.original.deliveryAddress;
           return (
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-500 rounded-lg shadow-sm">
-                <MapPin className="w-4 h-4 text-white" />
-              </div>
               <div className="flex flex-col max-w-[200px]">
                 <span className="text-sm font-semibold text-slate-700 truncate">
                   {addr?.city}
@@ -131,9 +123,6 @@ export default function DeliveryTable({
         accessorKey: "estimatedArrival",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-white  rounded-lg shadow-sm">
-              <Timer className="w-4 h-4 text-white" />
-            </div>
             <div className="flex flex-col">
               <span className="text-xs font-medium">
                 {row.original.estimatedArrival

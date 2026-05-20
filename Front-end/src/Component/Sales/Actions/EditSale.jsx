@@ -24,7 +24,7 @@ import {
   IdCard,
   FolderSync,
   Save,
-  ClipboardList
+  ClipboardList,
 } from "lucide-react";
 
 export default function EditSale({ open, setIsOpen, saleData }) {
@@ -62,10 +62,19 @@ export default function EditSale({ open, setIsOpen, saleData }) {
     },
   });
 
+  // Manually register fields that are not bound to standard HTML inputs in the JSX.
+  // This allows React Hook Form's reset() and watch() to track them reactively.
+  useEffect(() => {
+    register("paymentMethod");
+    register("requiresDelivery");
+    register("paidAmount");
+    register("deliveryfees");
+  }, [register]);
+
   const watchRequiresDelivery = watch("requiresDelivery");
+  const watchPaymentMethod = watch("paymentMethod");
   const watchDeliveryfees = watch("deliveryfees");
   const watchPaidAmount = watch("paidAmount");
-  const watchPaymentMethod = watch("paymentMethod");
 
   // Dynamic calculations for preview
   const subtotal = saleData?.subtotal || 0;
@@ -86,20 +95,25 @@ export default function EditSale({ open, setIsOpen, saleData }) {
   useEffect(() => {
     if (saleData) {
       const isDelivery = !!saleData.requiresDelivery;
-      
+      console.log(saleData);
+
       // Resolve delivery man id
       let resolvedDeliveryManId = "";
       if (saleData.deliveryId) {
-        resolvedDeliveryManId = saleData.deliveryId.deliveryMan?._id || 
-                                saleData.deliveryId.deliveryMan || 
+        resolvedDeliveryManId = saleData.deliveryId.deliveryMan?._id ||
+                                saleData.deliveryId.deliveryMan ||
                                 (typeof saleData.deliveryId === "string" ? saleData.deliveryId : "");
       }
 
       // Resolve address string
       let resolvedAddress = "";
+      // Resolve address fields
+      let resolvedStreet = "";
+      let resolvedCity = "";
       if (saleData.deliveryId?.deliveryAddress) {
-        resolvedAddress = saleData.deliveryId.deliveryAddress.street || 
+        resolvedStreet = saleData.deliveryId.deliveryAddress.street ||
                           (typeof saleData.deliveryId.deliveryAddress === "string" ? saleData.deliveryId.deliveryAddress : "");
+        resolvedCity = saleData.deliveryId.deliveryAddress.city || "";
       }
 
       reset({
@@ -107,7 +121,8 @@ export default function EditSale({ open, setIsOpen, saleData }) {
         customerPhone: saleData.customerPhone || "",
         requiresDelivery: isDelivery,
         deliveryId: resolvedDeliveryManId,
-        deliveryAddress: resolvedAddress,
+        street: resolvedStreet,
+        city: resolvedCity,
         deliveryfees: saleData.deliveryfees ?? saleData.deliveryId?.deliveryfees ?? 0,
         paymentMethod: saleData.paymentMethod || "cash",
         paidAmount: saleData.paidAmount || 0,
@@ -126,23 +141,34 @@ export default function EditSale({ open, setIsOpen, saleData }) {
       toast.error(
         err?.response?.data?.message ||
           err?.message ||
-          "Une erreur est survenue lors de la mise à jour."
+          "Une erreur est survenue lors de la mise à jour.",
       );
     },
   });
 
   const onSubmit = (data) => {
     const payload = {
-      customerName: data.customerName,
-      customerPhone: data.customerPhone,
-      requiresDelivery: data.requiresDelivery,
-      deliveryId: data.requiresDelivery ? data.deliveryId : null,
-      deliveryAddress: data.requiresDelivery ? data.deliveryAddress : null,
-      deliveryfees: data.requiresDelivery ? Number(data.deliveryfees || 0) : 0,
-      paymentMethod: data.paymentMethod,
-      paidAmount: Number(data.paidAmount || 0),
-      remainAmount,
-      paymentStatus,
+      sale: {
+        customerName: data.customerName,
+        customerPhone: data.customerPhone,
+        requiresDelivery: data.requiresDelivery,
+        deliveryAddress: data.requiresDelivery ? `${data.street || ""}${data.city ? ", " + data.city : ""}` : null,
+        deliveryfees: data.requiresDelivery ? Number(watchDeliveryfees || 0) : 0,
+        paymentMethod: data.paymentMethod,
+        paidAmount: Number(watchPaidAmount || 0),
+        remainAmount,
+        paymentStatus,
+      },
+      delevrydata: {
+        deliveryMan: data.requiresDelivery ? data.deliveryId : null,
+        deliveryAddress: data.requiresDelivery ? {
+          street: data.street,
+          city: data.city,
+          phone: data.customerPhone,
+          notes: saleData?.notes || "",
+        } : null,
+        deliveryfees: data.requiresDelivery ? Number(watchDeliveryfees || 0) : 0,
+      }
     };
     mutate(payload);
   };
@@ -152,11 +178,19 @@ export default function EditSale({ open, setIsOpen, saleData }) {
   };
 
   return (
-    <Dialog open={open} fullWidth maxWidth="md" onClose={handleClose} scroll="paper">
+    <Dialog
+      open={open}
+      fullWidth
+      maxWidth="md"
+      onClose={handleClose}
+      scroll="paper"
+    >
       <DialogTitle sx={{ background: "#F8FAFC" }}>
         <div className="flex justify-between items-center my-1 text-slate-800">
           <div>
-            <h2 className="text-[#94A3B8] text-[12px] font-bold tracking-wider">MODIFIER LA VENTE</h2>
+            <h2 className="text-[#94A3B8] text-[12px] font-bold tracking-wider">
+              MODIFIER LA VENTE
+            </h2>
             <p className="text-[#0F172A] text-[18px] font-bold">
               {saleData?.invoiceNumber || "N/A"}
             </p>
@@ -209,10 +243,14 @@ export default function EditSale({ open, setIsOpen, saleData }) {
                 Détails de Livraison
               </h3>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-500 font-medium">Activer la livraison</span>
+                <span className="text-xs text-slate-500 font-medium">
+                  Activer la livraison
+                </span>
                 <Switch
                   checked={watchRequiresDelivery}
-                  onChange={(e) => setValue("requiresDelivery", e.target.checked)}
+                  onChange={(e) =>
+                    setValue("requiresDelivery", e.target.checked)
+                  }
                 />
               </div>
             </div>
@@ -262,33 +300,37 @@ export default function EditSale({ open, setIsOpen, saleData }) {
 
                   <div className="flex flex-col gap-1">
                     <FieldLabel>Frais de livraison (DH)</FieldLabel>
-                    <TextField
-                      fullWidth
-                      size="small"
-                      type="number"
-                      placeholder="Ex: 25"
-                      {...register("deliveryfees", {
-                        valueAsNumber: true,
-                        min: { value: 0, message: "Les frais doivent être positifs" },
-                      })}
-                    />
-                    {errors.deliveryfees && <FieldError>{errors.deliveryfees.message}</FieldError>}
+                    <div className="h-[38px] flex items-center px-3 border border-slate-200 rounded-md bg-[#F1F5F9] text-slate-700 text-sm font-medium">
+                      {watchDeliveryfees ?? 0}
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <FieldLabel>Adresse de livraison</FieldLabel>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    multiline
-                    rows={2}
-                    placeholder="Adresse complète du client..."
-                    {...register("deliveryAddress", {
-                      required: watchRequiresDelivery ? "L'adresse de livraison est requise" : false,
-                    })}
-                  />
-                  {errors.deliveryAddress && <FieldError>{errors.deliveryAddress.message}</FieldError>}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                  <div className="flex flex-col gap-1">
+                    <FieldLabel>Rue / Adresse</FieldLabel>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Ex: Rue de la Liberté"
+                      {...register("street", {
+                        required: watchRequiresDelivery ? "La rue / adresse est requise" : false,
+                      })}
+                    />
+                    {errors.street && <FieldError>{errors.street.message}</FieldError>}
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <FieldLabel>Ville</FieldLabel>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      placeholder="Ex: Agadir"
+                      {...register("city", {
+                        required: watchRequiresDelivery ? "La ville est requise" : false,
+                      })}
+                    />
+                    {errors.city && <FieldError>{errors.city.message}</FieldError>}
+                  </div>
                 </div>
               </div>
             )}
@@ -328,26 +370,9 @@ export default function EditSale({ open, setIsOpen, saleData }) {
               {/* Paid Amount */}
               <div className="flex flex-col gap-1">
                 <FieldLabel>Montant Payé (DH)</FieldLabel>
-                <TextField
-                  fullWidth
-                  size="small"
-                  type="number"
-                  placeholder="Ex: 150"
-                  InputProps={{
-                    readOnly: !hasRemain,
-                  }}
-                  {...register("paidAmount", {
-                    required: "Le montant payé est requis",
-                    valueAsNumber: true,
-                    min: { value: 0, message: "Le montant doit être supérieur ou égal à 0" },
-                  })}
-                  sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: !hasRemain ? "#F1F5F9" : "inherit",
-                    }
-                  }}
-                />
-                {errors.paidAmount && <FieldError>{errors.paidAmount.message}</FieldError>}
+                <div className="h-[38px] flex items-center px-3 border border-slate-200 rounded-md bg-[#F1F5F9] text-slate-700 text-sm font-medium">
+                  {watchPaidAmount ?? 0}
+                </div>
               </div>
             </div>
 

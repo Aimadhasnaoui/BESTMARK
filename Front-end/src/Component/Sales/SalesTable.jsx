@@ -119,11 +119,11 @@ export default function SalesTable({
                 <Truck className="w-4 h-4 text-white" />
               </div>
             {row.original.requiresDelivery ? (
-              <div className="flex flex-col gap-1">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
-                  Oui
+              <div className="flex flex-col gap-1 items-start">
+                <span className="inline-flex items-center rounded text-xs font-medium ">
+                  Livreur : 
                 </span>
-                <span className="text-[10px] text-slate-500 font-mono">ID: {row.original.deliveryId?._id || row.original.deliveryId}</span>
+                <span className="text-[10px] bg-amber-100 text-amber-800 px-2 rounded-md font-mono"> {row.original.deliveryId?.deliveryMan.name || row.original.deliveryId}</span>
               </div>
             ) : (
               <span className="text-xs text-slate-300">Non</span>

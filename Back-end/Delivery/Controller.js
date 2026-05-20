@@ -8,7 +8,7 @@ export const CreateDelivery = catchAsync(async (req, res, next) => {
 });
 
 export const GetDeliveries = catchAsync(async (req, res, next) => {
-  const deliveries = await Delivery.find().sort({ createdAt: -1 });
+  const deliveries = await Delivery.find().populate('deliveryMan', "name").populate('sale', "invoiceNumber ").sort({ createdAt: -1 });
   res.status(200).json({ success: true, deliveries });
 });
 

@@ -5,6 +5,7 @@ import Delivery from "../Delivery/Delivery.js";
 import Products from "../Products/Product/Products.js";
 import TranTransaction from "../Transactions/Transaction.js";
 import StockMovement from "../stockMovements/StockMovement.js";
+
 export const CreateSale = transactional(async (req, res, next, session) => {
   const {
     requiresDelivery,
@@ -87,12 +88,20 @@ export const CreateSale = transactional(async (req, res, next, session) => {
         {
           sale: saledata._id,
           deliveryMan: deliveryMan,
-          deliveryAddress: deliveryAddress,
+          deliveryAddress: {
+            street: req.body.street || (typeof req.body.deliveryAddress === "string" ? req.body.deliveryAddress : req.body.deliveryAddress?.street || ""),
+            city: req.body.city || req.body.deliveryAddress?.city || "",
+            phone: req.body.customerPhone || req.body.deliveryAddress?.phone || "",
+            notes: req.body.notes || req.body.deliveryAddress?.notes || "",
+          },
           deliveryfees: deliveryfees,
         },
       ],
       { session },
     );
+
+    saledata.deliveryId = Deliverydata._id;
+    await saledata.save({ session });
   }
   res.status(201).json({ success: true, saledata });
 });
@@ -101,14 +110,27 @@ export const GetSales = catchAsync(async (req, res, next) => {
   const sales = await Sale.find()
     .sort({ createdAt: -1 })
     .populate("servedBy", "name")
-    .populate("deliveryId", "name");
+    .populate({
+      path: "deliveryId",
+      populate: {
+        path: "deliveryMan",
+        select: "name",
+      },
+    });
+    
   res.status(200).json({ success: true, sales });
 });
 
 export const GetSale = catchAsync(async (req, res, next) => {
   const sale = await Sale.findById(req.params.id)
     .populate("servedBy", "name")
-    .populate("deliveryId", "name");
+    .populate({
+      path: "deliveryId",
+      populate: {
+        path: "deliveryMan",
+        select: "name",
+      },
+    });
   if (!sale) {
     return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
   }
@@ -116,12 +138,58 @@ export const GetSale = catchAsync(async (req, res, next) => {
 });
 
 export const UpdateSale = catchAsync(async (req, res, next) => {
-  const sale = await Sale.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-  });
-  if (!sale) {
+  console.log(req.body);
+  const saleData = await Sale.findById(req.params.id);
+  if (!saleData) {
     return next(new APPError(`Sale with ID ${req.params.id} not found`, 404));
   }
+
+  // Remove deliveryId from update body to prevent overwriting the relation ID with an employee ID
+  if (req.body.sale) {
+    delete req.body.sale.deliveryId;
+  }
+
+  const sale = await Sale.findByIdAndUpdate(req.params.id, req.body.sale, {
+    new: true,
+  });
+
+  if (req.body.delevrydata && req.body.delevrydata.deliveryMan) {
+    // Format delivery address string to object compatibility if necessary
+    const formattedAddress = typeof req.body.delevrydata.deliveryAddress === "string"
+      ? { street: req.body.delevrydata.deliveryAddress }
+      : req.body.delevrydata.deliveryAddress;
+
+    const deliveryPayload = {
+      deliveryMan: req.body.delevrydata.deliveryMan,
+      deliveryAddress: formattedAddress,
+      deliveryfees: req.body.delevrydata.deliveryfees,
+    };
+
+    let delivery = await Delivery.findOne({ sale: sale._id });
+
+    if (!delivery) {
+      // Create new delivery document
+      delivery = await Delivery.create({
+        sale: sale._id,
+        ...deliveryPayload,
+      });
+    } else {
+      // Update existing delivery document
+      delivery = await Delivery.findByIdAndUpdate(delivery._id, deliveryPayload, {
+        new: true,
+      });
+    }
+
+    // Ensure the sale document is correctly linked to the Delivery document ID
+    sale.deliveryId = delivery._id;
+    await sale.save();
+  } else {
+    // If no delivery is required, delete any associated delivery documents
+    await Delivery.deleteMany({ sale: sale._id });
+    sale.deliveryId = null;
+    await sale.save();
+  }
+
   res.status(200).json({ success: true, sale });
 });
 
@@ -132,15 +200,21 @@ export const DeleteSale = transactional(async (req, res, next, session) => {
   }
 
   // Delete associated StockMovement records if they exist
-  const stockMovementsExist = await StockMovement.exists({ referenceId: sale._id });
+  const stockMovementsExist = await StockMovement.exists({
+    referenceId: sale._id,
+  });
   if (stockMovementsExist) {
     await StockMovement.deleteMany({ referenceId: sale._id }).session(session);
   }
 
   // Delete associated TranTransaction records if they exist
-  const transactionsExist = await TranTransaction.exists({ referenceId: sale._id });
+  const transactionsExist = await TranTransaction.exists({
+    referenceId: sale._id,
+  });
   if (transactionsExist) {
-    await TranTransaction.deleteMany({ referenceId: sale._id }).session(session);
+    await TranTransaction.deleteMany({ referenceId: sale._id }).session(
+      session,
+    );
   }
 
   // Delete associated Delivery records if they exist

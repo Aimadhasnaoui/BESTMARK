@@ -129,21 +129,35 @@ export default function CustomerPart({
               )}
             />
           </div>
-          <div className="w-full">
-            <FieldLabel>Adresse de livraison</FieldLabel>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Adresse complète"
-              {...register("deliveryAddress", {
-                required: NeedDelevry ? "L'adresse de livraison est requise" : false,
-              })}
-              multiline
-              rows={2}
-            />
-            {errors.deliveryAddress && (
-              <FieldError>{errors.deliveryAddress.message}</FieldError>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+            <div className="flex flex-col gap-1">
+              <FieldLabel>Rue / Adresse</FieldLabel>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Ex: Rue de la Liberté"
+                {...register("street", {
+                  required: NeedDelevry ? "La rue / adresse est requise" : false,
+                })}
+              />
+              {errors.street && (
+                <FieldError>{errors.street.message}</FieldError>
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              <FieldLabel>Ville</FieldLabel>
+              <TextField
+                fullWidth
+                size="small"
+                placeholder="Ex: Agadir"
+                {...register("city", {
+                  required: NeedDelevry ? "La ville est requise" : false,
+                })}
+              />
+              {errors.city && (
+                <FieldError>{errors.city.message}</FieldError>
+              )}
+            </div>
           </div>
           <div className="w-full">
             <FieldLabel>Frais de livraison (DH)</FieldLabel>
