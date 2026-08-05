@@ -141,7 +141,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
               >
                 <Settings size={24} />
                 <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
-                  Settings
+                  Paramètres
                 </span>
               </Link>
             </SidebarMenuButton>
@@ -155,7 +155,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
               >
                 <LogOut size={24} />
                 <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
-                  Logout
+                  déconnexion
                 </span>
               </button>
             </SidebarMenuButton>

@@ -15,38 +15,48 @@ import {
 } from "@/components/ui/avatar"
 import { useLocation } from "react-router-dom";
 import { DataContext } from "../Data/contextApi";
+import { getImageUrl } from "@/lib/utils";
 export default function NavBar() {
-  const[PageName,setPageName] = useState("Dashboard")
+  const[PageName,setPageName] = useState("Tableau de bord")
   const location = useLocation();
   const {userInfo} = useContext(DataContext)
   useEffect(() => {
     switch (location.pathname) {
       case "/dashboard":
-        setPageName("Dashboard");
+        setPageName("Tableau de bord");
         break;
       case "/products":
-        setPageName("Products");
+        setPageName("Produits");
+        break;
+      case "/purchases":
+        setPageName("Achats");
         break;
       case "/stock":
-        setPageName("Stock");
+        setPageName("Gestion de Stock");
         break;
       case "/sales":
-        setPageName("Sales");
+        setPageName("Ventes");
         break;
       case "/finance":
         setPageName("Finance");
         break;
       case "/suppliers":
-        setPageName("Suppliers");
+        setPageName("Fournisseurs");
+        break;
+      case "/employees":
+        setPageName("Employés");
+        break;
+      case "/delivery":
+        setPageName("Livraisons");
         break;
       case "/requests":
-        setPageName("Requests");
+        setPageName("Demandes clients");
         break;
       case "/settings":
-        setPageName("Settings");
+        setPageName("Paramètres");
         break;
       default:
-        setPageName("Dashboard");
+        setPageName("Tableau de bord");
     }
   }, [location]);
   return (
@@ -72,8 +82,10 @@ export default function NavBar() {
                   <p className="text-sm text-muted-foreground">{userInfo?.mission?.name}</p>
               </div>
         <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-            <AvatarFallback>CN</AvatarFallback>
+            <AvatarImage src={getImageUrl(userInfo?.image)} alt={userInfo?.name} />
+            <AvatarFallback>
+              {userInfo?.name ? userInfo.name.slice(0, 2).toUpperCase() : "CN"}
+            </AvatarFallback>
             <AvatarBadge className="bg-green-600 dark:bg-green-800" />
         </Avatar>
           </div>
