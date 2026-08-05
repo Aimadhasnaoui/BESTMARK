@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check Midelwars/UploadImage.js)",
+      "Bash(node --check Index.js)",
+      "Bash(node --check Products/Product/Router.js)",
+      "Bash(node --check Midelwars/ErrorHandlers.js)",
+      "Bash(node --check Employes/Emplye/Router.js)"
+    ]
+  }
+}

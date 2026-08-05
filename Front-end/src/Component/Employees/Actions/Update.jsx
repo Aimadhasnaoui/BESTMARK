@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
 import {
   Field,
@@ -14,6 +14,14 @@ import { GetEmployeeTypes } from "@/Servises/EmployeeTypes";
 import { toast } from "react-hot-toast";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { User } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
+
+const PHONE_PATTERN = {
+  value: /^0[67][0-9]{8}$/,
+  message: "Le numéro doit commencer par 06 ou 07 et contenir 10 chiffres",
+};
 
 export default function Update({
   isUpdating,
@@ -21,6 +29,7 @@ export default function Update({
   selectedEmployee,
 }) {
   const queryClient = useQueryClient();
+  const [imagePreview, setImagePreview] = useState(null);
   const {
     register,
     handleSubmit,
@@ -44,6 +53,7 @@ export default function Update({
         mission: selectedEmployee.mission?._id || selectedEmployee.mission,
         salary: selectedEmployee.salary,
       });
+      setImagePreview(null);
     }
   }, [selectedEmployee, reset]);
 
@@ -56,11 +66,25 @@ export default function Update({
     },
   });
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    setImagePreview(file ? URL.createObjectURL(file) : null);
+  };
+
   const onSubmit = (data) => {
     // On update, we usually don't send the password unless it's being changed
-    if (data.password) delete data.password;
+    delete data.password;
     delete data.isActive;
-    mutate(data);
+
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === "image") {
+        if (value?.[0]) formData.append("image", value[0]);
+      } else {
+        formData.append(key, value);
+      }
+    });
+    mutate(formData);
   };
 
   return (
@@ -78,6 +102,30 @@ export default function Update({
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <FieldSet>
           <FieldGroup className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Field className="md:col-span-2 flex flex-row items-center gap-4">
+              <Avatar size="lg">
+                {imagePreview || selectedEmployee?.image ? (
+                  <AvatarImage
+                    src={imagePreview || getImageUrl(selectedEmployee.image)}
+                    alt="Aperçu"
+                  />
+                ) : (
+                  <AvatarFallback>
+                    <User className="w-5 h-5 text-slate-400" />
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <div className="flex-1">
+                <FieldLabel htmlFor="image">Photo</FieldLabel>
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  className="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  {...register("image", { onChange: handleImageChange })}
+                />
+              </div>
+            </Field>
             <Field className="md:col-span-2">
               <FieldLabel htmlFor="name">Nom complet</FieldLabel>
               <TextField
@@ -107,10 +155,15 @@ export default function Update({
                 id="phone"
                 fullWidth
                 placeholder="06..."
-                {...register("phone", { required: "Le téléphone est requis" })}
+                {...register("phone", {
+                  required: "Le téléphone est requis",
+                  pattern: PHONE_PATTERN,
+                })}
               />
               {errors.phone && <FieldError>{errors.phone.message}</FieldError>}
             </Field>
+
+          
 
             <Field className="md:col-span-2">
               <FieldLabel htmlFor="address">Adresse</FieldLabel>

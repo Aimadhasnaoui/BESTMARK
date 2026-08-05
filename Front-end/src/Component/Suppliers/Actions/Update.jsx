@@ -15,6 +15,9 @@ import { GetCategorys } from "@/Servises/ProductCategories";
 import { toast } from "react-hot-toast";
 import Autocomplete from "@mui/material/Autocomplete";
 
+const PHONE_PATTERN = /^0[67][0-9]{8}$/;
+const PHONE_MESSAGE = "Le numéro doit commencer par 06 ou 07 et contenir 10 chiffres";
+
 export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) {
   const queryClient = useQueryClient();
   const {
@@ -97,8 +100,12 @@ export default function Update({ isUpdating, setIsUpdating, selectedSupplier }) 
                   <TextField
                     id="phone"
                     placeholder="Ex: 06 12 34 56 78"
-                    {...register("phone")}
+                    {...register("phone", {
+                      validate: (value) =>
+                        !value || PHONE_PATTERN.test(value) || PHONE_MESSAGE,
+                    })}
                   />
+                  {errors.phone && <FieldError>{errors.phone.message}</FieldError>}
                 </Field>
 
                 <Field className="md:col-span-2">

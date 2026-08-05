@@ -14,7 +14,7 @@ export default function ProductsStatic({data}) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{data?.products?.length || 0}</div>
-          <p className='text-xs text-[#059669] my-2'>12% from last month</p>
+          {/* <p className='text-xs text-[#059669] my-2'>12% from last month</p> */}
         </CardContent>
       </Card>
       <Card>

@@ -50,21 +50,23 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       icon: LayoutDashboard,
       path: "/dashboard",
     },
-    { id: "products", label: "Produits", icon: Package, path: "/products" },
     { id: "purchases", label: "Achats", icon: ShoppingBag, path: "/purchases" },
-    { id: "sales", label: "Ventes", icon: Receipt, path: "/sales" },
+    { id: "products", label: "Produits", icon: Package, path: "/products" },
     {
       id: "stock",
       label: "Gestion de Stock",
       icon: ClipboardList,
       path: "/stock",
     },
+    { id: "sales", label: "Ventes", icon: Receipt, path: "/sales" },
     {
       id: "requests",
       label: "Demandes clients",
       icon: HelpCircle,
       path: "/requests",
     },
+    { id: "delivery", label: "Livraisons", icon: Truck, path: "/delivery" },
+    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
     {
       id: "suppliers",
       label: "Fournisseurs",
@@ -72,8 +74,6 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       path: "/suppliers",
     },
     { id: "employees", label: "Employés", icon: User2, path: "/employees" },
-    { id: "delivery", label: "Livraisons", icon: Truck, path: "/delivery" },
-    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
   ];
 
   return (

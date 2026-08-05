@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import {
   handeUnhanledRoute,
   globalErrorHandler,
@@ -25,9 +27,18 @@ import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import hpp from "hpp";
 import cookieParser from "cookie-parser";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 dotenv.config();
 app.use(helmet());
+app.use(
+  "/uploads",
+  (req, res, next) => {
+    res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    next();
+  },
+  express.static(path.join(__dirname, "uploads")),
+);
 mongoose
   .connect(`${process.env.DataBase}`)
   .then(() => {
@@ -41,7 +52,7 @@ mongoose
 
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: "http://localhost:5173",
     credentials: true,
   }),
 );

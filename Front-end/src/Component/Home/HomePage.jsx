@@ -38,9 +38,7 @@ if(isSuccess){
 
   return (
     <>
-      {isPending ? (
-        <LoaderApp />
-      ) : (
+      {isSuccess ? (
         <SidebarProvider>
           <AppSidebar
             currentPage={currentPage}
@@ -61,6 +59,8 @@ if(isSuccess){
               <AddSlle></AddSlle>
           </main>
         </SidebarProvider>
+      ) : (
+        <LoaderApp />
       )}
     </>
   );

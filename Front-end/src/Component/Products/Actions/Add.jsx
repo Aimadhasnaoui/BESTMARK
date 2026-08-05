@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
 import {
   Field,
@@ -15,8 +15,11 @@ import { GetSuppliers } from "@/Servises/Suppliers";
 import { toast } from "react-hot-toast";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Image } from "lucide-react";
 export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();
+  const [imagePreview, setImagePreview] = useState(null);
   const {
     register,
     handleSubmit,
@@ -53,11 +56,25 @@ export default function Add({ isAdding, setIsAdding }) {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Le produit a été ajouté avec succès");
       reset();
+      setImagePreview(null);
     },
   });
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    setImagePreview(file ? URL.createObjectURL(file) : null);
+  };
+
   const onSubmit = (data) => {
-    mutate(data);
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === "image") {
+        if (value?.[0]) formData.append("image", value[0]);
+      } else {
+        formData.append(key, value);
+      }
+    });
+    mutate(formData);
   };
 
 
@@ -118,18 +135,32 @@ export default function Add({ isAdding, setIsAdding }) {
                   />
                 </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="image">URL de l'image</FieldLabel>
-                  <TextField
-                    id="image"
-                    placeholder="https://..."
-                    {...register("image", {
-                      required: "L'URL de l'image est requise",
-                    })}
-                  />
-                  {errors.image && (
-                    <FieldError>{errors.image.message}</FieldError>
-                  )}
+                <Field className="md:col-span-2 flex flex-row items-center gap-4">
+                  <Avatar size="lg" className="rounded-md size-16">
+                    {imagePreview ? (
+                      <AvatarImage src={imagePreview} alt="Aperçu" className="rounded-md" />
+                    ) : (
+                      <AvatarFallback className="rounded-md">
+                        <Image className="w-5 h-5 text-slate-400" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div className="flex-1">
+                    <FieldLabel htmlFor="image">Photo du produit</FieldLabel>
+                    <input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      className="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      {...register("image", {
+                        required: "L'image du produit est requise",
+                        onChange: handleImageChange,
+                      })}
+                    />
+                    {errors.image && (
+                      <FieldError>{errors.image.message}</FieldError>
+                    )}
+                  </div>
                 </Field>
 
                 <Field>

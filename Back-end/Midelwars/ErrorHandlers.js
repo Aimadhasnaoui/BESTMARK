@@ -28,10 +28,16 @@ export const globalErrorHandler = (err, req, res, next) => {
       //   if (err.name === 'CastError') err = handleCastErrorDB(err);
       //   if (err.code === 11000) err = handleDuplicateFieldsDB(err);
 
-        if (err.name === 'JsonWebTokenError' || err.name === "TokenExpiredError"){          
+        if (err.name === 'JsonWebTokenError' || err.name === "TokenExpiredError"){
           return   res.status(401).json({
               sttus:'error',
               message:'accès refusé'
+             });
+        }
+        if (err.name === 'MulterError'){
+          return res.status(400).json({
+              status: 'fail',
+              message: err.code === 'LIMIT_FILE_SIZE' ? "L'image dépasse la taille maximale autorisée (5MB)" : err.message,
              });
         }
         if (err.name === 'ValidationError'){

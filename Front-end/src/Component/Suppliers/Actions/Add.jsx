@@ -15,6 +15,9 @@ import { GetCategorys } from "@/Servises/ProductCategories";
 import { toast } from "react-hot-toast";
 import Autocomplete from "@mui/material/Autocomplete";
 
+const PHONE_PATTERN = /^0[67][0-9]{8}$/;
+const PHONE_MESSAGE = "Le numéro doit commencer par 06 ou 07 et contenir 10 chiffres";
+
 export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();
   const {
@@ -88,8 +91,12 @@ export default function Add({ isAdding, setIsAdding }) {
                   <TextField
                     id="phone"
                     placeholder="Ex: 06 12 34 56 78"
-                    {...register("phone")}
+                    {...register("phone", {
+                      validate: (value) =>
+                        !value || PHONE_PATTERN.test(value) || PHONE_MESSAGE,
+                    })}
                   />
+                  {errors.phone && <FieldError>{errors.phone.message}</FieldError>}
                 </Field>
 
                 <Field className="md:col-span-2">
@@ -124,6 +131,10 @@ export default function Add({ isAdding, setIsAdding }) {
                   <Controller
                     name="productTypes"
                     control={control}
+                    rules={{
+                      validate: (value) =>
+                        (value && value.length > 0) || "Sélectionnez au moins un type de produit",
+                    }}
                     render={({ field: { onChange, value } }) => (
                       <Autocomplete
                         multiple
@@ -139,6 +150,9 @@ export default function Add({ isAdding, setIsAdding }) {
                       />
                     )}
                   />
+                  {errors.productTypes && (
+                    <FieldError>{errors.productTypes.message}</FieldError>
+                  )}
                   <p className="text-[0.8rem] text-muted-foreground mt-2">
                     Sélectionnez les types de produits que ce fournisseur propose.
                   </p>

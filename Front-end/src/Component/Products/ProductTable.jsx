@@ -14,8 +14,9 @@ import {
   InputGroupInput,
 } from "@/components/ui/input-group";
 import { Search, AlertCircle, ArrowUpRight, ArrowDownLeft, Box, Layers, DollarSign, BarChart3, Archive, Bell, Truck, MoreHorizontal, Filter, Package } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton"; 
+import { Skeleton } from "@/components/ui/skeleton";
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
+import { getImageUrl } from "@/lib/utils";
 // import Filter from "./Actions/Filter";
 
 export default function ProductTable({
@@ -75,7 +76,7 @@ export default function ProductTable({
           <div className="w-20 h-20 rounded-md overflow-hidden">
             {row.original.image ? (
               <img
-                src={row.original.image}
+                src={getImageUrl(row.original.image)}
                 alt={row.original.name}
                 className="w-full h-full object-cover"
               />

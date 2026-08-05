@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
 import {
   Field,
@@ -15,9 +15,13 @@ import { GetSuppliers } from "@/Servises/Suppliers";
 import { toast } from "react-hot-toast";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Image } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
   const queryClient = useQueryClient();
+  const [imagePreview, setImagePreview] = useState(null);
   const {
     register,
     handleSubmit,
@@ -54,7 +58,6 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
         barcode: selectedProduct.barcode,
         buyingPrice: selectedProduct.buyingPrice,
         sellingPrice: selectedProduct.sellingPrice,
-        image: selectedProduct.image,
         category: selectedProduct.category?._id || selectedProduct.category,
         quantity: selectedProduct.quantity,
         hassupplier: selectedProduct.hassupplier || !!selectedProduct.supplier,
@@ -62,6 +65,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
         minStockAlert: selectedProduct.minStockAlert,
         Number_of_sales: selectedProduct.Number_of_sales,
       });
+      setImagePreview(null);
     }
   }, [selectedProduct, reset]);
 
@@ -74,8 +78,21 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
     },
   });
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    setImagePreview(file ? URL.createObjectURL(file) : null);
+  };
+
   const onSubmit = (data) => {
-    mutate(data);
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      if (key === "image") {
+        if (value?.[0]) formData.append("image", value[0]);
+      } else {
+        formData.append(key, value);
+      }
+    });
+    mutate(formData);
   };
 
   return (
@@ -135,18 +152,30 @@ export default function Update({ isUpdating, setIsUpdating, selectedProduct }) {
                   />
                 </Field>
 
-                <Field>
-                  <FieldLabel htmlFor="image">URL de l'image</FieldLabel>
-                  <TextField
-                    id="image"
-                    placeholder="https://..."
-                    {...register("image", {
-                      required: "L'URL de l'image est requise",
-                    })}
-                  />
-                  {errors.image && (
-                    <FieldError>{errors.image.message}</FieldError>
-                  )}
+                <Field className="md:col-span-2 flex flex-row items-center gap-4">
+                  <Avatar size="lg" className="rounded-md size-16">
+                    {imagePreview || selectedProduct?.image ? (
+                      <AvatarImage
+                        src={imagePreview || getImageUrl(selectedProduct.image)}
+                        alt="Aperçu"
+                        className="rounded-md"
+                      />
+                    ) : (
+                      <AvatarFallback className="rounded-md">
+                        <Image className="w-5 h-5 text-slate-400" />
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  <div className="flex-1">
+                    <FieldLabel htmlFor="image">Photo du produit</FieldLabel>
+                    <input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      className="block w-full text-sm text-slate-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                      {...register("image", { onChange: handleImageChange })}
+                    />
+                  </div>
                 </Field>
 
                 <Field>

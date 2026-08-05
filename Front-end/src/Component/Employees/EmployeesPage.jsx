@@ -8,7 +8,10 @@ import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
 import PasswordReset from "./Actions/PasswordReset";
-
+import HeaderPage from '../UI/HeaderPage'
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { User } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 export default function EmployeesPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -42,9 +45,23 @@ export default function EmployeesPage() {
         header: "Nom",
         accessorKey: "name",
         cell: ({ row }) => (
-          <div className="flex flex-col">
-            <span className="font-semibold text-slate-900">{row.original.name}</span>
-            <span className="text-xs text-slate-500">{row.original.email || "Pas d'email"}</span>
+          <div className="flex items-center gap-3">
+            <Avatar size="default">
+              {row.original.image ? (
+                <AvatarImage
+                  src={getImageUrl(row.original.image)}
+                  alt={row.original.name}
+                />
+              ) : (
+                <AvatarFallback>
+                  <User className="w-4 h-4 text-slate-400" />
+                </AvatarFallback>
+              )}
+            </Avatar>
+            <div className="flex flex-col">
+              <span className="font-semibold text-slate-900">{row.original.name}</span>
+              <span className="text-xs text-slate-500">{row.original.email || "Pas d'email"}</span>
+            </div>
           </div>
         )
       },
@@ -115,6 +132,13 @@ export default function EmployeesPage() {
 
   return (
     <div className="w-full">
+      <HeaderPage
+              title="Gestion des Employées"
+              description="Gérez vos employés, leurs coordonnées et leurs informations"
+              isAjouter={true}
+              ButtonText="Ajouter un fournisseur"
+              onButtonClick={() => setIsAdding(true)}
+            />
       {isResettingPassword && (
         <PasswordReset
           isUpdating={isResettingPassword}
@@ -130,7 +154,7 @@ export default function EmployeesPage() {
         ErrorMessage={error?.message}
         TableTitle="des employés"
         ButtonText="Ajouter un employé"
-        onButtonClick={() => setIsAdding(true)}
+         isAjouter={false}
       />
 
       {isAdding && (
