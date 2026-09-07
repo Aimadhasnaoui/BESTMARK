@@ -35,11 +35,29 @@ import {
 const TYPE_LABELS = { sale: "Vente", expense: "Dépense", purchase: "Achat", return: "Retour" };
 const EXPENSE_COLORS = ["#f59e0b", "#3b82f6", "#a855f7", "#64748b"];
 const INCOME_COLORS = ["#10b981", "#64748b"];
+const MONTHS_FR = [
+  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre",
+];
 
 export default function FinanceReportPage() {
+  const currentYear = dayjs().year();
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
+  const [monthFilter, setMonthFilter] = useState("");
+
+  const handleMonthChange = (value) => {
+    setMonthFilter(value);
+    if (value === "") {
+      setDateFrom("");
+      setDateTo("");
+      return;
+    }
+    const start = dayjs().year(currentYear).month(Number(value)).startOf("month");
+    setDateFrom(start.format("YYYY-MM-DD"));
+    setDateTo(start.endOf("month").format("YYYY-MM-DD"));
+  };
 
   const { data, isPending } = useQuery({
     queryKey: ["transactions"],
@@ -61,11 +79,12 @@ export default function FinanceReportPage() {
     });
   }, [allTransactions, typeFilter, dateFrom, dateTo]);
 
-  const hasActiveFilters = !!(typeFilter || dateFrom || dateTo);
+  const hasActiveFilters = !!(typeFilter || dateFrom || dateTo || monthFilter);
   const resetFilters = () => {
     setDateFrom("");
     setDateTo("");
     setTypeFilter("");
+    setMonthFilter("");
   };
 
   const totalIn = useMemo(
@@ -143,12 +162,35 @@ export default function FinanceReportPage() {
           </TextField>
         </div>
 
+        <div className="flex flex-col gap-1.5 min-w-45">
+          <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+            <Calendar className="w-3.5 h-3.5 text-purple-500" />
+            Mois ({currentYear})
+          </label>
+          <TextField select size="small" value={monthFilter} onChange={(e) => handleMonthChange(e.target.value)}>
+            <MenuItem value="">Tous les mois</MenuItem>
+            {MONTHS_FR.map((label, index) => (
+              <MenuItem key={label} value={String(index)}>
+                {label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </div>
+
         <div className="flex flex-col gap-1.5 min-w-40">
           <label className="flex items-center gap-1.5 text-xs font-semibold text-slate-500 uppercase tracking-wide">
             <Calendar className="w-3.5 h-3.5 text-blue-500" />
             Du
           </label>
-          <TextField type="date" size="small" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+          <TextField
+            type="date"
+            size="small"
+            value={dateFrom}
+            onChange={(e) => {
+              setDateFrom(e.target.value);
+              setMonthFilter("");
+            }}
+          />
         </div>
 
         <div className="flex flex-col gap-1.5 min-w-40">
@@ -156,7 +198,15 @@ export default function FinanceReportPage() {
             <Calendar className="w-3.5 h-3.5 text-blue-500" />
             Au
           </label>
-          <TextField type="date" size="small" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
+          <TextField
+            type="date"
+            size="small"
+            value={dateTo}
+            onChange={(e) => {
+              setDateTo(e.target.value);
+              setMonthFilter("");
+            }}
+          />
         </div>
 
         {hasActiveFilters && (
