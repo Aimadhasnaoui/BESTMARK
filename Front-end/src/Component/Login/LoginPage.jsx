@@ -15,7 +15,7 @@ export default function LoginPage() {
               <div className="bg-white p-2 rounded-full">
                 <ShoppingCart size={18} color="#2563EB" />
               </div>
-              <h1 className="text-white font-bold text-[24px]">Store Pilot</h1>
+              <h1 className="text-white font-bold text-[24px]">BESTMARK</h1>
             </div>
             <div className="absolute bottom-8 left-8 text-[42px] text-white w-[60%] text-centre font-bold">
               Pilotez votre commerce,vers de nouveaux sommets.

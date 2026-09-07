@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
+import { DataContext } from "@/Component/Data/contextApi";
 import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
 import {
   Field,
@@ -27,6 +28,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();
+  const { prefillProduct, setPrefillProduct } = useContext(DataContext);
   const {
     register,
     handleSubmit,
@@ -79,6 +81,29 @@ const selectedSupplier = watch("supplier");
   const debts = Math.max(0, totalAmount - paidAmount);
 
   useEffect(() => {
+    if (isAdding && prefillProduct) {
+      if (prefillProduct.supplier) {
+        const supplierId = prefillProduct.supplier._id || prefillProduct.supplier;
+        setValue("supplier", supplierId);
+      } else {
+        toast.error("Ce produit n'a pas de fournisseur, veuillez le sélectionner manuellement.");
+        setPrefillProduct(null);
+      }
+    }
+  }, [isAdding, prefillProduct]);
+
+  useEffect(() => {
+    if (isAdding && prefillProduct && productsData?.products) {
+      const product = productsData.products.find((p) => p._id === prefillProduct._id);
+      if (product) {
+        setValue("items.0.product", product._id);
+        setValue("items.0.buyingPrice", product.buyingPrice);
+        setPrefillProduct(null);
+      }
+    }
+  }, [isAdding, prefillProduct, productsData, setValue, setPrefillProduct]);
+
+  useEffect(() => {
     if (paidAmount === totalAmount) {
       setValue("paymentStatus", "paid");
     } else if (paidAmount > 0) {
@@ -129,6 +154,10 @@ const selectedSupplier = watch("supplier");
           error={error}
           errorTitle="Échec de l'ajout"
           size="lg"
+          onCancel={() => {
+            reset();
+            setPrefillProduct(null);
+          }}
         >
           <form
             onSubmit={handleSubmit(onSubmit)}

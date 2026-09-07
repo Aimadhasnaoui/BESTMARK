@@ -29,7 +29,6 @@ export default function EmploisType() {
       {
         header: "Actions",
         accessorKey: "actions",
-        className: "sticky right-0 bg-white border-l w-[150px] bg-[#F8FAFC]",
         cell: ({ row }) => (
           <ActionButtons
             onEdit={() => {

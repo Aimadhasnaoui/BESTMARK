@@ -5,7 +5,9 @@
       "Bash(node --check Index.js)",
       "Bash(node --check Products/Product/Router.js)",
       "Bash(node --check Midelwars/ErrorHandlers.js)",
-      "Bash(node --check Employes/Emplye/Router.js)"
+      "Bash(node --check Employes/Emplye/Router.js)",
+      "Bash(npx --yes playwright --version)",
+      "Bash(npx --yes playwright install chromium)"
     ]
   }
 }

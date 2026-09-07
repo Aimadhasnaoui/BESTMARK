@@ -50,7 +50,6 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       icon: LayoutDashboard,
       path: "/dashboard",
     },
-    { id: "purchases", label: "Achats", icon: ShoppingBag, path: "/purchases" },
     { id: "products", label: "Produits", icon: Package, path: "/products" },
     {
       id: "stock",
@@ -58,6 +57,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       icon: ClipboardList,
       path: "/stock",
     },
+    { id: "purchases", label: "Achats", icon: ShoppingBag, path: "/purchases" },
     { id: "sales", label: "Ventes", icon: Receipt, path: "/sales" },
     {
       id: "requests",
@@ -74,12 +74,14 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       path: "/suppliers",
     },
     { id: "employees", label: "Employés", icon: User2, path: "/employees" },
+    { id: "settings", label: "Paramètres", icon: Settings, path: "/settings" },
   ];
 
   return (
     <Sidebar
       collapsible="icon"
-      className={state === "collapsed" ? "cursor-pointer" : ""}
+      className={`${state === "collapsed" ? "cursor-pointer" : ""}`}
+      style={{ "--sidebar": "oklch(1 0 0)" }}
       onClick={() => {
         if (state === "collapsed") {
           setOpen(true);
@@ -94,8 +96,8 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
           className="w-10 object-cover transition-all group-data-[collapsible=icon]:w-8"
         />
         <div className="text-2xl font-bold pl-2 group-data-[collapsible=icon]:hidden">
-          <span>Store</span>
-          <span className="text-[#0066FF]">Pilot</span>
+          <span>BEST</span>
+          <span className="text-[#0066FF]">MARK</span>
         </div>
       </SidebarHeader>
       {/* sidebar content */}
@@ -114,7 +116,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
                   }`}
                 >
                   <item.icon size={24} />
-                  <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
+                  <span className="group-data-[collapsible=icon]:hidden">
                     {item.label}
                   </span>
                 </Link>
@@ -129,22 +131,6 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       <SidebarFooter>
         <SidebarMenu className="gap-2">
           <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <Link
-                to="/settings"
-                onClick={() => setcurrentPage("settings")}
-                className={`rounded-none cursor-pointer transition-all ${
-                  currentPage === "settings"
-                    ? "bg-[#EFF6FF] border-l-4 border-[#0066FF] text-[#2563EB]"
-                    : "border-l-4 border-transparent !hover:bg-slate-50 text-[#475569]"
-                }`}
-              >
-                <Settings size={24} />
-                <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
-                  Paramètres
-                </span>
-              </Link>
-            </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
@@ -154,7 +140,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
                 className="rounded-none cursor-pointer transition-all border-l-4 border-transparent !hover:bg-red-100 text-red-500 !hover:text-white"
               >
                 <LogOut size={24} />
-                <span className="group-data-[collapsible=icon]:hidden text-[16px] font-medium">
+                <span className="group-data-[collapsible=icon]:hidden">
                   déconnexion
                 </span>
               </button>

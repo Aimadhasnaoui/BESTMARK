@@ -29,7 +29,7 @@ const upload = multer({
 export const uploadImage = (fieldName = "image") => upload.single(fieldName);
 
 // Resizes/converts the buffer from memory storage to an optimized webp file on disk,
-// then rewrites req.body[bodyField] to the public path so controllers can save it as-is.
+// then rewrites req.body[bodyField] to a full URL so the front-end can use it as-is.
 export const optimizeImage = (folder, { width = 1000, quality = 80, bodyField = "image" } = {}) =>
   async (req, res, next) => {
     if (!req.file) return next();
@@ -43,7 +43,8 @@ export const optimizeImage = (folder, { width = 1000, quality = 80, bodyField = 
         .webp({ quality })
         .toFile(path.join(dir, filename));
 
-      req.body[bodyField] = `/uploads/${folder}/${filename}`;
+      const backendUrl = (process.env.BACKEND_URL || "").replace(/\/+$/, "");
+      req.body[bodyField] = `${backendUrl}/uploads/${folder}/${filename}`;
       next();
     } catch (err) {
       next(err);

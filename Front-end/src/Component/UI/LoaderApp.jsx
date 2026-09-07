@@ -8,7 +8,7 @@ export default function LoaderApp() {
     "Connexion sécurisée en cours d'établissement...",
     "Chargement de vos indicateurs de performance...",
     "Synchronisation des mouvements de stock en temps réel...",
-    "Préparation de votre interface premium StorePilot...",
+    "Préparation de votre interface premium BESTMARK...",
   ];
   const [messageIndex, setMessageIndex] = useState(0);
 
@@ -27,7 +27,7 @@ export default function LoaderApp() {
        {/* Spinner et titre de l'espace */}
         <div className="flex items-center gap-3 mb-4">
           <h3 className="text-white font-bold text-[20px] tracking-wide">
-            Espace StorePilot
+            Espace BESTMARK
           </h3>
         </div>
         {/* Anneaux orbitaux rotatifs avec Logo intégré au centre */}
@@ -41,7 +41,7 @@ export default function LoaderApp() {
           {/* Logo officiel mis en valeur */}
           <img
             src={Logo}
-            alt="StorePilot"
+            alt="BESTMARK"
             className="h-12 object-contain relative z-10 drop-shadow-lg brightness-125"
           />
         </div>

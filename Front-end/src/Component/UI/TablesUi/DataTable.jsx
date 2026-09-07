@@ -63,11 +63,12 @@ export function DataTable({
         </InputGroup>
         {isAjouter && (
           <Button
-            size="lg"
-            className="bg-[#0050CB] cursor-pointer text-white rounded-md py-4 px-2"
+            size="sm"
+            variant="default"
+            className="cursor-pointer bg-[#0050CB] text-white hover:bg-[#0050CB]/90"
             onClick={onButtonClick}
           >
-            <Plus className="w-4 h-4" />
+            <Plus />
             {ButtonText}
           </Button>
         )}
@@ -82,7 +83,7 @@ export function DataTable({
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className={`px-6 py-5 border-b text-left text-white ${header.column.columnDef.className || ''}`}
+                    className={`px-4 py-3 border-b border-white/10 text-left text-[11px] font-semibold uppercase tracking-wider text-white ${header.column.columnDef.className || ''}`}
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -100,7 +101,7 @@ export function DataTable({
                   <tr key={index} className="hover:bg-gray-50">
                     {
                       columns.map((column) => (
-                        <td key={column.id} className="px-5 py-4 border-b">
+                        <td key={column.id} className="px-4 py-3 border-b">
                           <Skeleton className="h-4 w-[250px]" />
                         </td>
                       ))
@@ -123,7 +124,7 @@ export function DataTable({
                 table.getRowModel().rows.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50 transition-colors">
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className={`px-5 py-4 border-b text-[#1E293B] ${cell.column.columnDef.className || ''}`}>
+                      <td key={cell.id} className={`px-4 py-3 border-b text-sm text-[#1E293B] ${cell.column.columnDef.className || ''}`}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}

@@ -46,7 +46,7 @@ import CustomerPart from "./AddSelleParts/CustomerPart";
 import PaymentPart from "./AddSelleParts/PaymentPart";
 import FactureSell from "./AddSelleParts/FactureSell";
 export default function AddSlle() {
-  const { openAddSellerModal, setOpenAddSellerModal, userInfo } =
+  const { openAddSellerModal, setOpenAddSellerModal, userInfo, prefillProduct, setPrefillProduct } =
     useContext(DataContext);
   const [NeedDelevry, setNeedDelevry] = useState(false);
   const [pages, setpages] = useState({
@@ -128,12 +128,24 @@ export default function AddSlle() {
   }, [register]);
 
   useEffect(() => {
-    // Calculate subtotal dynamically using quantity * buyingPrice
+    if (openAddSellerModal && prefillProduct && fields.length === 0) {
+      append({
+        product: prefillProduct._id,
+        quantity: 1,
+        productDetials: prefillProduct,
+        sellingPrice: prefillProduct.sellingPrice,
+      });
+      setPrefillProduct(null);
+    }
+  }, [openAddSellerModal, prefillProduct, fields.length, append, setPrefillProduct]);
+
+  useEffect(() => {
+    // Calculate subtotal dynamically using quantity * sellingPrice
     const subtotalprice =
       watchItems?.reduce(
         (accumulator, currentValue) =>
           accumulator +
-          (currentValue.quantity || 0) * (currentValue.buyingPrice || 0),
+          (currentValue.quantity || 0) * (currentValue.sellingPrice || 0),
         0,
       ) || 0;
 
@@ -215,8 +227,10 @@ export default function AddSlle() {
 
   function handleClose() {
     setOpenAddSellerModal(false);
-    reset(); // Reset form values
+    reset({ items: [], discount: 0, deliveryfees: 0, paidAmount: 0 }); // Reset form values, including the items field array
     resetMutation(); // Reset mutation state
+    setNeedDelevry(false);
+    setPrefillProduct(null);
     setpages({
       currentPage: 0,
       maxPage: 2,

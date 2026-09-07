@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { FieldError, FieldLabel } from "@/components/ui/field";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
+import { getImageUrl } from "@/lib/utils";
 import {
   Plus,
   Trash2,
@@ -57,9 +58,8 @@ export default function ProductPart({
                       append({
                         product: newValue._id,
                         quantity: 1,
-                        buyingPrice: newValue.buyingPrice,
                         productDetials: newValue,
-                        sellingPrice: newValue.buyingPrice * 1,
+                        sellingPrice: newValue.sellingPrice,
                       });
                       // Reset the autocomplete input to empty after adding
                       onChange("");
@@ -108,7 +108,7 @@ export default function ProductPart({
             const currentQuantity =
               watchItems?.[index]?.quantity ?? field.quantity ?? 1;
             const currentPrice =
-              watchItems?.[index]?.buyingPrice ?? field.buyingPrice ?? 0;
+              watchItems?.[index]?.sellingPrice ?? field.sellingPrice ?? 0;
             const totalPrice = (currentQuantity * currentPrice).toFixed(2);
 
             return (
@@ -121,9 +121,9 @@ export default function ProductPart({
                     <div className=" rounded-md ">
                       {field.productDetials.image ? (
                         <img
-                          src={field.productDetials.image}
+                          src={getImageUrl(field.productDetials.image)}
                           alt={field.productDetials.name}
-                          className="w-[100px] h-[100px] rounded-md"
+                          className="w-[100px] h-[100px] rounded-md object-cover"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -170,8 +170,8 @@ export default function ProductPart({
                     type="number"
                     size="small"
                     step="0.01"
-                    {...register(`items.${index}.buyingPrice`, {
-                      required: "Le prix d'achat est requis",
+                    {...register(`items.${index}.sellingPrice`, {
+                      required: "Le prix de vente est requis",
                       valueAsNumber: true,
                       min: {
                         value: 0,
@@ -179,9 +179,9 @@ export default function ProductPart({
                       },
                     })}
                   />
-                  {errors.items?.[index]?.buyingPrice && (
+                  {errors.items?.[index]?.sellingPrice && (
                     <FieldError>
-                      {errors.items[index].buyingPrice.message}
+                      {errors.items[index].sellingPrice.message}
                     </FieldError>
                   )}
                 </div>

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,11 +14,11 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Search, AlertCircle, ArrowUpRight, ArrowDownLeft, Box, Layers, DollarSign, BarChart3, Archive, Bell, Truck, MoreHorizontal, Filter, Package } from "lucide-react";
+import { Search, AlertCircle, ArrowUpRight, ArrowDownLeft, Box, Layers, DollarSign, BarChart3, Archive, Bell, Truck, MoreHorizontal, Filter as FilterIcon, Package } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
 import { getImageUrl } from "@/lib/utils";
-// import Filter from "./Actions/Filter";
+import Filter from "./Actions/Filter";
 
 export default function ProductTable({
   data = [],
@@ -27,40 +28,15 @@ export default function ProductTable({
   ErrorMessage='Error Occured while fetching data',
   onDelete,
   onEdit,
-  onSee
+  onSee,
+  currentFilters,
+  onApplyFilters,
 }) {
+  const navigate = useNavigate();
   const [globalFilter, setGlobalFilter] = useState("");
   const [isFiltering, setIsFiltering] = useState(false);
-  const [filters, setFilters] = useState({
-    category: null,
-    supplier: null,
-    stockStatus: "all",
-    priceRange: [0, 20000],
-  });
+  const activeFilterCount = (currentFilters?.category ? 1 : 0) + (currentFilters?.supplier ? 1 : 0);
 
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      // Category filter
-      if (filters.category && item.category?._id !== filters.category._id) return false;
-      
-      // Supplier filter
-      if (filters.supplier && item.supplier?._id !== filters.supplier._id) return false;
-      
-      // Stock Status filter
-      if (filters.stockStatus === "lowStock") {
-        if (!(item.quantity > 0 && item.quantity <= item.minStockAlert)) return false;
-      } else if (filters.stockStatus === "outOfStock") {
-        if (item.quantity > 0) return false;
-      } else if (filters.stockStatus === "inStock") {
-        if (item.quantity === 0) return false;
-      }
-      
-      // Price Range filter
-      if (item.sellingPrice < filters.priceRange[0] || item.sellingPrice > filters.priceRange[1]) return false;
-      
-      return true;
-    });
-  }, [data, filters]);
   const columns = useMemo(
     () => [
       {
@@ -72,8 +48,8 @@ export default function ProductTable({
         ),
         accessorKey: "image",
         cell: ({ row }) => (
-          <div className='w-[300px] flex items-center gap-4'>
-          <div className="w-20 h-20 rounded-md overflow-hidden">
+          <div className='w-60 flex items-center gap-3'>
+          <div className="w-11 h-11 shrink-0 rounded-md overflow-hidden">
             {row.original.image ? (
               <img
                 src={getImageUrl(row.original.image)}
@@ -83,12 +59,12 @@ export default function ProductTable({
 
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400">
-                <Package className="w-5 h-5" />
+                <Package className="w-4 h-4" />
               </div>
             )}
           </div>
-          <div className='flex flex-col gap-1'>
-            <p className='w-[150px] font-semibold'>{row.original.name}</p>
+          <div className='flex flex-col gap-0.5'>
+            <p className='w-[150px] text-sm font-semibold truncate'>{row.original.name}</p>
             <div className='flex items-center gap-1'>
               <p className='text-xs text-gray-500'>{row.original.barcode}</p>
             </div>
@@ -119,16 +95,16 @@ export default function ProductTable({
         ),
         accessorKey: "sellingPrice",
         cell: ({ row }) => (
-          <div className='flex flex-col gap-1.5 w-[110px]'>
-            <div className='flex items-center gap-2'>
-              <div className='flex items-center justify-center w-6 h-6 rounded-md bg-green-50 text-green-600'>
-                <ArrowUpRight className='w-3.5 h-3.5' />
+          <div className='flex flex-col gap-1 w-25'>
+            <div className='flex items-center gap-1.5'>
+              <div className='flex items-center justify-center w-5 h-5 rounded-md bg-green-50 text-green-600'>
+                <ArrowUpRight className='w-3 h-3' />
               </div>
-              <span className='font-bold text-[0.9rem] text-slate-800'>{row.original.sellingPrice} <span className='text-[0.7rem] text-slate-500 font-medium'>DH</span></span>
+              <span className='font-bold text-sm text-slate-800'>{row.original.sellingPrice} <span className='text-[0.65rem] text-slate-500 font-medium'>DH</span></span>
             </div>
-            <div className='flex items-center gap-2'>
-              <div className='flex items-center justify-center w-6 h-6 rounded-md bg-amber-50 text-amber-600'>
-                <ArrowDownLeft className='w-3.5 h-3.5' />
+            <div className='flex items-center gap-1.5'>
+              <div className='flex items-center justify-center w-5 h-5 rounded-md bg-amber-50 text-amber-600'>
+                <ArrowDownLeft className='w-3 h-3' />
               </div>
               <span className='text-xs font-semibold text-slate-500'>{row.original.buyingPrice} <span className='text-[0.6rem] text-slate-400'>DH</span></span>
             </div>
@@ -199,18 +175,16 @@ export default function ProductTable({
             onEdit={()=>onEdit(row.original)}
             onDelete={()=>onDelete(row.original)}
             isSee = { true }
-            onSee={() => {
-              console.log("See", row.original);
-            }}
+            onSee={() => navigate(`/products/${row.original._id}`)}
           />
         ),
       },
     ],
-    [onEdit, onDelete, onSee]
+    [onEdit, onDelete, navigate]
   );
   // 2. The "Brain" of the table
   const table = useReactTable({
-    data: filteredData,
+    data,
     columns,
     state: {
       globalFilter,
@@ -247,13 +221,18 @@ export default function ProductTable({
         {/* Quick info or view toggles can go here */}
         <div className="flex items-center gap-2 px-2">
  
-                   <Button 
-            variant="outline" 
+                   <Button
+            variant="outline"
             className="flex items-center gap-2 text-slate-600 border-slate-200 hover:bg-slate-50"
             onClick={() => setIsFiltering(true)}
           >
-            <Filter className="w-4 h-4" />
+            <FilterIcon className="w-4 h-4" />
             <span className="text-sm font-medium">Filtrer</span>
+            {activeFilterCount > 0 && (
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0050CB] text-[11px] font-semibold text-white">
+                {activeFilterCount}
+              </span>
+            )}
           </Button>
         </div>
       </div>
@@ -267,7 +246,7 @@ export default function ProductTable({
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className={`px-6 py-3 border-b text-left text-[0.9rem] font-semibold text-slate-700 border-l ${header.column.columnDef.className || ''}`}
+                    className={`px-4 py-2.5 border-b text-left text-[11px] font-semibold uppercase tracking-wider text-slate-600 border-l ${header.column.columnDef.className || ''}`}
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -285,7 +264,7 @@ export default function ProductTable({
                   <tr key={index} className="hover:bg-gray-50">
                     {
                       columns.map((column) => (
-                        <td key={column.id} className="px-5 py-4 border-b">
+                        <td key={column.id} className="px-4 py-2.5 border-b">
                           <Skeleton className="h-4 w-[250px]" />
                         </td>
                       ))
@@ -308,7 +287,7 @@ export default function ProductTable({
                 table.getRowModel().rows.map((row) => (
                   <tr key={row.id} className="hover:bg-gray-50 transition-colors cursor-pointer text-center  ">
                     {row.getVisibleCells().map((cell) => (
-                      <td key={cell.id} className={`px-5 py-4 border-b text-[#1E293B] border-l ${cell.column.columnDef.className || ''}`}>
+                      <td key={cell.id} className={`px-4 py-2.5 border-b text-sm text-[#1E293B] border-l ${cell.column.columnDef.className || ''}`}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </td>
                     ))}
@@ -323,7 +302,7 @@ export default function ProductTable({
         <div className="flex gap-2 items-center">
           <span className="text-sm text-gray-700">
             Montrant <span className="font-semibold">{table.getRowModel().rows.length}</span> sur{" "}
-            <span className="font-semibold">{filteredData.length}</span> produits filtrés
+            <span className="font-semibold">{data.length}</span> produits filtrés
           </span>
         </div>
         <div className="flex gap-2">
@@ -358,14 +337,14 @@ export default function ProductTable({
         </div>
       </div>
 
-      {/* {isFiltering && (
-        <Filter 
-          isFiltering={isFiltering} 
-          setIsFiltering={setIsFiltering} 
-          onApplyFilters={setFilters} 
-          currentFilters={filters}
+      {isFiltering && (
+        <Filter
+          isFiltering={isFiltering}
+          setIsFiltering={setIsFiltering}
+          onApplyFilters={onApplyFilters}
+          currentFilters={currentFilters}
         />
-      )} */}
+      )}
     </div>
   );
 }

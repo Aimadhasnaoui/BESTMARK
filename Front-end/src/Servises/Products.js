@@ -18,6 +18,24 @@ export const GetProducts = async (filters) => {
     }
 };
 
+export const GetProduct = async (id) => {
+    try {
+        const response = await axiosInstance.get(`/products/${id}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const GetLowStockProducts = async () => {
+    try {
+        const response = await axiosInstance.get("/products/low-stock");
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const UpdateProduct = async (id, data) => {
     try {
         const response = await axiosInstance.patch(`/products/${id}`, data);

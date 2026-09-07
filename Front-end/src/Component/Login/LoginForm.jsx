@@ -117,7 +117,7 @@ export default function LoginForm() {
           </button>
         </div>
       </form>
-      <h1 className="text-[#64748B] text-[16px] text-center">© 2026 STORE PILOT. TOUS DROITS RÉSERVÉS.</h1>
+      <h1 className="text-[#64748B] text-[16px] text-center">© 2026 BESTMARK. TOUS DROITS RÉSERVÉS.</h1>
     </div>
   );
 }

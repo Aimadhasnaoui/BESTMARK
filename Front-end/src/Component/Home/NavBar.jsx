@@ -1,25 +1,17 @@
-import React, { useState,useEffect ,useContext} from "react";
+import React, { useState, useEffect } from "react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Search,Bell  } from "lucide-react";
+import { Search, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Avatar,
-  AvatarBadge,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
 import { useLocation } from "react-router-dom";
-import { DataContext } from "../Data/contextApi";
-import { getImageUrl } from "@/lib/utils";
+import UserMenu from "./UserMenu";
 export default function NavBar() {
-  const[PageName,setPageName] = useState("Tableau de bord")
+  const [PageName, setPageName] = useState("Tableau de bord");
   const location = useLocation();
-  const {userInfo} = useContext(DataContext)
   useEffect(() => {
     switch (location.pathname) {
       case "/dashboard":
@@ -55,6 +47,9 @@ export default function NavBar() {
       case "/settings":
         setPageName("Paramètres");
         break;
+      case "/profile":
+        setPageName("Profil");
+        break;
       default:
         setPageName("Tableau de bord");
     }
@@ -63,33 +58,32 @@ export default function NavBar() {
     <div className="w-full py-3 px-4 flex items-center justify-between gap-3 border-b border-slate-200 bg-white">
       <div className="flex items-center gap-3 ">
         <SidebarTrigger />
-        <h1 className="text-2xl font-medium text-[#2563EB]">{PageName}</h1>
+        <h1 className="truncate text-base font-medium text-[#2563EB]">
+          {PageName}
+        </h1>
       </div>
       <div>
-        
+        <InputGroup className="h-10 w-[450px] rounded-full border-transparent bg-[#F1F5F9] px-1 shadow-none transition-all focus-within:border-[#2563EB] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#2563EB]/10">
+          <InputGroupAddon className="pl-3">
+            <Search className="h-4 w-4 text-[#94A3B8] transition-colors group-focus-within/input-group:text-[#2563EB]" />
+          </InputGroupAddon>
+          <InputGroupInput
+            placeholder="Rechercher produits, commandes, clients..."
+            className="text-sm placeholder:text-[#94A3B8]"
+          />
+          <InputGroupAddon align="inline-end" className="pr-2.5">
+            <kbd className="hidden items-center gap-0.5 rounded-md border border-slate-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-[#94A3B8] sm:inline-flex">
+              ⌘K
+            </kbd>
+          </InputGroupAddon>
+        </InputGroup>
       </div>
       <div className="flex gap-4 items-center">
-        <InputGroup className="w-[350px] rounded-md focus-visible:ring-amber-500">
-          <InputGroupAddon>
-            <Search className="text-muted-foreground" />
-          </InputGroupAddon>
-          <InputGroupInput placeholder="Search products, orders, or customers..." />
-        </InputGroup>
-          <Bell className="text-muted-foreground cursor-pointer" />
-          <div className="flex items-center gap-2 border-l border-slate-200 px-3">
-              <div className="flex flex-col">
-                  <p className="text-sm font-medium">{userInfo?.name}</p>
-                  <p className="text-sm text-muted-foreground">{userInfo?.mission?.name}</p>
-              </div>
-        <Avatar>
-            <AvatarImage src={getImageUrl(userInfo?.image)} alt={userInfo?.name} />
-            <AvatarFallback>
-              {userInfo?.name ? userInfo.name.slice(0, 2).toUpperCase() : "CN"}
-            </AvatarFallback>
-            <AvatarBadge className="bg-green-600 dark:bg-green-800" />
-        </Avatar>
-          </div>
-
+        <Button size="icon" variant="outline" className="rounded-full p-2 cursor-pointer relative">
+          <span className='absolute top-0 right-0 size-2 animate-bounce rounded-full bg-sky-600 dark:bg-sky-400' />
+          <Bell />
+        </Button>
+        <UserMenu />
       </div>
     </div>
   );

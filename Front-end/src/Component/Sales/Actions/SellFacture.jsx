@@ -160,7 +160,7 @@ export default function SellFacture({
               <tbody className="divide-y divide-slate-50 text-slate-700">
                 {FactureData?.items?.map((item, index) => {
                   const qty = Number(item.quantity || 0);
-                  const priceVal = Number(item.buyingPrice || item.sellingPrice || 0);
+                  const priceVal = Number(item.sellingPrice || 0);
                   const itemTotal = qty * priceVal;
                   return (
                     <tr key={index} className="hover:bg-slate-50/50">
