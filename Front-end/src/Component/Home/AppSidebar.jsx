@@ -3,15 +3,10 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
-  SidebarGroupLabel,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarMenuAction,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Link } from "react-router-dom";
@@ -30,7 +25,7 @@ import {
   ShoppingBag,
   Truck,
 } from "lucide-react";
-import Logo from "@/assets/Logo/logo.png";
+import Logo from "@/assets/Logo/logo.svg";
 import { useMutation } from "@tanstack/react-query";
 import { LogOutUser } from "@/Servises/Autontification";
 import { useNavigate } from "react-router-dom";

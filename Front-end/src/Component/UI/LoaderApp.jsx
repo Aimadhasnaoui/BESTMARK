@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Logo from "@/assets/Logo/logo.png";
+import Logo from "@/assets/Logo/logo.svg";
 import { Loader2 } from "lucide-react";
 
 export default function LoaderApp() {
