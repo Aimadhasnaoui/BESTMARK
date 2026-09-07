@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-export default function HeaderPage({title,description,isAjouter,ButtonText,onButtonClick}) {
+export default function HeaderPage({title,description,isAjouter,ButtonText,onButtonClick,children}) {
   return (
     <div className='flex justify-between items-center'>
         <div className="flex flex-col space-y-2">
@@ -14,6 +14,8 @@ export default function HeaderPage({title,description,isAjouter,ButtonText,onBut
                     ) : null
                   }
                 </div>
+                <div className="flex items-center gap-2">
+                  {children}
                   {isAjouter && (
                         <Button
                                  size="sm"
@@ -25,6 +27,7 @@ export default function HeaderPage({title,description,isAjouter,ButtonText,onBut
                                  {ButtonText}
                                </Button>
                         )}
+                </div>
     </div>
   )
 }
