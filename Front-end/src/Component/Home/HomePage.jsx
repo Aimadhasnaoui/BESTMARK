@@ -12,8 +12,6 @@ import {DataContext} from '@/Component/Data/contextApi'
 import { useNavigate } from "react-router-dom";
 import AddSlle from "../Sales/Actions/AddSlle";
 function HomePage() {
-  const [buttonAppear, setbuttoAppear] = useState(false);
-  // const [buyerModalOpen, setBuyerModalOpen] = useState(false);
   const [currentPage, setcurrentPage] = useState("dashboard");
   const navigate = useNavigate();
   const {openAddBuyerModal, setOpenAddBuyerModal,setuserInfo,setOpenAddSellerModal} = useContext(DataContext)
@@ -50,8 +48,6 @@ if(isSuccess){
               <Outlet />
             </div>
             <AddButton
-              buttonAppear={buttonAppear}
-              setbuttoAppear={setbuttoAppear}
               setBuyerModalOpen={setOpenAddBuyerModal}
               setOpenAddSellerModal={setOpenAddSellerModal}
             />
