@@ -15,6 +15,7 @@ import SalesPage from "./Component/Sales/SalesPage";
 import DeliveryPage from "./Component/Delivery/DeliveryPage";
 import CustomersPage from "./Component/Customers/CustomersPage";
 import TransactionsPage from "./Component/Transactions/TransactionsPage";
+import FinanceReportPage from "./Component/FinanceReport/FinanceReportPage";
 import LoginPage from "./Component/Login/LoginPage";
 import { useQuery } from "@tanstack/react-query";
 import { me } from "@/Servises/Autontification";
@@ -109,6 +110,10 @@ export const router = createBrowserRouter([
       {
         path: "/finance",
         element: <TransactionsPage />,
+      },
+      {
+        path: "/finance-report",
+        element: <FinanceReportPage />,
       },
     ],
   },

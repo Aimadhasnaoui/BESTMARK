@@ -22,6 +22,7 @@ import {
   ClipboardList,
   Receipt,
   Banknote,
+  FileBarChart,
   Users2,
   HelpCircle,
   Settings,
@@ -67,6 +68,12 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
     },
     { id: "delivery", label: "Livraisons", icon: Truck, path: "/delivery" },
     { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
+    {
+      id: "finance-report",
+      label: "Finance Rapport",
+      icon: FileBarChart,
+      path: "/finance-report",
+    },
     {
       id: "suppliers",
       label: "Fournisseurs",
