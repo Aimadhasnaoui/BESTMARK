@@ -89,11 +89,9 @@ export function ActionsModel({
             ? isPending
               ? "Ajout..."
               : "Ajouter"
-            : type === "Filter"
-              ? "Appliquer"
-              : isPending
-                ? "Modification..."
-                : "Modifier"}
+            : isPending
+              ? "Modification..."
+              : "Modifier"}
         </Button>
       </DialogActions>
     </Dialog>

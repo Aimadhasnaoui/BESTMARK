@@ -7,18 +7,16 @@ import {
   flexRender,
   getPaginationRowModel,
 } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Search, AlertCircle, ArrowUpRight, ArrowDownLeft, Box, Layers, DollarSign, BarChart3, Archive, Bell, Truck, MoreHorizontal, Filter as FilterIcon, Package } from "lucide-react";
+import { Search, AlertCircle, ArrowUpRight, ArrowDownLeft, Box, Layers, DollarSign, BarChart3, Archive, Bell, Truck, MoreHorizontal, Package } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
 import { getImageUrl } from "@/lib/utils";
-import Filter from "./Actions/Filter";
+import ProductFilters from "./ProductFilters";
 
 export default function ProductTable({
   data = [],
@@ -34,8 +32,6 @@ export default function ProductTable({
 }) {
   const navigate = useNavigate();
   const [globalFilter, setGlobalFilter] = useState("");
-  const [isFiltering, setIsFiltering] = useState(false);
-  const activeFilterCount = (currentFilters?.category ? 1 : 0) + (currentFilters?.supplier ? 1 : 0);
 
   const columns = useMemo(
     () => [
@@ -202,6 +198,8 @@ export default function ProductTable({
 
   return (
     <div className="">
+      <ProductFilters currentFilters={currentFilters} onApplyFilters={onApplyFilters} />
+
       {/* Search Input */}
       <div className="flex justify-between items-center p-2 border rounded-t-xl shadow-sm  bg-white">
         <div className="flex items-center gap-2">
@@ -216,24 +214,6 @@ export default function ProductTable({
             />
           </InputGroup>
 
-        </div>
-        
-        {/* Quick info or view toggles can go here */}
-        <div className="flex items-center gap-2 px-2">
- 
-                   <Button
-            variant="outline"
-            className="flex items-center gap-2 text-slate-600 border-slate-200 hover:bg-slate-50"
-            onClick={() => setIsFiltering(true)}
-          >
-            <FilterIcon className="w-4 h-4" />
-            <span className="text-sm font-medium">Filtrer</span>
-            {activeFilterCount > 0 && (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0050CB] text-[11px] font-semibold text-white">
-                {activeFilterCount}
-              </span>
-            )}
-          </Button>
         </div>
       </div>
 
@@ -337,14 +317,6 @@ export default function ProductTable({
         </div>
       </div>
 
-      {isFiltering && (
-        <Filter
-          isFiltering={isFiltering}
-          setIsFiltering={setIsFiltering}
-          onApplyFilters={onApplyFilters}
-          currentFilters={currentFilters}
-        />
-      )}
     </div>
   );
 }

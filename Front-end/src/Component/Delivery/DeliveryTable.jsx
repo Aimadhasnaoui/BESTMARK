@@ -121,27 +121,39 @@ export default function DeliveryTable({
           </div>
         ),
         accessorKey: "estimatedArrival",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col">
-              <span className="text-xs font-medium">
-                {row.original.estimatedArrival
-                  ? new Date(row.original.estimatedArrival).toLocaleDateString(
-                      "fr-FR",
-                    )
-                  : "-"}
-              </span>
-              <span className="text-[10px] text-slate-400">
-                {row.original.estimatedArrival
-                  ? new Date(row.original.estimatedArrival).toLocaleTimeString(
-                      "fr-FR",
-                      { hour: "2-digit", minute: "2-digit" },
-                    )
-                  : ""}
-              </span>
+        cell: ({ row }) => {
+          const { estimatedArrival, status } = row.original;
+          const isLate =
+            estimatedArrival &&
+            status !== "arrived" &&
+            status !== "failed" &&
+            new Date(estimatedArrival) < new Date();
+          return (
+            <div className="flex items-center gap-3">
+              <div className="flex flex-col">
+                <span className="text-xs font-medium">
+                  {estimatedArrival
+                    ? new Date(estimatedArrival).toLocaleDateString("fr-FR")
+                    : "-"}
+                </span>
+                <span className="text-[10px] text-slate-400">
+                  {estimatedArrival
+                    ? new Date(estimatedArrival).toLocaleTimeString("fr-FR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : ""}
+                </span>
+                {isLate && (
+                  <span className="inline-flex items-center gap-1 mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-50 text-red-700 border border-red-100 w-fit">
+                    <AlertCircle className="w-3 h-3" />
+                    En retard
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
-        ),
+          );
+        },
       },
       {
         header: "ACTIONS",
