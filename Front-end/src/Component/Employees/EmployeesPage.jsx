@@ -12,7 +12,9 @@ import HeaderPage from '../UI/HeaderPage'
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
+import { useModelPermissions } from "@/hooks/usePermissions";
 export default function EmployeesPage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Employés");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -102,32 +104,46 @@ export default function EmployeesPage() {
         header: "Actions",
         cell: ({ row }) => (
           <ActionButtons
-            onEdit={() => {
-              setSelectedEmployee(row.original);
-              setIsUpdating(true);
-            }}
-            onDelete={() => {
-              setSelectedEmployee(row.original);
-              setIsDeleting(true);
-            }}
+            onEdit={
+              canEdit
+                ? () => {
+                    setSelectedEmployee(row.original);
+                    setIsUpdating(true);
+                  }
+                : undefined
+            }
+            onDelete={
+              canDelete
+                ? () => {
+                    setSelectedEmployee(row.original);
+                    setIsDeleting(true);
+                  }
+                : undefined
+            }
             onSee={() => {
               // Optional: Add view details logic if needed
             }}
-            onPassword={() => {
-              setSelectedEmployee(row.original);
-              setIsResettingPassword(true);
-            }}
+            onPassword={
+              canEdit
+                ? () => {
+                    setSelectedEmployee(row.original);
+                    setIsResettingPassword(true);
+                  }
+                : undefined
+            }
             onToggleActive={
-              ()=>{
-               handleTogleActivation(row.original)
-              }
+              canEdit
+                ? () => {
+                    handleTogleActivation(row.original);
+                  }
+                : undefined
             }
             isActive={row.original.isActive}
           />
         ),
       },
     ],
-    []
+    [canEdit, canDelete]
   );
 
   return (
@@ -135,7 +151,7 @@ export default function EmployeesPage() {
       <HeaderPage
               title="Gestion des Employées"
               description="Gérez vos employés, leurs coordonnées et leurs informations"
-              isAjouter={true}
+              isAjouter={canAdd}
               ButtonText="Ajouter un fournisseur"
               onButtonClick={() => setIsAdding(true)}
             />

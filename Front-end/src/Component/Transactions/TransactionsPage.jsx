@@ -7,8 +7,10 @@ import TransactionsFilters from "./TransactionsFilters";
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
+import { useModelPermissions } from "@/hooks/usePermissions";
 
 export default function TransactionsPage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Finance");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -62,7 +64,7 @@ export default function TransactionsPage() {
       <HeaderPage
         title="Transactions Financières"
         description="Consultez et gérez l'historique de vos entrées et sorties d'argent"
-        isAjouter={true}
+        isAjouter={canAdd}
         ButtonText="Ajouter une transaction"
         onButtonClick={() => setIsAdding(true)}
       />
@@ -85,8 +87,8 @@ export default function TransactionsPage() {
         isError={isError}
         error={error}
         isLoading={isPending}
-        onEdit={handleUpdate}
-        onDelete={handleDelete}
+        onEdit={canEdit ? handleUpdate : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
       />
 
       {/* Action Modals */}

@@ -7,8 +7,10 @@ import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
 import { DataContext } from '../Data/contextApi';
+import { useModelPermissions } from "@/hooks/usePermissions";
 
 export default function PurchasePage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Achats");
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
@@ -34,18 +36,18 @@ export default function PurchasePage() {
       <HeaderPage 
         title="Gestion des Achats"
         description="Gérez les achats auprès de vos fournisseurs, suivez les paiements et les dettes."
-        isAjouter={true}
+        isAjouter={canAdd}
         ButtonText="Ajouter un achat"
         onButtonClick={() => setOpenAddBuyerModal(true)}
       />
-      
+
       <PurchaseTable
         data={data?.purchases || []}
         isError={isError}
         error={error}
         isLoading={isPending}
-        onEdit={handleUpdate}
-        onDelete={handleDelete}
+        onEdit={canEdit ? handleUpdate : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
       />
 
       {/* Action Modals */}

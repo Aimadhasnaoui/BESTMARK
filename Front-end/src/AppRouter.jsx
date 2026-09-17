@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import ErrorPage from "./Component/ErrorPage/ErrorPage";
 import NoAccesPage from "./Component/ErrorPage/NoAccesPage";
 import HomePage from "./Component/Home/HomePage";
+import Welcome from "./Component/Home/Welcome";
 import Dashbord from "./Component/Dashboard/Dashbord";
 import Profile from "./Component/Profile/Profile";
 import SettingPage from "./Component/Settings/SettingPage";
@@ -23,6 +24,7 @@ import LoaderApp from "@/Component/UI/LoaderApp";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Outlet } from "react-router-dom";
+import RequirePermission from "@/Component/UI/RequirePermission";
 function RederirectLogin() {
   const navigate = useNavigate();
   const { isPending, isSuccess, isError } = useQuery({
@@ -60,60 +62,122 @@ export const router = createBrowserRouter([
     element: <HomePage />,
     children: [
       {
+        index: true,
+        element: <Welcome />,
+      },
+      {
         path: "/dashboard",
-        element: <Dashbord />,
+        element: (
+          <RequirePermission model="Tableau de bord">
+            <Dashbord />
+          </RequirePermission>
+        ),
       },
       {
         path: "/settings",
-        element: <SettingPage />,
+        element: (
+          <RequirePermission
+            models={["Modèles & Permissions", "Types de produits", "Types d'employés"]}
+          >
+            <SettingPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/profile",
-        element: <Profile />,
+        element: (
+          <RequirePermission model="Profil">
+            <Profile />
+          </RequirePermission>
+        ),
       },
       {
         path: "/products",
-        element: <ProductsPage />,
+        element: (
+          <RequirePermission model="Produits">
+            <ProductsPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/products/:id",
-        element: <ProductDetails />,
+        element: (
+          <RequirePermission model="Produits">
+            <ProductDetails />
+          </RequirePermission>
+        ),
       },
       {
         path: "/suppliers",
-        element: <SuppliersPage />,
+        element: (
+          <RequirePermission model="Fournisseurs">
+            <SuppliersPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/employees",
-        element: <EmployeesPage />,
+        element: (
+          <RequirePermission model="Employés">
+            <EmployeesPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/purchases",
-        element: <PurchasePage />,
+        element: (
+          <RequirePermission model="Achats">
+            <PurchasePage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/stock",
-        element: <StockPage />,
+        element: (
+          <RequirePermission model="Gestion de Stock">
+            <StockPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/sales",
-        element: <SalesPage />,
+        element: (
+          <RequirePermission model="Ventes">
+            <SalesPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/delivery",
-        element: <DeliveryPage />,
+        element: (
+          <RequirePermission model="Livraisons">
+            <DeliveryPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/requests",
-        element: <CustomersPage />,
+        element: (
+          <RequirePermission model="Demandes clients">
+            <CustomersPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/finance",
-        element: <TransactionsPage />,
+        element: (
+          <RequirePermission model="Finance">
+            <TransactionsPage />
+          </RequirePermission>
+        ),
       },
       {
         path: "/finance-report",
-        element: <FinanceReportPage />,
+        element: (
+          <RequirePermission model="Finance Rapport">
+            <FinanceReportPage />
+          </RequirePermission>
+        ),
       },
     ],
   },

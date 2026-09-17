@@ -1,0 +1,17 @@
+export const AVAILABLE_MODELS = [
+  "Tableau de bord",
+  "Produits",
+  "Achats",
+  "Gestion de Stock",
+  "Ventes",
+  "Finance",
+  "Finance Rapport",
+  "Fournisseurs",
+  "Employés",
+  "Livraisons",
+  "Demandes clients",
+  "Types de produits",
+  "Types d'employés",
+  "Modèles & Permissions",
+  "Profil",
+];

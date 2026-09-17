@@ -8,8 +8,10 @@ import DeletModel from "../UI/Models/DeletModel";
 import { toast } from "react-hot-toast";
 import SellFacture from "./Actions/SellFacture";
 import EditSale from "./Actions/EditSale";
+import { useModelPermissions } from "@/hooks/usePermissions";
 
 export default function SalesPage() {
+  const { canEdit, canDelete } = useModelPermissions("Ventes");
   const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
@@ -114,9 +116,9 @@ export default function SalesPage() {
         isError={isError}
         error={error}
         isLoading={isPending}
-        onDelete={handleDeleteClick}
+        onDelete={canDelete ? handleDeleteClick : undefined}
         onSee={handsefunction}
-        onEdit={handleEditClick}
+        onEdit={canEdit ? handleEditClick : undefined}
       />
 
       <DeletModel

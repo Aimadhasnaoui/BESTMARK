@@ -6,8 +6,10 @@ import CustomersTable from "./CustomersTable";
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
+import { useModelPermissions } from "@/hooks/usePermissions";
 
 export default function CustomersPage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Demandes clients");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -33,7 +35,7 @@ export default function CustomersPage() {
       <HeaderPage
         title="Demandes Clients"
         description="Gérez les demandes de produits spécifiques de vos clients"
-        isAjouter={true}
+        isAjouter={canAdd}
         ButtonText="Ajouter une demande"
         onButtonClick={() => setIsAdding(true)}
       />
@@ -43,8 +45,8 @@ export default function CustomersPage() {
         isError={isError}
         error={error}
         isLoading={isPending}
-        onEdit={handleUpdate}
-        onDelete={handleDelete}
+        onEdit={canEdit ? handleUpdate : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
       />
 
       {/* Action Modals */}

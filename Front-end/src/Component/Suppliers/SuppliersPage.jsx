@@ -7,8 +7,10 @@ import { ActionButtons } from '../UI/TablesUi/ActionButtons'
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
+import { useModelPermissions } from "@/hooks/usePermissions";
 
 export default function SuppliersPage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Fournisseurs");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -65,19 +67,27 @@ export default function SuppliersPage() {
         accessorKey: "actions",
         cell: ({ row }) => (
           <ActionButtons
-            onEdit={() => {
-              setSelectedSupplier(row.original);
-              setIsUpdating(true);
-            }}
-            onDelete={() => {
-              setSelectedSupplier(row.original);
-              setIsDeleting(true);
-            }}
+            onEdit={
+              canEdit
+                ? () => {
+                    setSelectedSupplier(row.original);
+                    setIsUpdating(true);
+                  }
+                : undefined
+            }
+            onDelete={
+              canDelete
+                ? () => {
+                    setSelectedSupplier(row.original);
+                    setIsDeleting(true);
+                  }
+                : undefined
+            }
           />
         ),
       },
     ],
-    []
+    [canEdit, canDelete]
   );
 
   return (
@@ -85,7 +95,7 @@ export default function SuppliersPage() {
       <HeaderPage
         title="Gestion des fournisseurs"
         description="Gérez vos fournisseurs, leurs coordonnées et leurs entreprises"
-        isAjouter={true}
+        isAjouter={canAdd}
         ButtonText="Ajouter un fournisseur"
         onButtonClick={() => setIsAdding(true)}
       />

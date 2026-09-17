@@ -8,26 +8,28 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import TextField from "@mui/material/TextField";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AddEmployeeType } from "@/Servises/EmployeeTypes";
 import { toast } from "react-hot-toast";
+import PermissionsAssigner from "./PermissionsAssigner";
 
 export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();
   const {
     register,
     handleSubmit,
+    control,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({ defaultValues: { name: "", permissions: [] } });
   const { mutate, isPending, error, isError } = useMutation({
     mutationFn: AddEmployeeType,
     onSuccess: () => {
       setIsAdding(false);
       queryClient.invalidateQueries({ queryKey: ["employee-types"] });
       toast.success("Employee type has been added successfully");
-      reset();
+      reset({ name: "", permissions: [] });
     },
   });
   const onSubmit = (data) => {
@@ -66,6 +68,17 @@ export default function Add({ isAdding, setIsAdding }) {
                   {errors.name && (
                     <FieldError>{errors.name.message}</FieldError>
                   )}
+                </Field>
+
+                <Field>
+                  <FieldLabel>Permissions</FieldLabel>
+                  <Controller
+                    name="permissions"
+                    control={control}
+                    render={({ field: { value, onChange } }) => (
+                      <PermissionsAssigner value={value} onChange={onChange} />
+                    )}
+                  />
                 </Field>
               </FieldGroup>
             </FieldSet>

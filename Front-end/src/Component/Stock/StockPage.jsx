@@ -7,8 +7,10 @@ import StockFilters from './StockFilters';
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
+import { useModelPermissions } from "@/hooks/usePermissions";
 
 export default function StockPage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Gestion de Stock");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -70,11 +72,11 @@ export default function StockPage() {
       <HeaderPage 
         title="Gestion de Stock"
         description="Suivez les mouvements de stock, les ajustements et l'historique des produits."
-        isAjouter={true}
+        isAjouter={canAdd}
         ButtonText="Nouveau Mouvement"
         onButtonClick={() => setIsAdding(true)}
       />
-      
+
       <StockFilters
         typeFilter={typeFilter}
         setTypeFilter={setTypeFilter}
@@ -94,8 +96,8 @@ export default function StockPage() {
         isError={isError}
         error={error}
         isLoading={isPending}
-        onEdit={handleUpdate}
-        onDelete={handleDelete}
+        onEdit={canEdit ? handleUpdate : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
       />
 
       {/* Action Modals */}

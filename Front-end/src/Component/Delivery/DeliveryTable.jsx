@@ -160,8 +160,8 @@ export default function DeliveryTable({
         accessorKey: "actions",
         cell: ({ row }) => (
           <ActionButtons
-            onEdit={() => onEdit(row.original)}
-            onDelete={() => onDelete(row.original)}
+            onEdit={onEdit ? () => onEdit(row.original) : undefined}
+            onDelete={onDelete ? () => onDelete(row.original) : undefined}
           />
         ),
       },

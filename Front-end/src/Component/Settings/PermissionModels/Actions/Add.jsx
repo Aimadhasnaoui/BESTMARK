@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { ActionsModel } from "@/Component/Ui/Models/ActionsModel";
 import {
   Field,
@@ -7,38 +7,29 @@ import {
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
-import TextField from "@mui/material/TextField";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { UpdateEmployeeType } from "@/Servises/EmployeeTypes";
+import { AddPermissionModel } from "@/Servises/PermissionModels";
 import { toast } from "react-hot-toast";
-import PermissionsAssigner from "./PermissionsAssigner";
+import PermissionsPicker from "./PermissionsPicker";
+import ModelNameSelect from "./ModelNameSelect";
 
-export default function Update({ isUpdating, setIsUpdating, selectedType }) {
+export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();
   const {
-    register,
     handleSubmit,
     control,
     reset,
     formState: { errors },
   } = useForm({ defaultValues: { name: "", permissions: [] } });
 
-  useEffect(() => {
-    if (selectedType) {
-      reset({
-        name: selectedType.name,
-        permissions: selectedType.permissions || [],
-      });
-    }
-  }, [selectedType, reset]);
-
   const { mutate, isPending, error, isError } = useMutation({
-    mutationFn: (data) => UpdateEmployeeType(selectedType._id, data),
+    mutationFn: AddPermissionModel,
     onSuccess: () => {
-      setIsUpdating(false);
-      queryClient.invalidateQueries({ queryKey: ["employee-types"] });
-      toast.success("Employee type has been updated successfully");
+      setIsAdding(false);
+      queryClient.invalidateQueries({ queryKey: ["permission-models"] });
+      toast.success("Le modèle a été ajouté avec succès");
+      reset({ name: "", permissions: [] });
     },
   });
 
@@ -48,34 +39,33 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
 
   return (
     <div>
-      {isUpdating && (
+      {isAdding && (
         <ActionsModel
-          open={isUpdating}
-          setIsOpen={setIsUpdating}
-          title="Update Employee Type"
+          open={isAdding}
+          setIsOpen={setIsAdding}
+          title="Ajouter un modèle"
           handleSubmit={handleSubmit(onSubmit)}
           isPending={isPending}
           isError={isError}
           error={error}
-          errorTitle="Échec de la mise à jour"
-          type="Update"
+          errorTitle="Échec de l'ajout du modèle"
         >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FieldSet>
               <FieldGroup>
                 <Field>
-                  <FieldLabel htmlFor="name">Name</FieldLabel>
-                  <TextField
-                    id="name"
-                    autoComplete="off"
-                    placeholder="Employee Type Name"
-                    {...register("name", {
-                      required: "Name is required",
-                      minLength: {
-                        value: 2,
-                        message: "Name must be at least 2 characters",
-                      },
-                    })}
+                  <FieldLabel htmlFor="name">Nom du modèle</FieldLabel>
+                  <Controller
+                    name="name"
+                    control={control}
+                    rules={{ required: "Le nom est requis" }}
+                    render={({ field: { value, onChange } }) => (
+                      <ModelNameSelect
+                        value={value}
+                        onChange={onChange}
+                        error={errors.name}
+                      />
+                    )}
                   />
                   {errors.name && (
                     <FieldError>{errors.name.message}</FieldError>
@@ -88,7 +78,7 @@ export default function Update({ isUpdating, setIsUpdating, selectedType }) {
                     name="permissions"
                     control={control}
                     render={({ field: { value, onChange } }) => (
-                      <PermissionsAssigner value={value} onChange={onChange} />
+                      <PermissionsPicker value={value} onChange={onChange} />
                     )}
                   />
                 </Field>

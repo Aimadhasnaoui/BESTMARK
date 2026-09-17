@@ -7,6 +7,7 @@ import DeliveryFilters from './DeliveryFilters';
 import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
+import { useModelPermissions } from "@/hooks/usePermissions";
 
 const isLateDelivery = (delivery) => {
   if (!delivery.estimatedArrival) return false;
@@ -15,6 +16,7 @@ const isLateDelivery = (delivery) => {
 };
 
 export default function DeliveryPage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Livraisons");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -70,11 +72,11 @@ export default function DeliveryPage() {
       <HeaderPage 
         title="Gestion des Livraisons"
         description="Suivez l'état des livraisons, gérez les livreurs et les délais d'arrivée."
-        isAjouter={true}
+        isAjouter={canAdd}
         ButtonText="Planifier une livraison"
         onButtonClick={() => setIsAdding(true)}
       />
-      
+
       <DeliveryFilters
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
@@ -90,8 +92,8 @@ export default function DeliveryPage() {
         isError={isError}
         error={error}
         isLoading={isPending}
-        onEdit={handleUpdate}
-        onDelete={handleDelete}
+        onEdit={canEdit ? handleUpdate : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
       />
 
       {/* Action Modals */}

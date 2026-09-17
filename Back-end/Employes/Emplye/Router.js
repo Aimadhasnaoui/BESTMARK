@@ -7,10 +7,11 @@ import {
   UpdateEmployee,
   DeleteEmployee,
 } from "./Controller.js";
-import { ChnageUserPaword, DesactiverAccount, me ,Logout} from "./AuthEmployee.js";
+import { ChnageUserPaword, DesactiverAccount, me ,Logout, GetMyPermissions} from "./AuthEmployee.js";
 import { uploadImage, optimizeImage } from "../../Midelwars/UploadImage.js";
 
 router.get("/me", me);
+router.get("/me/permissions", GetMyPermissions);
 router.route("/").post(uploadImage("image"), optimizeImage("employees"), CreateEmployee).get(GetEmployees);
 router
   .route("/:id")

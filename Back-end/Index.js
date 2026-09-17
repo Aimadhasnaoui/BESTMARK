@@ -22,6 +22,7 @@ import Product from "./Products/Product/Router.js";
 import Category from "./Products/Productcategories/Router.js";
 import Expense from "./expenses/expense/Router.js";
 import ExpenseType from "./expenses/ExpensesType/Router.js";
+import PermissionModel from "./PermissionModels/Router.js";
 import { LoginEmplois, Protect } from "./Employes/Emplye/AuthEmployee.js";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
@@ -109,6 +110,7 @@ app.use("/api/products", Protect, Product);
 app.use("/api/categories/products", Protect, Category);
 app.use("/api/expenses", Protect, Expense);
 app.use("/api/expense-types", Protect, ExpenseType);
+app.use("/api/permission-models", Protect, PermissionModel);
 app.post("/api/auth/login", LoginEmplois);
 // Fin des routes de l'API
 

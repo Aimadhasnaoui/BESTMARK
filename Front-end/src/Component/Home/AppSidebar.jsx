@@ -29,12 +29,16 @@ import Logo from "@/assets/Logo/logo.svg";
 import { useMutation } from "@tanstack/react-query";
 import { LogOutUser } from "@/Servises/Autontification";
 import { useNavigate } from "react-router-dom";
+import { clearPermissions, hasModelAccess, hasAnyModelAccess } from "@/lib/permissions";
+import { usePermissions } from "@/hooks/usePermissions";
 export default function AppSidebar({ currentPage, setcurrentPage }) {
   const { state, setOpen } = useSidebar();
   const navigate = useNavigate();
+  const { permissions } = usePermissions();
   const { mutate, isError } = useMutation({
     mutationFn: LogOutUser,
     onSuccess: () => {
+      clearPermissions();
       navigate("/login");
     },
   });
@@ -76,8 +80,20 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       path: "/suppliers",
     },
     { id: "employees", label: "Employés", icon: User2, path: "/employees" },
-    { id: "settings", label: "Paramètres", icon: Settings, path: "/settings" },
+    {
+      id: "settings",
+      label: "Paramètres",
+      icon: Settings,
+      path: "/settings",
+      models: ["Modèles & Permissions", "Types de produits", "Types d'employés"],
+    },
   ];
+
+  const visibleMenuItems = menuItems.filter((item) =>
+    item.models
+      ? hasAnyModelAccess(permissions, item.models)
+      : hasModelAccess(permissions, item.label),
+  );
 
   return (
     <Sidebar
@@ -105,7 +121,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       {/* sidebar content */}
       <SidebarContent className="py-4">
         <SidebarMenu className="gap-2">
-          {menuItems.map((item) => (
+          {visibleMenuItems.map((item) => (
             <SidebarMenuItem key={item.id}>
               <SidebarMenuButton asChild>
                 <Link

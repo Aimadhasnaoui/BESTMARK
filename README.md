@@ -87,7 +87,11 @@ cd Back-end
 npm install
 ```
 
-Create a `.env` file in `Back-end/` with the following variables:
+Copy `.env.example` to `.env` in `Back-end/` and fill in the values:
+
+```bash
+cp .env.example .env
+```
 
 ```
 PORT=your_port
@@ -116,7 +120,11 @@ cd Front-end
 npm install
 ```
 
-Create a `.env` file in `Front-end/` with:
+Copy `.env.example` to `.env` in `Front-end/` and fill in the values:
+
+```bash
+cp .env.example .env
+```
 
 ```
 VITE_BASE_URL=http://localhost:<PORT>/api

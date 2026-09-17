@@ -8,7 +8,9 @@ import Delete from "./Actions/Delet";
 import { GetCategorys } from "@/Servises/ProductCategories";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { useModelPermissions } from "@/hooks/usePermissions";
 export default function ProductType() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Types de produits");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -41,19 +43,27 @@ export default function ProductType() {
         accessorKey: "actions",
         cell: ({ row }) => (
           <ActionButtons
-            onEdit={() => {
-              setSelectedType(row.original);
-              setIsUpdating(true);
-            }}
-            onDelete={() => {
-              setSelectedType(row.original);
-              setIsDeleting(true);
-            }}
+            onEdit={
+              canEdit
+                ? () => {
+                    setSelectedType(row.original);
+                    setIsUpdating(true);
+                  }
+                : undefined
+            }
+            onDelete={
+              canDelete
+                ? () => {
+                    setSelectedType(row.original);
+                    setIsDeleting(true);
+                  }
+                : undefined
+            }
           />
         ),
       },
     ],
-    [],
+    [canEdit, canDelete],
   );
 
   return (
@@ -63,7 +73,7 @@ export default function ProductType() {
         columns={columns}
         ButtonText="Ajouter Product Type"
         TableTitle="Product Types"
-        isAjouter={true}
+        isAjouter={canAdd}
         onButtonClick={() => setIsAdding(true)}
         isLoading={isLoading}
         isError={isError}

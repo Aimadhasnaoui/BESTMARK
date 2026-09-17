@@ -42,10 +42,11 @@ const MONTHS_FR = [
 
 export default function FinanceReportPage() {
   const currentYear = dayjs().year();
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const currentMonth = dayjs().month();
+  const [dateFrom, setDateFrom] = useState(dayjs().startOf("month").format("YYYY-MM-DD"));
+  const [dateTo, setDateTo] = useState(dayjs().endOf("month").format("YYYY-MM-DD"));
   const [typeFilter, setTypeFilter] = useState("");
-  const [monthFilter, setMonthFilter] = useState("");
+  const [monthFilter, setMonthFilter] = useState(String(currentMonth));
 
   const handleMonthChange = (value) => {
     setMonthFilter(value);

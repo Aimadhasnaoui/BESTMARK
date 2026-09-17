@@ -16,7 +16,7 @@ export const LoginEmplois = catchAsync(async (req, res, next) => {
   const employee = await Employee.findOne({ name: username }).select(
     "+password +isActive",
   );
-  if (!employee) {
+  if (!employee || !employee.password) {
     return next(
       new APPError("le nom d'employe ou le password  est incorrect ", 404),
     );
@@ -106,6 +106,12 @@ export const me = catchAsync(async (req, res, next) => {
   });
 });
 
+// get logged in user's permissions (polled periodically by the front-end)
+export const GetMyPermissions = catchAsync(async (req, res, next) => {
+  const permissions = req.user?.mission?.permissions || [];
+  res.status(200).json({ success: true, permissions });
+});
+
 // verify token midelware
 export const Protect = catchAsync(async (req, res, next) => {
   let token;
@@ -120,7 +126,7 @@ export const Protect = catchAsync(async (req, res, next) => {
   const decodedToken = jwt.verify(token, process.env.SecureTokenKey);
   const userexist = await Employee.findById(decodedToken.id)
     .select("+isActive")
-    .populate("mission", "name");
+    .populate("mission", "name permissions");
   if (!userexist || !userexist.isActive) {
     return next(
       new APPError("l'accès de l'utilisateur a été  desactiver", 401),

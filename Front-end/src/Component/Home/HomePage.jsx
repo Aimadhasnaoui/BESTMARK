@@ -6,15 +6,19 @@ import { useEffect, useState,useContext } from "react";
 import Add from "../Purchase/Actions/Add";
 import AddButton from "./AddButton";
 import { useQuery } from "@tanstack/react-query";
-import { me } from "@/Servises/Autontification";
+import { me, GetMyPermissions } from "@/Servises/Autontification";
 import LoaderApp from "../UI/LoaderApp";
 import {DataContext} from '@/Component/Data/contextApi'
 import { useNavigate } from "react-router-dom";
 import AddSlle from "../Sales/Actions/AddSlle";
+import { savePermissions } from "@/lib/permissions";
+import { useModelPermissions } from "@/hooks/usePermissions";
 function HomePage() {
   const [currentPage, setcurrentPage] = useState("dashboard");
   const navigate = useNavigate();
-  const {openAddBuyerModal, setOpenAddBuyerModal,setuserInfo,setOpenAddSellerModal} = useContext(DataContext)
+  const {openAddBuyerModal, setOpenAddBuyerModal,setuserInfo,setOpenAddSellerModal,setPermissions} = useContext(DataContext)
+  const { canAdd: canBuy } = useModelPermissions("Achats");
+  const { canAdd: canSell } = useModelPermissions("Ventes");
 
   const { isPending, isError ,isSuccess,data} = useQuery({
     queryKey: ["me"],
@@ -28,6 +32,28 @@ if(isSuccess){
 }
 },[isSuccess])
 
+  // fetch the logged-in user's permissions right after login/refresh,
+  // then keep them in sync by polling every hour
+  const {
+    data: permissionsData,
+    isSuccess: isPermissionsSuccess,
+    isError: isPermissionsError,
+  } = useQuery({
+    queryKey: ["my-permissions"],
+    queryFn: GetMyPermissions,
+    enabled: isSuccess,
+    refetchInterval: 60 * 60 * 1000, // every hour
+    refetchOnWindowFocus: false,
+  });
+  const permissionsReady = isPermissionsSuccess || isPermissionsError;
+
+  useEffect(() => {
+    if (permissionsData?.permissions) {
+      savePermissions(permissionsData.permissions);
+      setPermissions(permissionsData.permissions);
+    }
+  }, [permissionsData, setPermissions]);
+
   useEffect(() => {
     if (isError) {
       navigate("/login");
@@ -36,7 +62,7 @@ if(isSuccess){
 
   return (
     <>
-      {isSuccess ? (
+      {isSuccess && permissionsReady ? (
         <SidebarProvider>
           <AppSidebar
             currentPage={currentPage}
@@ -50,6 +76,8 @@ if(isSuccess){
             <AddButton
               setBuyerModalOpen={setOpenAddBuyerModal}
               setOpenAddSellerModal={setOpenAddSellerModal}
+              canBuy={canBuy}
+              canSell={canSell}
             />
               <Add isAdding={openAddBuyerModal} setIsAdding={setOpenAddBuyerModal} />
               <AddSlle></AddSlle>

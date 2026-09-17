@@ -25,3 +25,12 @@ export const me = async () => {
     throw err;
   }
 };
+
+export const GetMyPermissions = async () => {
+  try {
+    const response = await axiosInstance.get("/employees/me/permissions");
+    return response.data;
+  } catch (err) {
+    throw err;
+  }
+};

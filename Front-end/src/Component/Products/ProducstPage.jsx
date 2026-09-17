@@ -11,7 +11,9 @@ import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
 import ProductTable from "./ProductTable";
+import { useModelPermissions } from "@/hooks/usePermissions";
 export default function ProducstPage() {
+  const { canAdd, canEdit, canDelete } = useModelPermissions("Produits");
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -54,7 +56,7 @@ export default function ProducstPage() {
       <HeaderPage
         title="Gestion des produits"
         description="Créer, modifier et supprimer les produits de vos produits"
-        isAjouter={true}
+        isAjouter={canAdd}
         ButtonText="Ajouter un produit"
         onButtonClick={() => setIsAdding(true)}
       />
@@ -64,8 +66,8 @@ export default function ProducstPage() {
         isError={isError}
         error={error}
         isLoading={isPending || (activeFilter === "low-stock" && isLowStockPending)}
-        onEdit={handleUpdate}
-        onDelete={handleDelete}
+        onEdit={canEdit ? handleUpdate : undefined}
+        onDelete={canDelete ? handleDelete : undefined}
         currentFilters={{ category: categoryFilter, supplier: supplierFilter }}
         onApplyFilters={(f) => {
           setCategoryFilter(f.category || null);

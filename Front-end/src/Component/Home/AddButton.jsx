@@ -6,6 +6,8 @@ import { Plus, ShoppingCart, PackagePlus, X } from "lucide-react";
 export default function AddButton({
   setBuyerModalOpen,
   setOpenAddSellerModal,
+  canSell = true,
+  canBuy = true,
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,6 +20,8 @@ export default function AddButton({
     setIsOpen(false);
     setBuyerModalOpen(true);
   };
+
+  if (!canSell || !canBuy) return null;
 
   return (
     <>
@@ -55,25 +59,29 @@ export default function AddButton({
         </div>
 
         <div className="grid grid-cols-2 gap-4 p-6">
-          <button
-            onClick={handleSell}
-            className="group flex flex-col items-center gap-3 rounded-xl border-2 border-slate-100 p-5 text-center transition-all cursor-pointer hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 transition-colors group-hover:bg-emerald-200">
-              <ShoppingCart className="h-6 w-6 text-emerald-600" />
-            </div>
-            <span className="text-sm font-semibold text-slate-800">Vendre</span>
-          </button>
+          {canSell && (
+            <button
+              onClick={handleSell}
+              className="group flex flex-col items-center gap-3 rounded-xl border-2 border-slate-100 p-5 text-center transition-all cursor-pointer hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 transition-colors group-hover:bg-emerald-200">
+                <ShoppingCart className="h-6 w-6 text-emerald-600" />
+              </div>
+              <span className="text-sm font-semibold text-slate-800">Vendre</span>
+            </button>
+          )}
 
-          <button
-            onClick={handleBuy}
-            className="group flex flex-col items-center gap-3 rounded-xl border-2 border-slate-100 p-5 text-center transition-all cursor-pointer hover:border-blue-300 hover:bg-blue-50 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
-          >
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 transition-colors group-hover:bg-blue-200">
-              <PackagePlus className="h-6 w-6 text-blue-600" />
-            </div>
-            <span className="text-sm font-semibold text-slate-800">Acheter</span>
-          </button>
+          {canBuy && (
+            <button
+              onClick={handleBuy}
+              className="group flex flex-col items-center gap-3 rounded-xl border-2 border-slate-100 p-5 text-center transition-all cursor-pointer hover:border-blue-300 hover:bg-blue-50 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 transition-colors group-hover:bg-blue-200">
+                <PackagePlus className="h-6 w-6 text-blue-600" />
+              </div>
+              <span className="text-sm font-semibold text-slate-800">Acheter</span>
+            </button>
+          )}
         </div>
       </Dialog>
     </>

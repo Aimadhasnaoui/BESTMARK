@@ -168,8 +168,8 @@ export default function ProductTable({
         className: "sticky right-0 bg-white border-l",
         cell: ({ row }) => (
           <ActionButtons
-            onEdit={()=>onEdit(row.original)}
-            onDelete={()=>onDelete(row.original)}
+            onEdit={onEdit ? () => onEdit(row.original) : undefined}
+            onDelete={onDelete ? () => onDelete(row.original) : undefined}
             isSee = { true }
             onSee={() => navigate(`/products/${row.original._id}`)}
           />
