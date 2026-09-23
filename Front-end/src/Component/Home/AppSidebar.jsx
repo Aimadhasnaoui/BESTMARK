@@ -25,7 +25,7 @@ import {
   ShoppingBag,
   Truck,
 } from "lucide-react";
-import Logo from "@/assets/Logo/logo.svg";
+import Logo from "@/assets/Logo/logo.png";
 import { useMutation } from "@tanstack/react-query";
 import { LogOutUser } from "@/Servises/Autontification";
 import { useNavigate } from "react-router-dom";

@@ -27,12 +27,15 @@ export const CreateProduct = transactional(async (req, res, next, session) => {
 
 export const GetProducts = catchAsync(async (req, res, next) => {
   const filter ={}
-  const { supplier,category } = req.query
+  const { supplier,category,name } = req.query
   if(supplier){
     filter.supplier = supplier
   }
   if(category){
     filter.category = category
+  }
+  if(name){
+    filter.name = { $regex: String(name), $options: "i" }
   }
   const products = await Product.find(filter).populate("category","name").populate("supplier","name");
   res.status(200).json({ success: true, products });

@@ -24,6 +24,7 @@ import Expense from "./expenses/expense/Router.js";
 import ExpenseType from "./expenses/ExpensesType/Router.js";
 import PermissionModel from "./PermissionModels/Router.js";
 import { LoginEmplois, Protect } from "./Employes/Emplye/AuthEmployee.js";
+import { RequirePermission } from "./Midelwars/RequirePermission.js";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import hpp from "hpp";
@@ -96,21 +97,24 @@ app.disable("x-powered-by");
 // Fin de la configuration des middlewares de sécurité
 
 // Définition des routes de l'API
+// "/api/users" is legacy/unused by the front-end - authenticated only, no model permission gate.
 app.use("/api/users", Protect, User);
-app.use("/api/transactions", Protect, Transaction);
-app.use("/api/stock-movements", Protect, StockMovement);
-app.use("/api/customers", Protect, Customer);
-app.use("/api/delivery", Protect, Delivery);
-app.use("/api/purchases", Protect, Purchase);
-app.use("/api/suppliers", Protect, Supplier);
-app.use("/api/sales", Protect, Sale);
+app.use("/api/transactions", Protect, RequirePermission(["Finance", "Finance Rapport"]), Transaction);
+app.use("/api/stock-movements", Protect, RequirePermission("Gestion de Stock"), StockMovement);
+app.use("/api/customers", Protect, RequirePermission("Demandes clients"), Customer);
+app.use("/api/delivery", Protect, RequirePermission("Livraisons"), Delivery);
+app.use("/api/purchases", Protect, RequirePermission("Achats"), Purchase);
+app.use("/api/suppliers", Protect, RequirePermission("Fournisseurs"), Supplier);
+app.use("/api/sales", Protect, RequirePermission("Ventes"), Sale);
+// Employee router applies RequirePermission("Employés") per-route internally,
+// so /me and /me/permissions stay accessible to any authenticated employee.
 app.use("/api/employees", Protect, Employee);
-app.use("/api/employee-types", Protect, EmployeeType);
-app.use("/api/products", Protect, Product);
-app.use("/api/categories/products", Protect, Category);
-app.use("/api/expenses", Protect, Expense);
-app.use("/api/expense-types", Protect, ExpenseType);
-app.use("/api/permission-models", Protect, PermissionModel);
+app.use("/api/employee-types", Protect, RequirePermission("Types d'employés"), EmployeeType);
+app.use("/api/products", Protect, RequirePermission("Produits"), Product);
+app.use("/api/categories/products", Protect, RequirePermission("Types de produits"), Category);
+app.use("/api/expenses", Protect, RequirePermission("Finance"), Expense);
+app.use("/api/expense-types", Protect, RequirePermission("Finance"), ExpenseType);
+app.use("/api/permission-models", Protect, RequirePermission("Modèles & Permissions"), PermissionModel);
 app.post("/api/auth/login", LoginEmplois);
 // Fin des routes de l'API
 
