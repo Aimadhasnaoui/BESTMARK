@@ -15,10 +15,11 @@ export default function PurchasePage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState(null);
   const {setOpenAddBuyerModal}  =useContext(DataContext)
+  const [pageIndex, setPageIndex] = useState(1);
 
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ['purchases'],
-    queryFn: GetPurchases,
+    queryKey: ['purchases', pageIndex],
+    queryFn: () => GetPurchases({ page: pageIndex }),
   });
 
   const handleUpdate = (purchase) => {
@@ -48,6 +49,12 @@ export default function PurchasePage() {
         isLoading={isPending}
         onEdit={canEdit ? handleUpdate : undefined}
         onDelete={canDelete ? handleDelete : undefined}
+        serverPagination={{
+          currentPage: data?.currentPage || 1,
+          totalPages: data?.totalPages || 1,
+          totalDocs: data?.totalDocs || 0,
+          onPageChange: setPageIndex,
+        }}
       />
 
       {/* Action Modals */}

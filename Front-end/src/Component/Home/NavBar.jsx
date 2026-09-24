@@ -172,10 +172,10 @@ export default function NavBar() {
         )}
       </div>
       <div className="flex gap-4 items-center">
-        <Button size="icon" variant="outline" className="rounded-full p-2 cursor-pointer relative">
+        {/* <Button size="icon" variant="outline" className="rounded-full p-2 cursor-pointer relative">
           <span className='absolute top-0 right-0 size-2 animate-bounce rounded-full bg-sky-600 dark:bg-sky-400' />
           <Bell />
-        </Button>
+        </Button> */}
         <UserMenu />
       </div>
     </div>

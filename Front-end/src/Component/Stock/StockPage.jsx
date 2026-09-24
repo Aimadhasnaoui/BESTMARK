@@ -20,10 +20,11 @@ export default function StockPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [userFilter, setUserFilter] = useState(null);
+  const [pageIndex, setPageIndex] = useState(1);
 
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ['stockMovements'],
-    queryFn: GetStockMovements,
+    queryKey: ['stockMovements', pageIndex],
+    queryFn: () => GetStockMovements({ page: pageIndex }),
   });
 
   const userOptions = useMemo(() => {
@@ -98,6 +99,12 @@ export default function StockPage() {
         isLoading={isPending}
         onEdit={canEdit ? handleUpdate : undefined}
         onDelete={canDelete ? handleDelete : undefined}
+        serverPagination={{
+          currentPage: data?.currentPage || 1,
+          totalPages: data?.totalPages || 1,
+          totalDocs: data?.totalDocs || 0,
+          onPageChange: setPageIndex,
+        }}
       />
 
       {/* Action Modals */}

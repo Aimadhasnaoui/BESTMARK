@@ -15,6 +15,7 @@ export default function TransactionsPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [pageIndex, setPageIndex] = useState(1);
 
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -22,8 +23,8 @@ export default function TransactionsPage() {
   const [directionFilter, setDirectionFilter] = useState("");
 
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ["transactions"],
-    queryFn: () => GetTransactions(),
+    queryKey: ["transactions", pageIndex],
+    queryFn: () => GetTransactions({ page: pageIndex }),
   });
 
   const filteredTransactions = useMemo(() => {
@@ -89,6 +90,12 @@ export default function TransactionsPage() {
         isLoading={isPending}
         onEdit={canEdit ? handleUpdate : undefined}
         onDelete={canDelete ? handleDelete : undefined}
+        serverPagination={{
+          currentPage: data?.currentPage || 1,
+          totalPages: data?.totalPages || 1,
+          totalDocs: data?.totalDocs || 0,
+          onPageChange: setPageIndex,
+        }}
       />
 
       {/* Action Modals */}

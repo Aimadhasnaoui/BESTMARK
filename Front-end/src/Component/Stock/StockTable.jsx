@@ -22,6 +22,7 @@ export default function StockTable({
   ErrorMessage = 'Erreur lors de la récupération des mouvements de stock',
   onDelete,
   onEdit,
+  serverPagination,
 }) {
   const columns = useMemo(
     () => [
@@ -167,6 +168,7 @@ export default function StockTable({
       ErrorMessage={ErrorMessage}
       TableTitle="Mouvements de Stock"
       isAjouter={false}
+      serverPagination={serverPagination}
     />
   );
 }

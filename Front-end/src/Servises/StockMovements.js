@@ -9,9 +9,9 @@ export const AddStockMovement = async (data) => {
     }
 };
 
-export const GetStockMovements = async () => {
+export const GetStockMovements = async ({ page = 1, limit = 50 } = {}) => {
     try {
-        const response = await axiosInstance.get(`/stock-movements`);
+        const response = await axiosInstance.get(`/stock-movements?page=${page}&limit=${limit}`);
         return response.data;
     } catch (error) {
         throw error;

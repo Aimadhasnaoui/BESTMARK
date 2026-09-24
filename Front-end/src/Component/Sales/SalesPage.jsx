@@ -26,10 +26,11 @@ export default function SalesPage() {
   const [dateTo, setDateTo] = useState("");
   const [userFilter, setUserFilter] = useState(null);
   const [deliveryFilter, setDeliveryFilter] = useState("");
+  const [pageIndex, setPageIndex] = useState(1);
 
   const { data, isPending, isError, error } = useQuery({
-    queryKey: ["sales"],
-    queryFn: GetSales,
+    queryKey: ["sales", pageIndex],
+    queryFn: () => GetSales({ page: pageIndex }),
   });
 
   const userOptions = useMemo(() => {
@@ -124,6 +125,12 @@ export default function SalesPage() {
         onDelete={canDelete ? handleDeleteClick : undefined}
         onSee={handsefunction}
         onEdit={canEdit ? handleEditClick : undefined}
+        serverPagination={{
+          currentPage: data?.currentPage || 1,
+          totalPages: data?.totalPages || 1,
+          totalDocs: data?.totalDocs || 0,
+          onPageChange: setPageIndex,
+        }}
       />
 
       <DeletModel

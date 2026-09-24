@@ -1,4 +1,4 @@
-﻿import axiosInstance from './axiosInstance';
+import axiosInstance from './axiosInstance';
 
 export const AddPurchase = async (data) => {
     try {
@@ -9,9 +9,9 @@ export const AddPurchase = async (data) => {
     }
 };
 
-export const GetPurchases = async () => {
+export const GetPurchases = async ({ page = 1, limit = 50 } = {}) => {
     try {
-        const response = await axiosInstance.get("/purchases");
+        const response = await axiosInstance.get(`/purchases?page=${page}&limit=${limit}`);
         return response.data;
     } catch (error) {
         throw error;

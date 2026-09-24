@@ -65,9 +65,23 @@ export const CreatePurchase = transactional(async (req, res, next, session) => {
 });
 
 export const GetPurchases = catchAsync(async (req, res, next) => {
-  const purchases = await Purchases.find().sort({ createdAt: -1 });
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.max(1, parseInt(req.query.limit) || 50);
+  const skip = (page - 1) * limit;
 
-  res.status(200).json({ success: true, purchases });
+  const [purchases, totalDocs] = await Promise.all([
+    Purchases.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+    Purchases.countDocuments(),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    purchases,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
+    limit,
+  });
 });
 
 export const GetPurchase = catchAsync(async (req, res, next) => {

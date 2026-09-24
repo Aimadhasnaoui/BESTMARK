@@ -29,8 +29,13 @@ import Logo from "@/assets/Logo/logo.png";
 import { useMutation } from "@tanstack/react-query";
 import { LogOutUser } from "@/Servises/Autontification";
 import { useNavigate } from "react-router-dom";
-import { clearPermissions, hasModelAccess, hasAnyModelAccess } from "@/lib/permissions";
+import {
+  clearPermissions,
+  hasModelAccess,
+  hasAnyModelAccess,
+} from "@/lib/permissions";
 import { usePermissions } from "@/hooks/usePermissions";
+
 export default function AppSidebar({ currentPage, setcurrentPage }) {
   const { state, setOpen } = useSidebar();
   const navigate = useNavigate();
@@ -66,7 +71,6 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       path: "/requests",
     },
     { id: "delivery", label: "Livraisons", icon: Truck, path: "/delivery" },
-    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
     {
       id: "finance-report",
       label: "Finance Rapport",
@@ -80,20 +84,18 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
       path: "/suppliers",
     },
     { id: "employees", label: "Employés", icon: User2, path: "/employees" },
-    {
-      id: "settings",
-      label: "Paramètres",
-      icon: Settings,
-      path: "/settings",
-      models: ["Modèles & Permissions", "Types de produits", "Types d'employés"],
-    },
+    { id: "finance", label: "Finance", icon: Banknote, path: "/finance" },
   ];
 
   const visibleMenuItems = menuItems.filter((item) =>
-    item.models
-      ? hasAnyModelAccess(permissions, item.models)
-      : hasModelAccess(permissions, item.label),
+    hasModelAccess(permissions, item.label),
   );
+
+  const canViewSettings = hasAnyModelAccess(permissions, [
+    "Modèles & Permissions",
+    "Types de produits",
+    "Types d'employés",
+  ]);
 
   return (
     <Sidebar
@@ -106,7 +108,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
         }
       }}
     >
-      {/*sidebar header*/}
+      {/* sidebar header */}
       <SidebarHeader className="flex flex-row items-center group-data-[collapsible=icon]:justify-center">
         <img
           src={Logo}
@@ -118,6 +120,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
           <span className="text-[#0066FF]">MARK</span>
         </div>
       </SidebarHeader>
+
       {/* sidebar content */}
       <SidebarContent className="py-4">
         <SidebarMenu className="gap-2">
@@ -127,7 +130,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
                 <Link
                   to={item.path}
                   onClick={() => setcurrentPage(item.id)}
-                  className={`rounded-none cursor-pointer transition-all  ${
+                  className={`rounded-none cursor-pointer transition-all ${
                     currentPage === item.id
                       ? "bg-[#EFF6FF] border-l-4 border-[#0066FF] text-[#2563EB]"
                       : "border-l-4 border-transparent !hover:bg-slate-50 text-[#475569]"
@@ -144,16 +147,55 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
         </SidebarMenu>
       </SidebarContent>
 
-      {/* sidebar content */}
-      {/*sidebar footer*/}
+      {/* sidebar footer with Profil, Paramètres & Déconnexion */}
       <SidebarFooter>
         <SidebarMenu className="gap-2">
+          {/* Profil */}
           <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link
+                to="/profile"
+                onClick={() => setcurrentPage("profile")}
+                className={`rounded-none cursor-pointer transition-all ${
+                  currentPage === "profile"
+                    ? "bg-[#EFF6FF] border-l-4 border-[#0066FF] text-[#2563EB]"
+                    : "border-l-4 border-transparent !hover:bg-slate-50 text-[#475569]"
+                }`}
+              >
+                <User2 size={24} />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Profil
+                </span>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
+
+          {/* Paramètres (if permitted) */}
+          {canViewSettings && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link
+                  to="/settings"
+                  onClick={() => setcurrentPage("settings")}
+                  className={`rounded-none cursor-pointer transition-all ${
+                    currentPage === "settings"
+                      ? "bg-[#EFF6FF] border-l-4 border-[#0066FF] text-[#2563EB]"
+                      : "border-l-4 border-transparent !hover:bg-slate-50 text-[#475569]"
+                  }`}
+                >
+                  <Settings size={24} />
+                  <span className="group-data-[collapsible=icon]:hidden">
+                    Paramètres
+                  </span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+
+          {/* Déconnexion */}
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <button
-                // href="#"
                 onClick={mutate}
                 className="rounded-none cursor-pointer transition-all border-l-4 border-transparent !hover:bg-red-100 text-red-500 !hover:text-white"
               >
@@ -166,7 +208,6 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      {/*sidebar footer*/}
     </Sidebar>
   );
 }

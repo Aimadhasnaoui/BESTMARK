@@ -20,6 +20,7 @@ export default function PurchaseTable({
   ErrorMessage = 'Erreur lors de la récupération des achats',
   onDelete,
   onEdit,
+  serverPagination,
 }) {
   const columns = useMemo(
     () => [
@@ -165,6 +166,7 @@ export default function PurchaseTable({
       ErrorMessage={ErrorMessage}
       TableTitle="Achats"
       isAjouter={false} // Header button is handled in PurchasePage
+      serverPagination={serverPagination}
     />
   );
 }

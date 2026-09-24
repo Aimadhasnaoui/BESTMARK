@@ -20,6 +20,7 @@ export default function TransactionsTable({
   error,
   onEdit,
   onDelete,
+  serverPagination,
 }) {
   const columns = useMemo(
     () => [
@@ -138,6 +139,7 @@ export default function TransactionsTable({
       ErrorMessage={error?.message || "Erreur lors du chargement des transactions"}
       TableTitle="Transactions Financières"
       isAjouter={false}
+      serverPagination={serverPagination}
     />
   );
 }

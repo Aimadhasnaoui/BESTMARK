@@ -17,7 +17,8 @@ export default function SalesTable({
   ErrorMessage = 'Erreur lors de la récupération des ventes',
   onDelete,
   onSee,
-  onEdit
+  onEdit,
+  serverPagination,
 }) {
   const columns = useMemo(
     () => [
@@ -156,6 +157,7 @@ export default function SalesTable({
       ErrorMessage={ErrorMessage}
       TableTitle="Ventes"
       isAjouter={false}
+      serverPagination={serverPagination}
     />
   );
 }

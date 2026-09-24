@@ -49,11 +49,28 @@ export const CreateStockMovement = transactional(
 );
 
 export const GetStockMovements = catchAsync(async (req, res, next) => {
-  const stockMovements = await StockMovement.find()
-    .sort({ createdAt: -1 })
-    .populate("product", "name")
-    .populate("createdBy", "name");
-  res.status(200).json({ success: true, stockMovements });
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.max(1, parseInt(req.query.limit) || 50);
+  const skip = (page - 1) * limit;
+
+  const [stockMovements, totalDocs] = await Promise.all([
+    StockMovement.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("product", "name")
+      .populate("createdBy", "name"),
+    StockMovement.countDocuments(),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    stockMovements,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
+    limit,
+  });
 });
 
 export const GetStockMovement = catchAsync(async (req, res, next) => {

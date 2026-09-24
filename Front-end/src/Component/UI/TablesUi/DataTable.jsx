@@ -25,7 +25,8 @@ export function DataTable({
   isLoading,
   isError,
   ErrorMessage='Error Occured while fetching data',
-  
+  // Server-side pagination props (optional)
+  serverPagination,
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -42,10 +43,17 @@ export function DataTable({
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
       pagination: {
-        pageSize: 50, // 2. Set default page size (e.g., 5 rows per page)
+        pageSize: serverPagination ? data.length || 50 : 50,
       },
     },
   });
+
+  // Server pagination helpers
+  const isServerPaginated = !!serverPagination;
+  const serverPage = serverPagination?.currentPage || 1;
+  const serverTotalPages = serverPagination?.totalPages || 1;
+  const serverTotalDocs = serverPagination?.totalDocs || 0;
+  const onPageChange = serverPagination?.onPageChange;
 
   return (
     <div className="p-6">
@@ -135,65 +143,110 @@ export function DataTable({
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-between px-4 py-3 bg-white border-t">
-        <div className="flex gap-2 items-center">
-          {/* Page Info */}
-          <span className="text-sm text-gray-700">
-            showing{" "}
-            <strong className="font-semibold">
-              {table.getState().pagination.pageIndex + 1}
-            </strong>{" "}
-            of <strong className="font-semibold">{table.getPageCount()}</strong>{" "}
-            {TableTitle}
-          </span>
 
-          {/* Page Size Selector */}
-          <select
-            value={table.getState().pagination.pageSize}
-            onChange={(e) => table.setPageSize(Number(e.target.value))}
-            className="p-1 border rounded bg-white text-sm"
-          >
-            {[50, 100, 200].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>
-                Show {pageSize}
-              </option>
-            ))}
-          </select>
+      {/* Pagination Controls */}
+      {isServerPaginated ? (
+        <div className="flex items-center justify-between px-4 py-3 bg-white border-t">
+          <div className="flex gap-2 items-center">
+            <span className="text-sm text-gray-700">
+              Page{" "}
+              <strong className="font-semibold">{serverPage}</strong>{" "}
+              sur <strong className="font-semibold">{serverTotalPages}</strong>{" "}
+              — <strong>{serverTotalDocs}</strong> {TableTitle || "résultats"}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => onPageChange?.(1)}
+              disabled={serverPage <= 1}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white cursor-pointer"
+            >
+              {"<<"}
+            </button>
+            <button
+              onClick={() => onPageChange?.(serverPage - 1)}
+              disabled={serverPage <= 1}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white cursor-pointer"
+            >
+              Précédent
+            </button>
+            <button
+              onClick={() => onPageChange?.(serverPage + 1)}
+              disabled={serverPage >= serverTotalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white cursor-pointer"
+            >
+              Suivant
+            </button>
+            <button
+              onClick={() => onPageChange?.(serverTotalPages)}
+              disabled={serverPage >= serverTotalPages}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white cursor-pointer"
+            >
+              {">>"}
+            </button>
+          </div>
         </div>
-        <div className="flex gap-2">
-          {/* First & Previous Buttons */}
-          <button
-            onClick={() => table.setPageIndex(0)}
-            disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
-          >
-            {"<<"}
-          </button>
-          <button
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
-          >
-            Previous
-          </button>
+      ) : (
+        <div className="flex items-center justify-between px-4 py-3 bg-white border-t">
+          <div className="flex gap-2 items-center">
+            {/* Page Info */}
+            <span className="text-sm text-gray-700">
+              showing{" "}
+              <strong className="font-semibold">
+                {table.getState().pagination.pageIndex + 1}
+              </strong>{" "}
+              of <strong className="font-semibold">{table.getPageCount()}</strong>{" "}
+              {TableTitle}
+            </span>
 
-          {/* Next & Last Buttons */}
-          <button
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
-          >
-            Next
-          </button>
-          <button
-            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-            disabled={!table.getCanNextPage()}
-            className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
-          >
-            {">>"}
-          </button>
+            {/* Page Size Selector */}
+            <select
+              value={table.getState().pagination.pageSize}
+              onChange={(e) => table.setPageSize(Number(e.target.value))}
+              className="p-1 border rounded bg-white text-sm"
+            >
+              {[50, 100, 200].map((pageSize) => (
+                <option key={pageSize} value={pageSize}>
+                  Show {pageSize}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex gap-2">
+            {/* First & Previous Buttons */}
+            <button
+              onClick={() => table.setPageIndex(0)}
+              disabled={!table.getCanPreviousPage()}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            >
+              {"<<"}
+            </button>
+            <button
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            >
+              Previous
+            </button>
+
+            {/* Next & Last Buttons */}
+            <button
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            >
+              Next
+            </button>
+            <button
+              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+              disabled={!table.getCanNextPage()}
+              className="px-3 py-1 border rounded disabled:opacity-50 bg-white"
+            >
+              {">>"}
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -12,10 +12,27 @@ export const CreateTransaction = catchAsync(async (req, res, next) => {
 });
 
 export const GetTransactions = catchAsync(async (req, res, next) => {
-  const transactions = await Transaction.find()
-    .sort({ createdAt: -1 })
-    .populate("performedBy", "name");
-  res.status(200).json({ success: true, transactions });
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.max(1, parseInt(req.query.limit) || 50);
+  const skip = (page - 1) * limit;
+
+  const [transactions, totalDocs] = await Promise.all([
+    Transaction.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("performedBy", "name"),
+    Transaction.countDocuments(),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    transactions,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
+    limit,
+  });
 });
 
 export const GetTransaction = catchAsync(async (req, res, next) => {

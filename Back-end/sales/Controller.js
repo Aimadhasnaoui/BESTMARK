@@ -114,18 +114,34 @@ export const CreateSale = transactional(async (req, res, next, session) => {
 });
 
 export const GetSales = catchAsync(async (req, res, next) => {
-  const sales = await Sale.find()
-    .sort({ createdAt: -1 })
-    .populate("servedBy", "name")
-    .populate({
-      path: "deliveryId",
-      populate: {
-        path: "deliveryMan",
-        select: "name",
-      },
-    });
-    
-  res.status(200).json({ success: true, sales });
+  const page = Math.max(1, parseInt(req.query.page) || 1);
+  const limit = Math.max(1, parseInt(req.query.limit) || 50);
+  const skip = (page - 1) * limit;
+
+  const [sales, totalDocs] = await Promise.all([
+    Sale.find()
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+      .populate("servedBy", "name")
+      .populate({
+        path: "deliveryId",
+        populate: {
+          path: "deliveryMan",
+          select: "name",
+        },
+      }),
+    Sale.countDocuments(),
+  ]);
+
+  res.status(200).json({
+    success: true,
+    sales,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    currentPage: page,
+    limit,
+  });
 });
 
 export const GetSale = catchAsync(async (req, res, next) => {
