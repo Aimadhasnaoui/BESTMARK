@@ -18,11 +18,7 @@ import {
 import HeaderPage from "../UI/HeaderPage";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GetSales } from "@/Servises/Sales";
-import { GetStockMovements } from "@/Servises/StockMovements";
-import { GetTransactions } from "@/Servises/Transactions";
-import { GetDeliverys } from "@/Servises/Delivery";
-import { GetProducts, GetLowStockProducts } from "@/Servises/Products";
+import { GetDashboard } from "@/Servises/Dashboard";
 import {
   Wallet,
   AlertTriangle,
@@ -44,12 +40,6 @@ import {
   Phone,
 } from "lucide-react";
 
-const isLateDelivery = (delivery) => {
-  if (!delivery.estimatedArrival) return false;
-  if (delivery.status === "arrived" || delivery.status === "failed") return false;
-  return new Date(delivery.estimatedArrival) < new Date();
-};
-
 const EXPENSE_TYPE_LABELS = { expense: "Dépense", purchase: "Achat", return: "Retour", sale: "Vente" };
 const EXPENSE_COLORS = ["#f59e0b", "#3b82f6", "#a855f7", "#64748b"];
 
@@ -57,122 +47,46 @@ export default function Dashbord() {
   const navigate = useNavigate();
   const [showFinance, setShowFinance] = useState(false);
 
-  const { data: salesData } = useQuery({ queryKey: ["sales"], queryFn: GetSales });
-  const { data: movementsData } = useQuery({ queryKey: ["stockMovements"], queryFn: GetStockMovements });
-  const { data: transactionsData } = useQuery({ queryKey: ["transactions"], queryFn: () => GetTransactions() });
-  const { data: deliveriesData } = useQuery({ queryKey: ["deliveries"], queryFn: GetDeliverys });
-  const { data: productsData } = useQuery({ queryKey: ["products"], queryFn: () => GetProducts() });
-  const { data: lowStockData } = useQuery({ queryKey: ["products", "low-stock"], queryFn: GetLowStockProducts });
+  // Every figure is computed by the server (GET /api/dashboard); only formatting happens here
+  const { data } = useQuery({ queryKey: ["dashboard"], queryFn: GetDashboard });
+  const dashboard = data?.dashboard;
 
-  const monthStart = useMemo(() => dayjs().startOf("month"), []);
-
-  const monthlyRevenue = useMemo(() => {
-    return (salesData?.sales || [])
-      .filter((s) => dayjs(s.saleDate).isAfter(monthStart))
-      .reduce((acc, s) => acc + (s.totalAmount || 0), 0);
-  }, [salesData, monthStart]);
-
-  const monthlyBalance = useMemo(() => {
-    return (transactionsData?.transactions || [])
-      .filter((t) => dayjs(t.date).isAfter(monthStart))
-      .reduce((acc, t) => acc + (t.direction === "in" ? t.amount : -t.amount), 0);
-  }, [transactionsData, monthStart]);
-
-  const lateDeliveries = useMemo(() => {
-    return (deliveriesData?.deliveries || []).filter(isLateDelivery);
-  }, [deliveriesData]);
-
-  const outOfStockCount = useMemo(() => {
-    return (productsData?.products || []).filter((p) => p.quantity === 0).length;
-  }, [productsData]);
-
-  const lowStockCount = lowStockData?.products?.length || 0;
+  const monthlyRevenue = dashboard?.monthlyRevenue || 0;
+  const previousMonthRevenue = dashboard?.previousMonthRevenue || 0;
+  const monthlyBalance = dashboard?.monthlyBalance || 0;
+  const lowStockCount = dashboard?.lowStockCount || 0;
+  const outOfStockCount = dashboard?.outOfStockCount || 0;
   const alertProductsTotal = lowStockCount + outOfStockCount;
-
-  const financeChartData = useMemo(() => {
-    const months = Array.from({ length: 6 }, (_, i) =>
-      dayjs().subtract(5 - i, "month").startOf("month"),
-    );
-    return months.map((start) => {
-      const end = start.endOf("month");
-      const monthTx = (transactionsData?.transactions || []).filter((t) => {
-        const d = dayjs(t.date);
-        return d.isAfter(start) && d.isBefore(end);
-      });
-      return {
-        month: start.format("MMM YY"),
-        Entrées: monthTx
-          .filter((t) => t.direction === "in")
-          .reduce((acc, t) => acc + (t.amount || 0), 0),
-        Sorties: monthTx
-          .filter((t) => t.direction === "out")
-          .reduce((acc, t) => acc + (t.amount || 0), 0),
-      };
-    });
-  }, [transactionsData]);
-
-  const recentSales = useMemo(() => (salesData?.sales || []).slice(0, 5), [salesData]);
-  const recentMovements = useMemo(() => (movementsData?.stockMovements || []).slice(0, 5), [movementsData]);
-
-  const previousMonthRevenue = useMemo(() => {
-    const previousMonthStart = dayjs().subtract(1, "month").startOf("month");
-    const previousMonthEnd = dayjs().subtract(1, "month").endOf("month");
-    return (salesData?.sales || [])
-      .filter((s) => dayjs(s.saleDate).isAfter(previousMonthStart) && dayjs(s.saleDate).isBefore(previousMonthEnd))
-      .reduce((acc, s) => acc + (s.totalAmount || 0), 0);
-  }, [salesData]);
+  const lateDeliveries = dashboard?.lateDeliveries || [];
+  const recentSales = dashboard?.recentSales || [];
+  const recentMovements = dashboard?.recentMovements || [];
+  const topProducts = dashboard?.topProducts || [];
+  const topCustomers = dashboard?.topCustomers || [];
+  const vendorPerformance = dashboard?.vendorPerformance || [];
 
   const revenueChangePercent = useMemo(() => {
     if (previousMonthRevenue === 0) return monthlyRevenue > 0 ? 100 : 0;
     return ((monthlyRevenue - previousMonthRevenue) / previousMonthRevenue) * 100;
   }, [monthlyRevenue, previousMonthRevenue]);
 
-  const topProducts = useMemo(() => {
-    return [...(productsData?.products || [])]
-      .sort((a, b) => (b.Number_of_sales || 0) - (a.Number_of_sales || 0))
-      .slice(0, 5)
-      .map((p) => ({ name: p.name, ventes: p.Number_of_sales || 0 }));
-  }, [productsData]);
+  const financeChartData = useMemo(
+    () =>
+      (dashboard?.financeChart || []).map((m) => ({
+        month: dayjs(m.month).format("MMM YY"),
+        Entrées: m.in,
+        Sorties: m.out,
+      })),
+    [dashboard],
+  );
 
-  const expenseByType = useMemo(() => {
-    const map = {};
-    (transactionsData?.transactions || [])
-      .filter((t) => t.direction === "out")
-      .forEach((t) => {
-        map[t.type] = (map[t.type] || 0) + (t.amount || 0);
-      });
-    return Object.entries(map).map(([type, value]) => ({
-      name: EXPENSE_TYPE_LABELS[type] || type,
-      value,
-    }));
-  }, [transactionsData]);
-
-  const topCustomers = useMemo(() => {
-    const map = new Map();
-    (salesData?.sales || [])
-      .filter((s) => s.customerName)
-      .forEach((s) => {
-        const entry = map.get(s.customerName) || { name: s.customerName, total: 0, count: 0 };
-        entry.total += s.totalAmount || 0;
-        entry.count += 1;
-        map.set(s.customerName, entry);
-      });
-    return Array.from(map.values())
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 5);
-  }, [salesData]);
-
-  const vendorPerformance = useMemo(() => {
-    const map = new Map();
-    (salesData?.sales || []).forEach((s) => {
-      const name = s.servedBy?.name || "N/A";
-      const entry = map.get(name) || { name, total: 0, count: 0 };
-      entry.total += s.totalAmount || 0;
-      entry.count += 1;
-      map.set(name, entry);
-    });
-    return Array.from(map.values()).sort((a, b) => b.total - a.total);
-  }, [salesData]);
+  const expenseByType = useMemo(
+    () =>
+      (dashboard?.expenseByType || []).map((e) => ({
+        name: EXPENSE_TYPE_LABELS[e.type] || e.type,
+        value: e.value,
+      })),
+    [dashboard],
+  );
 
   return (
     <div className="space-y-4">
