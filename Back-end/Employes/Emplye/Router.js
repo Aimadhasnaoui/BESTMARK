@@ -15,7 +15,9 @@ import { RequirePermission } from "../../Midelwars/RequirePermission.js";
 // regardless of the "Employés" permission (self-service).
 router.get("/me", me);
 router.get("/me/permissions", GetMyPermissions);
-router.post('/logout',Logout)
+router.patch("/me", uploadImage("image"), optimizeImage("employees"), UpdateEmployee);
+router.put("/password/me", ChnageUserPaword);
+router.post('/logout', Logout);
 
 router.use(RequirePermission("Employés"));
 

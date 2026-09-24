@@ -85,11 +85,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        element: (
-          <RequirePermission model="Profil">
-            <Profile />
-          </RequirePermission>
-        ),
+        element: <Profile />,
       },
       {
         path: "/products",

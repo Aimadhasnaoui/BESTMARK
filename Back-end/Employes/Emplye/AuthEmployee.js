@@ -64,8 +64,9 @@ export const Logout = catchAsync(async (req, res, next) => {
 // changer password controller
 export const ChnageUserPaword = catchAsync(async (req, res, next) => {
   const { password } = req.body;
+  const id = req.params.id === "me" ? req.user?._id : req.params.id;
   // 1. Find the user first
-  const employer = await Employee.findById(req.params.id);
+  const employer = await Employee.findById(id);
 
   if (!employer) {
     return next(new APPError("Aucun employé trouvé avec cet ID", 404));

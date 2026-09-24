@@ -30,17 +30,25 @@ export const GetEmployee = catchAsync(async (req, res, next) => {
 });
 
 export const UpdateEmployee = catchAsync(async (req, res, next) => {
-  // don't allow chnaging password here
-  if (req.body.password  || req.body.isActive ) {
+  // don't allow changing password or isActive status via general update
+  if (req.body.password || req.body.isActive) {
     return next(new APPError(`you can't procces whit the chnage here`, 400));
   }
-  const employee = await Employee.findByIdAndUpdate(req.params.id, req.body, {
+
+  const id = req.params.id === "me" ? req.user?._id : req.params.id;
+
+  if (req.body.mission === "" || req.body.mission === "undefined" || req.body.mission === "null") {
+    delete req.body.mission;
+  }
+
+  const employee = await Employee.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
-  });
+  }).populate("mission", "name permissions");
+
   if (!employee) {
     return next(
-      new APPError(`Employee with ID ${req.params.id} not found`, 404),
+      new APPError(`Employee with ID ${id} not found`, 404),
     );
   }
   res.status(200).json({ success: true, employee });
