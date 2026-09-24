@@ -8,6 +8,7 @@ import Add from "./Actions/Add";
 import Update from "./Actions/Update";
 import Delete from "./Actions/Delete";
 import PasswordReset from "./Actions/PasswordReset";
+import Payslips from "./Actions/Payslips";
 import HeaderPage from '../UI/HeaderPage'
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User } from "lucide-react";
@@ -19,6 +20,7 @@ export default function EmployeesPage() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [isViewingPayslips, setIsViewingPayslips] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const queryClient = useQueryClient();
@@ -131,6 +133,14 @@ export default function EmployeesPage() {
                   }
                 : undefined
             }
+            onPayslip={
+              canAdd
+                ? () => {
+                    setSelectedEmployee(row.original);
+                    setIsViewingPayslips(true);
+                  }
+                : undefined
+            }
             onToggleActive={
               canEdit
                 ? () => {
@@ -143,7 +153,7 @@ export default function EmployeesPage() {
         ),
       },
     ],
-    [canEdit, canDelete]
+    [canAdd, canEdit, canDelete]
   );
 
   return (
@@ -155,6 +165,15 @@ export default function EmployeesPage() {
               ButtonText="Ajouter un fournisseur"
               onButtonClick={() => setIsAdding(true)}
             />
+      {isViewingPayslips && (
+        <Payslips
+          isOpen={isViewingPayslips}
+          setIsOpen={setIsViewingPayslips}
+          selectedEmployee={selectedEmployee}
+          canEdit={canEdit}
+          canDelete={canDelete}
+        />
+      )}
       {isResettingPassword && (
         <PasswordReset
           isUpdating={isResettingPassword}

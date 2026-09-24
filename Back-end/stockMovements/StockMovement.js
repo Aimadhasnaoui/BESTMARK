@@ -45,4 +45,7 @@ const StockMovementSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+// Stock history filtered by product and date
+StockMovementSchema.index({ product: 1, createdAt: -1 });
+
 module.exports = mongoose.model("StockMovement", StockMovementSchema);

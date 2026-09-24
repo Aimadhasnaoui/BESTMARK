@@ -1,6 +1,6 @@
-import { Pencil, Trash2, Eye, Lock, Power, PowerOff } from "lucide-react";
+import { Pencil, Trash2, Eye, Lock, Power, PowerOff, ReceiptText } from "lucide-react";
 
-export function ActionButtons({ onEdit, onDelete, onSee, onPassword, onToggleActive, isSee = false, isActive = true }) {
+export function ActionButtons({ onEdit, onDelete, onSee, onPassword, onPayslip, onToggleActive, isSee = false, isActive = true }) {
   return (
     <div className="flex gap-2 w-full justify-center">
       {isSee && (
@@ -10,6 +10,16 @@ export function ActionButtons({ onEdit, onDelete, onSee, onPassword, onToggleAct
           className="flex items-center gap-2 px-2 py-2 rounded-full border border-orange-600"
         >
           <Eye className="w-3.5 h-3.5 text-orange-600 cursor-pointer hover:text-blue-800 text-xs" />
+        </button>
+      )}
+      {onPayslip && (
+        <button
+          type="button"
+          onClick={onPayslip}
+          title="Bulletins de paie"
+          className="flex items-center gap-2 px-2 py-2 rounded-full border border-teal-600"
+        >
+          <ReceiptText className="w-3.5 h-3.5 text-teal-600 cursor-pointer hover:text-teal-800 text-xs" />
         </button>
       )}
       {onPassword && (

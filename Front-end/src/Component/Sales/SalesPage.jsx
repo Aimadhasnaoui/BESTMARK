@@ -69,6 +69,11 @@ export default function SalesPage() {
     onSuccess: () => {
       setIsDeleting(false);
       queryClient.invalidateQueries({ queryKey: ["sales"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
+      queryClient.invalidateQueries({ queryKey: ["stockMovements"] });
+      queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      queryClient.invalidateQueries({ queryKey: ["deliveries"] });
       toast.success("Vente supprimée avec succès");
     },
   });

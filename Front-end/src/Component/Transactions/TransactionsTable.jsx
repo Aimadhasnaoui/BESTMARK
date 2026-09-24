@@ -9,7 +9,8 @@ import {
   Wallet, 
   Calendar, 
   FileText, 
-  Tag 
+  Tag,
+  User
 } from "lucide-react";
 
 export default function TransactionsTable({
@@ -98,6 +99,21 @@ export default function TransactionsTable({
             <span className="text-xs leading-relaxed">{row.getValue("note")}</span>
           </div>
         ),
+      },
+      {
+        accessorKey: "performedBy",
+        header: "Effectué par",
+        cell: ({ row }) => {
+          const performedBy = row.getValue("performedBy");
+          return performedBy?.name ? (
+            <div className="flex items-center gap-2 text-gray-700 text-sm">
+              <User className="w-3.5 h-3.5 text-gray-400" />
+              {performedBy.name}
+            </div>
+          ) : (
+            <span className="text-gray-400 text-sm">—</span>
+          );
+        },
       },
       {
         id: "actions",

@@ -206,7 +206,7 @@ export default function ProductDetails() {
                   <BarChart3 className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-xs text-slate-500">Ventes</p>
+                  <p className="text-xs text-slate-500">Nombre de ventes</p>
                   <p className="font-bold text-sm text-slate-800">
                     {product.Number_of_sales || 0}
                   </p>

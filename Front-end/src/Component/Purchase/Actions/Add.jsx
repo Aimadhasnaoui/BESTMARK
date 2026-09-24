@@ -121,6 +121,7 @@ const selectedSupplier = watch("supplier");
       queryClient.invalidateQueries({ queryKey: ["stockMovements"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
+      queryClient.invalidateQueries({ queryKey: ["product"] });
       toast.success("L'achat a été ajouté avec succès");
       reset();
     },

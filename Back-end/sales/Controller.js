@@ -44,10 +44,17 @@ export const CreateSale = transactional(async (req, res, next, session) => {
     if (!product) {
       throw new APPError("Product not found", 404);
     }
+    if (product.quantity < Number(item.quantity)) {
+      throw new APPError(
+        `Stock insuffisant pour ${product.name} (disponible : ${product.quantity}, demandé : ${item.quantity})`,
+        400,
+      );
+    }
     ProdcutsName.push(
       `(${product.name}) pour un montant de ${item.buyingPrice}`,
     );
     product.quantity -= Number(item.quantity);
+    product.Number_of_sales += Number(item.quantity);
     await product.save({ session });
 
     await StockMovement.create(
@@ -199,29 +206,22 @@ export const DeleteSale = transactional(async (req, res, next, session) => {
     throw new APPError(`Sale with ID ${req.params.id} not found`, 404);
   }
 
-  // Delete associated StockMovement records if they exist
-  const stockMovementsExist = await StockMovement.exists({
-    referenceId: sale._id,
-  });
-  if (stockMovementsExist) {
-    await StockMovement.deleteMany({ referenceId: sale._id }).session(session);
-  }
-
-  // Delete associated TranTransaction records if they exist
-  const transactionsExist = await TranTransaction.exists({
-    referenceId: sale._id,
-  });
-  if (transactionsExist) {
-    await TranTransaction.deleteMany({ referenceId: sale._id }).session(
-      session,
+  // Restore the stock and sales counter of every sold product
+  for (const item of sale.items) {
+    const product = await Products.findById(item.product).session(session);
+    if (!product) continue; // product deleted since the sale: nothing to restore
+    product.quantity += Number(item.quantity);
+    product.Number_of_sales = Math.max(
+      0,
+      (product.Number_of_sales || 0) - Number(item.quantity),
     );
+    await product.save({ session });
   }
 
-  // Delete associated Delivery records if they exist
-  const deliveryExists = await Delivery.exists({ sale: sale._id });
-  if (deliveryExists) {
-    await Delivery.deleteMany({ sale: sale._id }).session(session);
-  }
+  // Delete associated StockMovement, TranTransaction and Delivery records
+  await StockMovement.deleteMany({ referenceId: sale._id }).session(session);
+  await TranTransaction.deleteMany({ referenceId: sale._id }).session(session);
+  await Delivery.deleteMany({ sale: sale._id }).session(session);
 
   // Delete the Sale document itself
   await Sale.findByIdAndDelete(sale._id).session(session);

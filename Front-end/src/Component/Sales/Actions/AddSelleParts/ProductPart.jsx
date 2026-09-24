@@ -47,6 +47,7 @@ export default function ProductPart({
                 <Autocomplete
                   options={productsData?.products || []}
                   getOptionLabel={(option) => option.name || ""}
+                  getOptionDisabled={(option) => option.quantity <= 0}
                   isOptionEqualToValue={(option, val) =>
                     option._id === val || option._id === val?._id
                   }
@@ -133,6 +134,9 @@ export default function ProductPart({
                     </div>
                     <div>
                       <h1 className="font-bold"> {field.productDetials.name}</h1>
+                      <p className="text-xs text-slate-500">
+                        Stock disponible : {field.productDetials.quantity}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -155,6 +159,10 @@ export default function ProductPart({
                       min: {
                         value: 1,
                         message: "La quantité doit être supérieure à 1",
+                      },
+                      max: {
+                        value: field.productDetials.quantity,
+                        message: `Stock insuffisant (disponible : ${field.productDetials.quantity})`,
                       },
                     })}
                   />

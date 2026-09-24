@@ -15,12 +15,16 @@ const TransactionSchema = new mongoose.Schema({
   referenceId: {type:mongoose.Schema.Types.ObjectId},
   referenceModel: {
     type: String,
-    enum: ['Sale', 'Expense', 'Purchase','adjustment','return']
+    enum: ['Sale', 'Expense', 'Purchase','adjustment','return','FactureEmploi']
   },
-  performedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  performedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'Employee' },
   date: {type:Date,required:true,default:Date.now},
   note: {type:String,required:true}
   
 },{timestamps:true});
+
+// Finance views sorted by date, and lookups of the transaction behind a sale/purchase/payslip
+TransactionSchema.index({ date: -1 });
+TransactionSchema.index({ referenceId: 1 });
 
 module.exports = mongoose.model("Transaction", TransactionSchema);

@@ -9,7 +9,7 @@ const SaleSchema = new mongoose.Schema(
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: { type: Number, required: true },
         sellingPrice: { type: Number, required: true },
-        itemTotal: { type: Number }, // ← quantity × buyingPrice, calculated on save
+        itemTotal: { type: Number }, // ← quantity × sellingPrice (not computed yet, see REPORT_GAPS 2d)
       },
     ],
 
@@ -52,5 +52,9 @@ const SaleSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
+
+// Sales filtered by period, and the daily invoice counter in CreateSale
+SaleSchema.index({ saleDate: -1 });
+SaleSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("Sale", SaleSchema);

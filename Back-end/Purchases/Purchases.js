@@ -9,7 +9,7 @@ const PurchaseSchema = new mongoose.Schema({
       product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
       quantity: {type:Number,required:true},
       buyingPrice: {type:Number,required:true},
-      itemTotal: { type: Number } // ← quantity × buyingPrice, calculated on save
+      itemTotal: { type: Number } // ← quantity × buyingPrice (not computed yet, see REPORT_GAPS 2d)
     }
   ],
   totalAmount: {type:Number,default:0,required:true},

@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { DataTable } from "../UI/TablesUi/DataTable";
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
 import { Badge } from "@/components/ui/badge";
-import { User, Phone, Package, Calendar, Tag } from "lucide-react";
+import { User, Phone, Package, Calendar, Tag, Bell } from "lucide-react";
 
 export default function CustomersTable({
   data = [],
@@ -103,6 +103,24 @@ export default function CustomersTable({
             {new Date(row.getValue("createdAt")).toLocaleDateString("fr-FR")}
           </div>
         ),
+      },
+      {
+        accessorKey: "notifiedAt",
+        header: "Date de notification",
+        cell: ({ row }) => {
+          const notifiedAt = row.getValue("notifiedAt");
+          return notifiedAt ? (
+            <div className="flex items-center gap-2 text-blue-600 text-sm">
+              <Bell className="w-3.5 h-3.5" />
+              {new Date(notifiedAt).toLocaleString("fr-FR", {
+                dateStyle: "short",
+                timeStyle: "short",
+              })}
+            </div>
+          ) : (
+            <span className="text-gray-400 text-sm">—</span>
+          );
+        },
       },
       {
         id: "actions",
