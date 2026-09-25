@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import HeaderPage from '../UI/HeaderPage';
 import { useQuery } from "@tanstack/react-query";
 import { GetDeliverys } from '@/Servises/Delivery';
@@ -17,13 +17,23 @@ const isLateDelivery = (delivery) => {
 
 export default function DeliveryPage() {
   const { canAdd, canEdit, canDelete } = useModelPermissions("Livraisons");
+  // A livreur has "Gestion des Livraisons" but NOT the full "Livraisons" access.
+  // The back-end already filters their data; we just adapt the UI accordingly.
+  const { canView: isLivreurView } = useModelPermissions("Gestion des Livraisons");
+  const isLivreur = isLivreurView && !canAdd;
   const [isAdding, setIsAdding] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedDelivery, setSelectedDelivery] = useState(null);
 
-  const [statusFilter, setStatusFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(isLivreur ? "pending" : "");
   const [deliveryManFilter, setDeliveryManFilter] = useState(null);
+
+  useEffect(() => {
+    if (isLivreur) {
+      setStatusFilter("pending");
+    }
+  }, [isLivreur]);
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ['deliveries'],
@@ -53,7 +63,7 @@ export default function DeliveryPage() {
   const hasActiveFilters = !!(statusFilter || deliveryManFilter);
 
   const resetFilters = () => {
-    setStatusFilter("");
+    setStatusFilter(isLivreur ? "pending" : "");
     setDeliveryManFilter(null);
   };
 
@@ -69,22 +79,25 @@ export default function DeliveryPage() {
 
   return (
     <div className=''>
-      <HeaderPage 
+      <HeaderPage
         title="Gestion des Livraisons"
-        description="Suivez l'état des livraisons, gérez les livreurs et les délais d'arrivée."
+        description={isLivreur ? "Vos livraisons assignées." : "Suivez l'état des livraisons, gérez les livreurs et les délais d'arrivée."}
         isAjouter={canAdd}
         ButtonText="Planifier une livraison"
         onButtonClick={() => setIsAdding(true)}
       />
 
+      {/* The livreur only sees their own deliveries (filtered server-side), so
+          hiding the deliveryMan filter avoids a useless single-option dropdown. */}
       <DeliveryFilters
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
         deliveryManFilter={deliveryManFilter}
         setDeliveryManFilter={setDeliveryManFilter}
-        deliveryManOptions={deliveryManOptions}
+        deliveryManOptions={isLivreur ? [] : deliveryManOptions}
         onReset={resetFilters}
         hasActiveFilters={hasActiveFilters}
+        isLivreur={isLivreur}
       />
 
       <DeliveryTable

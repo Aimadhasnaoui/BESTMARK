@@ -242,6 +242,10 @@ export default function AddSlle() {
   }
   const onSubmit = (data) => {
     delete data.product;
+    // The "Livreur" field is stored as `deliveryId` in the form, but it holds the
+    // livreur's employee id: the back-end expects it as `deliveryMan`.
+    const { deliveryId: deliveryMan, ...rest } = data;
+    data = { ...rest, deliveryMan: NeedDelevry ? deliveryMan : undefined };
     const sendData = {
       ...data,
       subtotal: price.subtotal,
@@ -249,7 +253,6 @@ export default function AddSlle() {
       servedBy: userInfo?._id,
       requiresDelivery: NeedDelevry,
       totalAmount: price.totalAmount,
-      deliveryId:data.deliveryMan,
     };
     console.log(sendData);
     mutate(sendData);
@@ -377,6 +380,7 @@ export default function AddSlle() {
                     emploisData={emploisData}
                     productsData={productsData}
                     Controller={Controller}
+                    watch={watch}
                   />
                 )}
                 {pages.currentPage === pages.maxPage && (

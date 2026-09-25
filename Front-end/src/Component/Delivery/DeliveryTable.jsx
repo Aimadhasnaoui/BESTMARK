@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { DataTable } from "../UI/TablesUi/DataTable";
 import { ActionButtons } from "../UI/TablesUi/ActionButtons";
 import {
@@ -10,7 +10,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Timer,
+  Eye,
 } from "lucide-react";
+import { useModelPermissions } from "@/hooks/usePermissions";
+import DeliveryDetailsModal from "./Actions/DeliveryDetailsModal";
 
 export default function DeliveryTable({
   data = [],
@@ -20,6 +23,18 @@ export default function DeliveryTable({
   onDelete,
   onEdit,
 }) {
+  const { canView: canViewLivraisons } = useModelPermissions("Livraisons");
+  const { canView: isLivreurView } = useModelPermissions("Gestion des Livraisons");
+  const canViewDetails = canViewLivraisons || isLivreurView;
+
+  const [selectedDeliveryDetails, setSelectedDeliveryDetails] = useState(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  const handleViewDetails = (delivery) => {
+    setSelectedDeliveryDetails(delivery);
+    setIsDetailsOpen(true);
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -36,9 +51,19 @@ export default function DeliveryTable({
               <Truck className="w-4 h-4 text-blue-600" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-slate-800">
-                {row.original.sale?.invoiceNumber || "N/A"}
-              </span>
+              {canViewDetails ? (
+                <button
+                  type="button"
+                  onClick={() => handleViewDetails(row.original)}
+                  className="font-bold text-blue-600 hover:text-blue-800 hover:underline cursor-pointer text-left"
+                >
+                  {row.original.sale?.invoiceNumber || "N/A"}
+                </button>
+              ) : (
+                <span className="font-bold text-slate-800">
+                  {row.original.sale?.invoiceNumber || "N/A"}
+                </span>
+              )}
             </div>
           </div>
         ),
@@ -160,24 +185,34 @@ export default function DeliveryTable({
         accessorKey: "actions",
         cell: ({ row }) => (
           <ActionButtons
+            isSee={canViewDetails}
+            onSee={() => handleViewDetails(row.original)}
             onEdit={onEdit ? () => onEdit(row.original) : undefined}
             onDelete={onDelete ? () => onDelete(row.original) : undefined}
           />
         ),
       },
     ],
-    [onEdit, onDelete],
+    [onEdit, onDelete, canViewDetails],
   );
 
   return (
-    <DataTable
-      columns={columns}
-      data={data}
-      isLoading={isLoading}
-      isError={isError}
-      ErrorMessage={ErrorMessage}
-      TableTitle="Livraisons"
-      isAjouter={false}
-    />
+    <>
+      <DataTable
+        columns={columns}
+        data={data}
+        isLoading={isLoading}
+        isError={isError}
+        ErrorMessage={ErrorMessage}
+        TableTitle="Livraisons"
+        isAjouter={false}
+      />
+
+      <DeliveryDetailsModal
+        open={isDetailsOpen}
+        onClose={() => setIsDetailsOpen(false)}
+        delivery={selectedDeliveryDetails}
+      />
+    </>
   );
 }

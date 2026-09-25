@@ -17,6 +17,14 @@ import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import { Truck, User, MapPin, Calendar } from "lucide-react";
 
+const STATUS_OPTIONS = [
+  { value: "pending", label: "En attente" },
+  { value: "preparing", label: "Préparation" },
+  { value: "on_route", label: "En route" },
+  { value: "arrived", label: "Livré" },
+  { value: "failed", label: "Échoué" },
+];
+
 export default function Add({ isAdding, setIsAdding }) {
   const queryClient = useQueryClient();
   const {
@@ -42,11 +50,13 @@ export default function Add({ isAdding, setIsAdding }) {
   const { data: salesData } = useQuery({
     queryKey: ["sales"],
     queryFn: GetSales,
+    enabled: isAdding,
   });
 
   const { data: employeesData } = useQuery({
     queryKey: ["employees"],
     queryFn: () => GetEmployees("69f5c02c8a334dc5b3181c40"),
+    enabled: isAdding,
   });
 
   // Filter sales that require delivery
@@ -130,11 +140,13 @@ export default function Add({ isAdding, setIsAdding }) {
                   <Controller
                     name="status"
                     control={control}
-                    render={({ field }) => (
+                    render={({ field: { onChange, value } }) => (
                       <Autocomplete
-                        options={['pending', 'preparing', 'on_route', 'arrived', 'failed']}
-                        value={field.value}
-                        onChange={(_, newValue) => field.onChange(newValue)}
+                        options={STATUS_OPTIONS}
+                        getOptionLabel={(option) => option.label || ""}
+                        isOptionEqualToValue={(option, val) => option.value === val}
+                        value={STATUS_OPTIONS.find((opt) => opt.value === value) || null}
+                        onChange={(_, newValue) => onChange(newValue?.value || "")}
                         renderInput={(params) => <TextField {...params} size="small" />}
                       />
                     )}

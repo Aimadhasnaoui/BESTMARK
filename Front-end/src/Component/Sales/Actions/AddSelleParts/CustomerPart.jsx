@@ -1,5 +1,5 @@
 import React from "react";
-import { User, Van } from "lucide-react";
+import { User, Van, Banknote } from "lucide-react";
 import Switch from "@mui/material/Switch";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
@@ -14,7 +14,9 @@ export default function CustomerPart({
   emploisData,
   productsData,
   Controller,
+  watch,
 }) {
+  const payementInlivrisan = watch("payementInlivrisan");
   return (
     <div className="border-2 border-[#E2E8F0] p-4 rounded-md h-full">
       <div className="flex items-center justify-between my-2">
@@ -202,6 +204,28 @@ export default function CustomerPart({
             {errors.deliveryfees && (
               <FieldError>{errors.deliveryfees.message}</FieldError>
             )}
+          </div>
+
+          <div className="py-3 border rounded-md px-3 bg-[#F8FAFC] flex justify-between items-center">
+            <div className="flex gap-3 items-center">
+              <div className="bg-white rounded-full w-fit p-2 flex items-center justify-center">
+                <Banknote size={20} color="#475569" />
+              </div>
+              <div>
+                <h1 className="text-[#0F172A] text-base">Payer à la livraison</h1>
+                <h2 className="text-[11px] text-[#64748B]">
+                  Le client paiera lors de la réception
+                </h2>
+              </div>
+            </div>
+            <Controller
+              name="payementInlivrisan"
+              control={control}
+              defaultValue={false}
+              render={({ field: { onChange, value } }) => (
+                <Switch checked={!!value} onChange={(e) => onChange(e.target.checked)} />
+              )}
+            />
           </div>
         </div>
       )}

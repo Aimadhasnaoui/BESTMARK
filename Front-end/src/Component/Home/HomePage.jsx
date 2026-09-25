@@ -79,8 +79,8 @@ if(isSuccess){
               canBuy={canBuy}
               canSell={canSell}
             />
-              <Add isAdding={openAddBuyerModal} setIsAdding={setOpenAddBuyerModal} />
-              <AddSlle></AddSlle>
+              {canBuy && <Add isAdding={openAddBuyerModal} setIsAdding={setOpenAddBuyerModal} />}
+              {canSell && <AddSlle></AddSlle>}
           </main>
         </SidebarProvider>
       ) : (

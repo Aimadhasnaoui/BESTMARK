@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Sale from "./sales.js";
 import { catchAsync, transactional } from "../utils/CatchFunction.js";
 import APPError from "../utils/ErrorHandler.js";
@@ -5,6 +6,7 @@ import Delivery from "../Delivery/Delivery.js";
 import Products from "../Products/Product/Products.js";
 import TranTransaction from "../Transactions/Transaction.js";
 import StockMovement from "../stockMovements/StockMovement.js";
+import { createNotification } from "../Notifications/Controller.js";
 
 export const CreateSale = transactional(async (req, res, next, session) => {
   const {
@@ -36,7 +38,34 @@ export const CreateSale = transactional(async (req, res, next, session) => {
 
   req.body.invoiceNumber = invoiceNumber;
 
-  const [saledata] = await Sale.create([req.body], session);
+  // deliveryId is required when requiresDelivery is true, so the delivery is
+  // created first (with a pre-generated sale id) and the sale is saved with it.
+  const saleId = new mongoose.Types.ObjectId();
+  delete req.body.deliveryId;
+  let Deliverydata = null;
+  if (requiresDelivery) {
+    [Deliverydata] = await Delivery.create(
+      [
+        {
+          sale: saleId,
+          deliveryMan: deliveryMan || undefined,
+          deliveryAddress: {
+            street: req.body.street || (typeof deliveryAddress === "string" ? deliveryAddress : deliveryAddress?.street || ""),
+            city: req.body.city || deliveryAddress?.city || "",
+            phone: req.body.customerPhone || deliveryAddress?.phone || "",
+            notes: req.body.notes || deliveryAddress?.notes || "",
+          },
+          deliveryfees: deliveryfees,
+        },
+      ],
+      { session },
+    );
+    req.body.deliveryId = Deliverydata._id;
+  }
+
+  const [saledata] = await Sale.create([{ ...req.body, _id: saleId }], {
+    session,
+  });
   const ProdcutsName = [];
 
   for (const item of items) {
@@ -89,26 +118,16 @@ export const CreateSale = transactional(async (req, res, next, session) => {
     ],
     { session },
   );
-  if (requiresDelivery) {
-    const [Deliverydata] = await Delivery.create(
-      [
-        {
-          sale: saledata._id,
-          deliveryMan: deliveryMan,
-          deliveryAddress: {
-            street: req.body.street || (typeof req.body.deliveryAddress === "string" ? req.body.deliveryAddress : req.body.deliveryAddress?.street || ""),
-            city: req.body.city || req.body.deliveryAddress?.city || "",
-            phone: req.body.customerPhone || req.body.deliveryAddress?.phone || "",
-            notes: req.body.notes || req.body.deliveryAddress?.notes || "",
-          },
-          deliveryfees: deliveryfees,
-        },
-      ],
-      { session },
+  if (Deliverydata?.deliveryMan) {
+    await createNotification(
+      {
+        emploisId: Deliverydata.deliveryMan,
+        message: `${req.user.name} vous a assigné une nouvelle livraison pour la vente ${invoiceNumber}${req.body.customerName ? ` (client : ${req.body.customerName})` : ""}.`,
+        path: "/delivery",
+        type: "info",
+      },
+      session,
     );
-
-    saledata.deliveryId = Deliverydata._id;
-    await saledata.save({ session });
   }
   res.status(201).json({ success: true, saledata });
 });

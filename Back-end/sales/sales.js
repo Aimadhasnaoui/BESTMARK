@@ -40,6 +40,7 @@ const SaleSchema = new mongoose.Schema(
     customerName: { type: String, default: null },
     customerPhone: { type: String, default: null },
     requiresDelivery: { type: Boolean, default: false },
+    payementInlivrisan: { type: Boolean, default: false },
     deliveryId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Delivery",

@@ -23,6 +23,7 @@ import Dashboard from "./Dashboard/Router.js";
 import Product from "./Products/Product/Router.js";
 import Category from "./Products/Productcategories/Router.js";
 import PermissionModel from "./PermissionModels/Router.js";
+import Notification from "./Notifications/Router.js";
 import { LoginEmplois, Protect } from "./Employes/Emplye/AuthEmployee.js";
 import { RequirePermission } from "./Midelwars/RequirePermission.js";
 import rateLimit from "express-rate-limit";
@@ -121,7 +122,8 @@ app.use("/api/users", Protect, User);
 app.use("/api/transactions", Protect, RequirePermission(["Finance", "Finance Rapport"]), Transaction);
 app.use("/api/stock-movements", Protect, RequirePermission("Gestion de Stock"), StockMovement);
 app.use("/api/customers", Protect, RequirePermission("Demandes clients"), Customer);
-app.use("/api/delivery", Protect, RequirePermission("Livraisons"), Delivery);
+// "Livraisons" = full manager access; "Gestion des Livraisons" = livreur's own deliveries only
+app.use("/api/delivery", Protect, RequirePermission(["Livraisons", "Gestion des Livraisons"]), Delivery);
 app.use("/api/purchases", Protect, RequirePermission("Achats"), Purchase);
 app.use("/api/suppliers", Protect, RequirePermission("Fournisseurs"), Supplier);
 app.use("/api/sales", Protect, RequirePermission("Ventes"), Sale);
@@ -134,6 +136,8 @@ app.use("/api/dashboard", Protect, RequirePermission("Tableau de bord"), Dashboa
 app.use("/api/products", Protect, RequirePermission("Produits"), Product);
 app.use("/api/categories/products", Protect, RequirePermission("Types de produits"), Category);
 app.use("/api/permission-models", Protect, RequirePermission("Modèles & Permissions"), PermissionModel);
+// Notifications are scoped to the logged-in employee, so no model permission gate.
+app.use("/api/notifications", Protect, Notification);
 app.post("/api/auth/login", loginLimiter, LoginEmplois);
 // Fin des routes de l'API
 
