@@ -4,6 +4,8 @@ import APPError from "../utils/ErrorHandler.js";
 import { createNotification } from "../Notifications/Controller.js";
 import TranTransaction from "../Transactions/Transaction.js";
 import Sale from "../sales/sales.js";
+import Employee from "../Employes/Emplye/Employee.js";
+import EmployeeType from "../Employes/typeemplois/EmployeeType.js";
 
 const DELIVERY_PATH = "/delivery";
 
@@ -15,19 +17,22 @@ const STATUS_LABELS = {
   failed: "échouée",
 };
 
-// Final statuses are reported to the manager (MANAGER_ID in .env)
+// Final statuses are reported to all Manager employees
 const MANAGER_STATUS_TYPES = {
   arrived: "success",
   failed: "alert",
 };
 
-const notifyManager = (message, type = "info") =>
-  createNotification({
-    emploisId: process.env.MANAGER_ID,
-    message,
-    path: DELIVERY_PATH,
-    type,
-  });
+const notifyManager = async (message, type = "info") => {
+  const managerType = await EmployeeType.findOne({ name: "Manager" }).select("_id");
+  if (!managerType) return;
+  const managers = await Employee.find({ mission: managerType._id, isActive: true }).select("_id");
+  await Promise.all(
+    managers.map((m) =>
+      createNotification({ emploisId: m._id, message, path: DELIVERY_PATH, type }),
+    ),
+  );
+};
 
 const notifyLivreur = (delivery, message, type = "info") =>
   createNotification({

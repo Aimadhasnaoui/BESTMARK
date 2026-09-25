@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const PermissionSchema = new mongoose.Schema(
   {
@@ -27,4 +27,4 @@ const EmployeeTypeSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-module.exports = mongoose.model("EmployeeType", EmployeeTypeSchema);
+export default mongoose.model("EmployeeType", EmployeeTypeSchema);
