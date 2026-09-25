@@ -106,10 +106,19 @@ export default function ProductPart({
       ) : (
         <div className="max-h-[300px] overflow-y-auto hide-scrollbar pr-2 mt-4 space-y-4">
           {fields.map((field, index) => {
+            const maxStock = field.productDetials?.quantity || 1;
+            const rawQty = watchItems?.[index]?.quantity;
             const currentQuantity =
-              watchItems?.[index]?.quantity ?? field.quantity ?? 1;
+              rawQty !== undefined && rawQty !== null && !isNaN(Number(rawQty))
+                ? Math.max(1, Math.min(Number(rawQty), maxStock))
+                : field.quantity || 1;
+
+            const rawPrice = watchItems?.[index]?.sellingPrice;
             const currentPrice =
-              watchItems?.[index]?.sellingPrice ?? field.sellingPrice ?? 0;
+              rawPrice !== undefined && rawPrice !== null && !isNaN(Number(rawPrice))
+                ? Math.max(0, Number(rawPrice))
+                : field.sellingPrice || 0;
+
             const totalPrice = (currentQuantity * currentPrice).toFixed(2);
 
             return (
@@ -145,12 +154,15 @@ export default function ProductPart({
                   <TextField
                     type="number"
                     size="small"
+                    slotProps={{
+                      htmlInput: {
+                        min: 1,
+                        max: maxStock,
+                      },
+                    }}
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         borderRadius: 1,
-                      },
-                      "& .MuiAutocomplete-input": {
-                        paddingLeft: "35px !important",
                       },
                     }}
                     {...register(`items.${index}.quantity`, {
@@ -158,11 +170,20 @@ export default function ProductPart({
                       valueAsNumber: true,
                       min: {
                         value: 1,
-                        message: "La quantité doit être supérieure à 1",
+                        message: "La quantité doit être supérieure ou égale à 1",
                       },
                       max: {
-                        value: field.productDetials.quantity,
-                        message: `Stock insuffisant (disponible : ${field.productDetials.quantity})`,
+                        value: maxStock,
+                        message: `Stock insuffisant (disponible : ${maxStock})`,
+                      },
+                      onChange: (e) => {
+                        let val = parseInt(e.target.value, 10);
+                        if (isNaN(val) || val < 1) {
+                          val = 1;
+                        } else if (val > maxStock) {
+                          val = maxStock;
+                        }
+                        e.target.value = val;
                       },
                     })}
                   />
@@ -177,13 +198,25 @@ export default function ProductPart({
                   <TextField
                     type="number"
                     size="small"
-                    step="0.01"
+                    slotProps={{
+                      htmlInput: {
+                        min: 0,
+                        step: "0.01",
+                      },
+                    }}
                     {...register(`items.${index}.sellingPrice`, {
                       required: "Le prix de vente est requis",
                       valueAsNumber: true,
                       min: {
                         value: 0,
                         message: "Le prix doit être supérieur ou égal à 0",
+                      },
+                      onChange: (e) => {
+                        let val = parseFloat(e.target.value);
+                        if (isNaN(val) || val < 0) {
+                          val = 0;
+                        }
+                        e.target.value = val;
                       },
                     })}
                   />

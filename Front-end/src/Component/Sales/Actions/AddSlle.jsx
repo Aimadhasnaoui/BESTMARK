@@ -10,7 +10,7 @@ import Divider from "@mui/material/Divider";
 import { X } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { useForm, Controller, useFieldArray } from "react-hook-form";
+import { useForm, Controller, useFieldArray, useWatch } from "react-hook-form";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { AddSale } from "@/Servises/Sales";
 import { GetSuppliers } from "@/Servises/Suppliers";
@@ -84,10 +84,13 @@ export default function AddSlle() {
     control,
     name: "items",
   });
-  const watchItems = watch("items");
-  const paidAmount = watch("paidAmount");
-  const discount = watch("discount");
-  const deliveryfees = watch("deliveryfees");
+  const watchItems = useWatch({ control, name: "items" });
+  const paidAmount = useWatch({ control, name: "paidAmount" });
+  const discount = useWatch({ control, name: "discount" });
+  const deliveryfees = useWatch({ control, name: "deliveryfees" });
+  const payementInlivrisan = useWatch({ control, name: "payementInlivrisan" });
+
+  const effectiveMaxPage = payementInlivrisan ? 1 : 2;
 
   const { data: productsData } = useQuery({
     queryKey: ["products"],
@@ -127,9 +130,9 @@ export default function AddSlle() {
 
   useEffect(() => {
     register("paymentMethod", {
-      required: "Veuillez sélectionner une méthode de paiement",
+      required: payementInlivrisan ? false : "Veuillez sélectionner une méthode de paiement",
     });
-  }, [register]);
+  }, [register, payementInlivrisan]);
 
   useEffect(() => {
     if (openAddSellerModal && prefillProduct && fields.length === 0) {
@@ -147,30 +150,34 @@ export default function AddSlle() {
     // Calculate subtotal dynamically using quantity * sellingPrice
     const subtotalprice =
       watchItems?.reduce(
-        (accumulator, currentValue) =>
-          accumulator +
-          (currentValue.quantity || 0) * (currentValue.sellingPrice || 0),
+        (accumulator, currentValue) => {
+          const qty = Number(currentValue?.quantity) || 0;
+          const priceVal = Number(currentValue?.sellingPrice) || 0;
+          return accumulator + qty * priceVal;
+        },
         0,
       ) || 0;
 
     const discVal = Number(discount || 0);
     const delFeesVal = NeedDelevry ? Number(deliveryfees || 0) : 0;
-    let paidVal = Number(paidAmount || 0);
+    let paidVal = payementInlivrisan ? 0 : Number(paidAmount || 0);
 
     const total = Math.max(0, subtotalprice - discVal + delFeesVal);
 
-    if (paidVal > total && total > 0) {
+    if (!payementInlivrisan && paidVal > total && total > 0) {
       setValue("paidAmount", total);
       paidVal = total;
     }
 
     const remain = Math.max(0, total - paidVal);
 
-    let status = "unpaid";
-    if (paidVal >= total && total > 0) {
-      status = "paid";
-    } else if (paidVal > 0 && paidVal < total) {
-      status = "partial";
+    let status = payementInlivrisan ? "unpaid" : "unpaid";
+    if (!payementInlivrisan) {
+      if (paidVal >= total && total > 0) {
+        status = "paid";
+      } else if (paidVal > 0 && paidVal < total) {
+        status = "partial";
+      }
     }
 
     setprice({
@@ -180,7 +187,8 @@ export default function AddSlle() {
     });
 
     setValue("paymentStatus", status);
-  }, [watchItems, discount, deliveryfees, paidAmount, NeedDelevry, setValue]);
+  }, [watchItems, discount, deliveryfees, paidAmount, NeedDelevry, payementInlivrisan, setValue]);
+
   // 1. On liste les champs par numéro de page
   const FIELDS_BY_PAGE = {
     0: ["items", "product"],
@@ -205,13 +213,12 @@ export default function AddSlle() {
 
       // Déclencher la validation uniquement pour ces champs
       const isStepValid = await trigger(fieldsToValidate);
-      console.log("Étape valide ?", isStepValid);
 
       // Si la page contient une erreur, on arrête la fonction ici !
       if (!isStepValid) return;
 
       // Si tout est valide, on passe à la suite
-      if (pages.currentPage !== pages.maxPage) {
+      if (pages.currentPage < effectiveMaxPage) {
         setpages((pre) => ({
           ...pre,
           currentPage: pre.currentPage + 1,
@@ -231,7 +238,7 @@ export default function AddSlle() {
 
   function handleClose() {
     setOpenAddSellerModal(false);
-    reset({ items: [], discount: 0, deliveryfees: 0, paidAmount: 0 }); // Reset form values, including the items field array
+    reset({ items: [], discount: 0, deliveryfees: 0, paidAmount: 0, payementInlivrisan: false }); // Reset form values
     resetMutation(); // Reset mutation state
     setNeedDelevry(false);
     setPrefillProduct(null);
@@ -240,21 +247,24 @@ export default function AddSlle() {
       maxPage: 2,
     });
   }
+
   const onSubmit = (data) => {
     delete data.product;
-    // The "Livreur" field is stored as `deliveryId` in the form, but it holds the
-    // livreur's employee id: the back-end expects it as `deliveryMan`.
     const { deliveryId: deliveryMan, ...rest } = data;
+    const isPayOnDelivery = !!data.payementInlivrisan;
+
     data = { ...rest, deliveryMan: NeedDelevry ? deliveryMan : undefined };
     const sendData = {
       ...data,
       subtotal: price.subtotal,
-      remainAmount: price.remainAmount,
+      paidAmount: isPayOnDelivery ? 0 : data.paidAmount || 0,
+      remainAmount: isPayOnDelivery ? price.totalAmount : price.remainAmount,
+      paymentStatus: isPayOnDelivery ? "unpaid" : data.paymentStatus || "unpaid",
+      paymentMethod: isPayOnDelivery ? (data.paymentMethod || "cash") : data.paymentMethod,
       servedBy: userInfo?._id,
       requiresDelivery: NeedDelevry,
       totalAmount: price.totalAmount,
     };
-    console.log(sendData);
     mutate(sendData);
   };
 
@@ -319,7 +329,7 @@ export default function AddSlle() {
                   Montant Payé :
                 </span>
                 <span className="font-bold text-emerald-600">
-                  {(watch("paidAmount") || 0).toFixed(2)} DH
+                  {(payementInlivrisan ? 0 : paidAmount || 0).toFixed(2)} DH
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -327,7 +337,7 @@ export default function AddSlle() {
                   Reste à payer :
                 </span>
                 <span className="font-bold text-amber-600">
-                  {price.remainAmount.toFixed(2)} DH
+                  {(payementInlivrisan ? price.totalAmount : price.remainAmount).toFixed(2)} DH
                 </span>
               </div>
             </div>
@@ -383,7 +393,7 @@ export default function AddSlle() {
                     watch={watch}
                   />
                 )}
-                {pages.currentPage === pages.maxPage && (
+                {!payementInlivrisan && pages.currentPage === 2 && (
                   <PaymentPart
                     register={register}
                     watch={watch}
@@ -429,10 +439,10 @@ export default function AddSlle() {
                 >
                   {isPending
                     ? "Enregistrement..."
-                    : pages.currentPage === pages.maxPage
+                    : pages.currentPage === effectiveMaxPage
                       ? "Confirmer la vente"
                       : "Prochaine étape"}
-                  {!isPending && pages.currentPage !== pages.maxPage && (
+                  {!isPending && pages.currentPage !== effectiveMaxPage && (
                     <ArrowRight size={12}></ArrowRight>
                   )}
                 </button>

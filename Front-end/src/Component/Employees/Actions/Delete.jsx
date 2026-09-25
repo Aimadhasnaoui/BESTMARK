@@ -25,7 +25,7 @@ export default function Delete({ isDeleting, setIsDeleting, selectedEmployee }) 
       setIsOpen={setIsDeleting}
       title="Supprimer l'employé"
       description={`Êtes-vous sûr de vouloir supprimer l'employé "${selectedEmployee?.name}" ? Cette action est irréversible.`}
-      handleSubmit={mutate}
+      handelDelet={mutate}
       isPending={isPending}
     />
   );
