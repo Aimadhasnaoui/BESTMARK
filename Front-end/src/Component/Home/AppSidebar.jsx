@@ -37,7 +37,12 @@ import {
 import { usePermissions } from "@/hooks/usePermissions";
 
 export default function AppSidebar({ currentPage, setcurrentPage }) {
-  const { state, setOpen } = useSidebar();
+  const { state, setOpen, isMobile, setOpenMobile } = useSidebar();
+
+  const handleNavClick = (id) => {
+    setcurrentPage(id);
+    if (isMobile) setOpenMobile(false);
+  };
   const navigate = useNavigate();
   const { permissions } = usePermissions();
   const { mutate, isError } = useMutation({
@@ -129,7 +134,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
               <SidebarMenuButton asChild>
                 <Link
                   to={item.path}
-                  onClick={() => setcurrentPage(item.id)}
+                  onClick={() => handleNavClick(item.id)}
                   className={`rounded-none cursor-pointer transition-all ${
                     currentPage === item.id
                       ? "bg-[#EFF6FF] border-l-4 border-[#0066FF] text-[#2563EB]"
@@ -155,7 +160,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
             <SidebarMenuButton asChild>
               <Link
                 to="/profile"
-                onClick={() => setcurrentPage("profile")}
+                onClick={() => handleNavClick("profile")}
                 className={`rounded-none cursor-pointer transition-all ${
                   currentPage === "profile"
                     ? "bg-[#EFF6FF] border-l-4 border-[#0066FF] text-[#2563EB]"
@@ -176,7 +181,7 @@ export default function AppSidebar({ currentPage, setcurrentPage }) {
               <SidebarMenuButton asChild>
                 <Link
                   to="/settings"
-                  onClick={() => setcurrentPage("settings")}
+                  onClick={() => handleNavClick("settings")}
                   className={`rounded-none cursor-pointer transition-all ${
                     currentPage === "settings"
                       ? "bg-[#EFF6FF] border-l-4 border-[#0066FF] text-[#2563EB]"

@@ -56,10 +56,10 @@ export function DataTable({
   const onPageChange = serverPagination?.onPageChange;
 
   return (
-    <div className="p-6">
+    <div className="p-3 sm:p-6">
       {/* Search Input */}
-      <div className="flex justify-between items-center py-2 mb-4">
-        <InputGroup className="w-[350px] rounded-md bg-white">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center py-2 mb-4">
+        <InputGroup className="w-full sm:w-[350px] rounded-md bg-white">
           <InputGroupAddon>
             <Search className="w-4 h-4 text-gray-400" />
           </InputGroupAddon>
@@ -146,7 +146,7 @@ export function DataTable({
 
       {/* Pagination Controls */}
       {isServerPaginated ? (
-        <div className="flex items-center justify-between px-4 py-3 bg-white border-t">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 bg-white border-t">
           <div className="flex gap-2 items-center">
             <span className="text-sm text-gray-700">
               Page{" "}
@@ -187,8 +187,8 @@ export function DataTable({
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-between px-4 py-3 bg-white border-t">
-          <div className="flex gap-2 items-center">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 py-3 bg-white border-t">
+          <div className="flex flex-wrap gap-2 items-center">
             {/* Page Info */}
             <span className="text-sm text-gray-700">
               showing{" "}

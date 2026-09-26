@@ -53,7 +53,7 @@ export default function NavSearch() {
 
   return (
     <div ref={searchRef} className="relative">
-      <InputGroup className="h-10 w-[450px] rounded-full border-transparent bg-[#F1F5F9] px-1 shadow-none transition-all focus-within:border-[#2563EB] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#2563EB]/10">
+      <InputGroup className="h-10 w-full max-w-[450px] rounded-full border-transparent bg-[#F1F5F9] px-1 shadow-none transition-all focus-within:border-[#2563EB] focus-within:bg-white focus-within:ring-4 focus-within:ring-[#2563EB]/10">
         <InputGroupAddon className="pl-3">
           <Search className="h-4 w-4 text-[#94A3B8] transition-colors group-focus-within/input-group:text-[#2563EB]" />
         </InputGroupAddon>

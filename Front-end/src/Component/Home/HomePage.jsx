@@ -70,7 +70,7 @@ if(isSuccess){
           />
           <main className="flex-1 min-w-0 relative">
             <NavBar />
-            <div className="px-6 py-4 bg-[#f7f9fb] min-h-screen">
+            <div className="px-3 py-3 sm:px-6 sm:py-4 bg-[#f7f9fb] min-h-screen overflow-x-hidden">
               <Outlet />
             </div>
             <AddButton

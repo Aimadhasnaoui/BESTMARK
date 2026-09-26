@@ -53,17 +53,19 @@ export default function NavBar() {
   }, [location]);
 
   return (
-    <div className="w-full py-3 px-4 flex items-center justify-between gap-3 border-b border-slate-200 bg-white">
-      <div className="flex items-center gap-3 ">
-        <SidebarTrigger />
+    <div className="sticky top-0 z-30 w-full py-3 px-4 flex items-center justify-between gap-3 border-b border-slate-200 bg-white">
+      <div className="flex items-center gap-3 min-w-0">
+        <SidebarTrigger className="shrink-0" />
         <h1 className="truncate text-base font-medium text-[#2563EB]">
           {PageName}
         </h1>
       </div>
 
-      <NavSearch />
+      <div className="hidden sm:flex flex-1 justify-center px-4">
+        <NavSearch />
+      </div>
 
-      <div className="flex gap-4 items-center">
+      <div className="flex gap-3 sm:gap-4 items-center shrink-0">
         <Notification />
         <UserMenu />
       </div>
